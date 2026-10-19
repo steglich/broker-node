@@ -5,8 +5,13 @@ packages:
   - 'scenarios'
   - 'infra'
 
+# Scripts de instalação bloqueados: todos opcionais (binários pré-compilados ou aceleração nativa).
 allowBuilds:
   unrs-resolver: false
+  esbuild: false
+  cpu-features: false
+  ssh2: false
+  protobufjs: false
 
 # Necessário para `pnpm deploy` copiar os pacotes do workspace para a imagem (D22).
 injectWorkspacePackages: true

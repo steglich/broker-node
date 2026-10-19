@@ -1,0 +1,36 @@
+{
+  "name": "@broker/persistence",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kysely + pg: conexão, numeric↔Decimal, transações, migrador, tabelas técnicas, criptografia de campo e eleição de líder.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@broker/domain-kernel": "workspace:*",
+    "kysely": "0.29.6",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@testcontainers/postgresql": "12.2.0",
+    "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
+    "testcontainers": "12.2.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

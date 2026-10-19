@@ -29,10 +29,10 @@
 
 ## 4. Fase 0 — Persistência
 
-- [ ] 4.1 Implementar `packages/persistence` com Kysely + `pg`, conversão `numeric`↔`Decimal`, helper de transação e o migrador one-shot com o usuário de migração; verificar com Testcontainers uma migração e uma transação com rollback
-- [ ] 4.2 Criar as migrações-base reutilizáveis (`outbox_event`, `processed_event`, `consumer_offset`, `idempotency_record`, `saga_instance`, `dead_letter`, `blocked_key`, `parked_message`) e o helper de tabela append-only (grant sem UPDATE/DELETE + gatilho); verificar que um UPDATE numa tabela append-only falha (RN-DB §3, §4)
-- [ ] 4.3 Implementar a criptografia de campo AES-256-GCM com envelope encryption e o hash HMAC para busca; verificar com teste o round-trip e que o valor gravado está cifrado (RN-DB-031)
-- [ ] 4.4 Implementar a eleição de líder por advisory lock com heartbeat; verificar com dois processos que só um fica líder e que o outro assume quando o primeiro morre (RN-ENV-021)
+- [x] 4.1 Implementar `packages/persistence` com Kysely + `pg`, conversão `numeric`↔`Decimal`, helper de transação e o migrador one-shot com o usuário de migração; verificar com Testcontainers uma migração e uma transação com rollback
+- [x] 4.2 Criar as migrações-base reutilizáveis (`outbox_event`, `processed_event`, `consumer_offset`, `idempotency_record`, `saga_instance`, `dead_letter`, `blocked_key`, `parked_message`) e o helper de tabela append-only (grant sem UPDATE/DELETE + gatilho); verificar que um UPDATE numa tabela append-only falha (RN-DB §3, §4)
+- [x] 4.3 Implementar a criptografia de campo AES-256-GCM com envelope encryption e o hash HMAC para busca; verificar com teste o round-trip e que o valor gravado está cifrado (RN-DB-031)
+- [x] 4.4 Implementar a eleição de líder por advisory lock com heartbeat; verificar com dois processos que só um fica líder e que o outro assume quando o primeiro morre (RN-ENV-021)
 
 ## 5. Fase 0 — Mensageria (RabbitMQ streams)
 

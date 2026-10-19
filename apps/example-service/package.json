@@ -9,6 +9,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@broker/persistence": "workspace:*",
+    "kysely": "0.29.6",
     "pg": "^8.23.1"
   },
   "devDependencies": {

@@ -1,19 +1,20 @@
 // One-shot de migração: roda com <svc>_migrator e termina. O serviço só sobe depois dele.
-import { connect } from './db.js';
+import { baseMigrations, runMigrationsFromEnv } from '@broker/persistence';
+import { sql, type Kysely } from 'kysely';
 
-const client = connect();
-await client.connect();
-try {
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS migration_marker (
-      id integer PRIMARY KEY,
-      migrated_at timestamptz NOT NULL DEFAULT now()
-    )`);
-  await client.query(
-    `INSERT INTO migration_marker (id) VALUES (1)
-     ON CONFLICT (id) DO UPDATE SET migrated_at = now()`,
-  );
-  console.log('migração concluída');
-} finally {
-  await client.end();
-}
+process.exitCode = await runMigrationsFromEnv({
+  ...baseMigrations,
+  '0001_migration_marker': {
+    async up(db: Kysely<unknown>) {
+      // IF NOT EXISTS: o volume local pode ter a tabela da versão anterior do exemplo.
+      await sql`
+        CREATE TABLE IF NOT EXISTS migration_marker (
+          id integer PRIMARY KEY,
+          migrated_at timestamptz NOT NULL DEFAULT now()
+        )`.execute(db);
+      await sql`INSERT INTO migration_marker (id) VALUES (1) ON CONFLICT (id) DO UPDATE SET migrated_at = now()`.execute(
+        db,
+      );
+    },
+  },
+});

@@ -38,17 +38,17 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Dados
 
-| Conceito                 | Tecnologia                                                                                          | Decisão |
-| ------------------------ | --------------------------------------------------------------------------------------------------- | ------- |
-| Banco de dados           | PostgreSQL 17 em Docker; um database e duas credenciais (`<svc>_app`, `<svc>_migrator`) por serviço | D4      |
-| Acesso a dados           | Kysely + `pg`; `numeric` convertido para `Decimal` no adaptador                                     | D4      |
-| Migrações                | `Migrator` do Kysely em contêiner one-shot, padrão expand/contract                                  | D4      |
-| Tabelas append-only      | Grant sem `UPDATE`/`DELETE` + gatilho de recusa                                                     | D4      |
-| Eleição de líder         | Advisory locks de sessão do PostgreSQL com heartbeat                                                | D14     |
-| Cache                    | Valkey (rate limit, revogação de tokens, idempotência rápida, cache da brapi, tempo real)           | D16     |
-| Armazenamento de objetos | MinIO (`documents`, `reports`, `brapi-raw`, `audit-anchors` com object lock/WORM)                   | D16     |
-| Criptografia de campo    | AES-256-GCM (`node:crypto`) com envelope encryption; busca por HMAC-SHA256                          | D18     |
-| Documentos               | `pdfkit` (PDF) e escritor CSV próprio                                                               | D19     |
+| Conceito                 | Tecnologia                                                                                                                                                                                                           | Decisão |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Banco de dados           | PostgreSQL 17 em Docker; um database e duas credenciais (`<svc>_app`, `<svc>_migrator`) por serviço                                                                                                                  | D4      |
+| Acesso a dados           | Kysely 0.29 + `pg` (`@broker/persistence`); `numeric` → `Decimal` e `int8` → `bigint` na leitura (parser de tipos do pool), `Decimal` → string exata na escrita (plugin do Kysely)                                   | D4      |
+| Migrações                | `Migrator` do Kysely (`kysely/migration`), tabela `schema_migration`, em contêiner one-shot com `<svc>_migrator` (`runMigrationsFromEnv`); migrações-base reutilizáveis (`baseMigrations`)                           | D4      |
+| Tabelas append-only      | Grant sem `UPDATE`/`DELETE` + gatilho de recusa                                                                                                                                                                      | D4      |
+| Eleição de líder         | Advisory lock de sessão do PostgreSQL (`pg_try_advisory_lock`) numa conexão dedicada, com heartbeat que confere o lock em `pg_locks` (`LeaderElector`)                                                               | D14     |
+| Cache                    | Valkey (rate limit, revogação de tokens, idempotência rápida, cache da brapi, tempo real)                                                                                                                            | D16     |
+| Armazenamento de objetos | MinIO (`documents`, `reports`, `brapi-raw`, `audit-anchors` com object lock/WORM)                                                                                                                                    | D16     |
+| Criptografia de campo    | AES-256-GCM (`node:crypto`) com envelope encryption: chave-mestra em Docker secret, chaves de dados cifradas na tabela `data_key` (com rotação), contexto do campo como AAD; busca por HMAC-SHA256 com chave própria | D18     |
+| Documentos               | `pdfkit` (PDF) e escritor CSV próprio                                                                                                                                                                                | D19     |
 
 ## Segurança e borda
 
@@ -94,6 +94,10 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 - **Imagem do MinIO**: a MinIO deixou de publicar imagens da edição comunitária no Docker Hub e no Quay. O ambiente usa `pgsty/minio` (build comunitário do código oficial, mantido pelo projeto Pigsty) com tag fixa. A imagem já traz o cliente `mc`, usado no init dos buckets.
 - **mkcert em contêiner**: a CA local e o certificado são gerados por um serviço one-shot (`certs`), para não exigir o mkcert instalado na máquina (RN-ENV-030). Para o navegador confiar, importe `infra/certs/ca/rootCA.pem`.
 - **WORM do `audit-anchors`**: S3 não impede um novo `PUT` na mesma chave; com versionamento e object lock em modo `COMPLIANCE`, o `PUT` cria outra versão e a versão gravada não pode ser alterada nem apagada até o fim da retenção (10 anos por padrão).
+
+- **Tabelas append-only**: duas barreiras independentes. O usuário `<svc>_app` perde UPDATE/DELETE/TRUNCATE, e o gatilho `forbid_mutation()` recusa essas operações até para o dono da tabela (`makeAppendOnly`).
+- **Limite da eleição de líder**: entre a queda real da conexão e o próximo heartbeat, o antigo líder ainda pode se achar líder. Quem escreve sob liderança deve escrever no mesmo banco (a queda da sessão derruba a transação) ou usar um _fencing token_.
+- **Datas técnicas no relógio do banco**: `created_at`, `processed_at` e afins das tabelas técnicas usam `now()` do PostgreSQL. Instantes de negócio (`occurred_at`) vêm sempre do relógio do ambiente (RN-CLK-004).
 
 ## Versões da infraestrutura local
 

@@ -4,10 +4,10 @@
 
 ## 1. Fase 0 — Monorepo e ferramentas
 
-- [ ] 1.1 Criar o monorepo pnpm + Turborepo com `apps/`, `packages/`, `contracts/`, `scenarios/`, `infra/` e `docs/`, fixando Node 24 (`.nvmrc`, `engines`); verificar que `pnpm install` e `pnpm turbo run build` passam vazios
-- [ ] 1.2 Criar `packages/tsconfig` (strict, ESM) e `packages/eslint-config` com Prettier, `import/no-restricted-paths` (domain sem adapters) e proibição de `Date.now`/`new Date()`/`Math.random` em `**/domain/**`; verificar com um arquivo de teste que a regra falha
-- [ ] 1.3 Configurar Vitest no workspace (cobertura por pacote, limite de 80% em `domain/`) e verificar que `pnpm test` roda um teste de exemplo
-- [ ] 1.4 Escrever `docs/mapeamento-tecnologico.md` com o mapeamento conceito → tecnologia do design (D1–D22) e verificar que cobre barramento, banco, cache, storage, observabilidade, cofre e registro de esquemas (RN-BE-082)
+- [x] 1.1 Criar o monorepo pnpm + Turborepo com `apps/`, `packages/`, `contracts/`, `scenarios/`, `infra/` e `docs/`, fixando Node 24 (`.nvmrc`, `engines`); verificar que `pnpm install` e `pnpm turbo run build` passam vazios
+- [x] 1.2 Criar `packages/tsconfig` (strict, ESM) e `packages/eslint-config` com Prettier, `import/no-restricted-paths` (domain sem adapters) e proibição de `Date.now`/`new Date()`/`Math.random` em `**/domain/**`; verificar com um arquivo de teste que a regra falha
+- [x] 1.3 Configurar Vitest no workspace (cobertura por pacote, limite de 80% em `domain/`) e verificar que `pnpm test` roda um teste de exemplo
+- [x] 1.4 Escrever `docs/mapeamento-tecnologico.md` com o mapeamento conceito → tecnologia do design (D1–D22) e verificar que cobre barramento, banco, cache, storage, observabilidade, cofre e registro de esquemas (RN-BE-082)
 
 ## 2. Fase 0 — Infraestrutura em Docker
 

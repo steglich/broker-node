@@ -1,0 +1,8 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'contracts'
+  - 'scenarios'
+
+allowBuilds:
+  unrs-resolver: false

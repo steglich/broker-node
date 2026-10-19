@@ -5,6 +5,7 @@ import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const DOMAIN_FILES = ['**/domain/**/*.{ts,mts,cts,js,mjs}'];
@@ -50,6 +51,10 @@ export default tseslint.config(
     ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**', '**/.turbo/**'],
   },
   js.configs.recommended,
+  {
+    // Todo o código roda em Node.js (serviços, scripts e testes).
+    languageOptions: { globals: globals.node },
+  },
   ...tseslint.configs.recommended,
   {
     plugins: { import: importX },

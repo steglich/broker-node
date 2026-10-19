@@ -11,12 +11,12 @@
 
 ## 2. Fase 0 — Infraestrutura em Docker
 
-- [ ] 2.1 Criar `infra/compose/compose.yml` com PostgreSQL 17, RabbitMQ 4 (plugins `stream`, `stream_management`, `management`), Valkey, MinIO, Mailpit, `grafana/otel-lgtm` e Traefik, com healthchecks; verificar com `pnpm env:up infra` que tudo fica `healthy`
-- [ ] 2.2 Criar o script de init do Postgres que gera, para cada serviço do catálogo, o database, `<svc>_app` (DML) e `<svc>_migrator` (DDL) com `REVOKE CONNECT FROM PUBLIC`; verificar por teste que o usuário do OMS não conecta no database do ledger e que `<svc>_app` não executa `CREATE TABLE`
-- [ ] 2.3 Configurar Traefik com certificados `mkcert` (`api.`, `ws.`, `bank.`, `kyc.`, `mail.` em `*.broker.localhost`) e redirecionamento HTTP→HTTPS; verificar que `curl http://api.broker.localhost` é redirecionado
-- [ ] 2.4 Criar o `Dockerfile` multi-stage parametrizado por serviço (`pnpm deploy --filter`, `node:24-slim`, usuário não-root) e o padrão de serviço one-shot de migração no compose; verificar com um serviço de exemplo que a imagem roda e a migração precede o serviço
-- [ ] 2.5 Definir os perfis `infra`, `core` e `full`, Docker secrets em `infra/secrets/` (fora do git) e limites de memória; criar os scripts `pnpm env:up|down|logs|seed`; verificar que `pnpm env:up core` sobe só o perfil core
-- [ ] 2.6 Configurar o MinIO com buckets `documents`, `reports`, `brapi-raw` e `audit-anchors` (object lock) e o Valkey com persistência desligada; verificar que um objeto em `audit-anchors` não pode ser sobrescrito
+- [x] 2.1 Criar `infra/compose/compose.yml` com PostgreSQL 17, RabbitMQ 4 (plugins `stream`, `stream_management`, `management`), Valkey, MinIO, Mailpit, `grafana/otel-lgtm` e Traefik, com healthchecks; verificar com `pnpm env:up infra` que tudo fica `healthy`
+- [x] 2.2 Criar o script de init do Postgres que gera, para cada serviço do catálogo, o database, `<svc>_app` (DML) e `<svc>_migrator` (DDL) com `REVOKE CONNECT FROM PUBLIC`; verificar por teste que o usuário do OMS não conecta no database do ledger e que `<svc>_app` não executa `CREATE TABLE`
+- [x] 2.3 Configurar Traefik com certificados `mkcert` (`api.`, `ws.`, `bank.`, `kyc.`, `mail.` em `*.broker.localhost`) e redirecionamento HTTP→HTTPS; verificar que `curl http://api.broker.localhost` é redirecionado
+- [x] 2.4 Criar o `Dockerfile` multi-stage parametrizado por serviço (`pnpm deploy --filter`, `node:24-slim`, usuário não-root) e o padrão de serviço one-shot de migração no compose; verificar com um serviço de exemplo que a imagem roda e a migração precede o serviço
+- [x] 2.5 Definir os perfis `infra`, `core` e `full`, Docker secrets em `infra/secrets/` (fora do git) e limites de memória; criar os scripts `pnpm env:up|down|logs|seed`; verificar que `pnpm env:up core` sobe só o perfil core
+- [x] 2.6 Configurar o MinIO com buckets `documents`, `reports`, `brapi-raw` e `audit-anchors` (object lock) e o Valkey com persistência desligada; verificar que um objeto em `audit-anchors` não pode ser sobrescrito
 
 ## 3. Fase 0 — Domínio compartilhado (domain-kernel, ids, clock, calendar)
 

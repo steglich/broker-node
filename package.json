@@ -12,9 +12,15 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run",
+    "test": "vitest run --project \"!infra\"",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "env:up": "node infra/scripts/env.mjs up",
+    "env:down": "node infra/scripts/env.mjs down",
+    "env:logs": "node infra/scripts/env.mjs logs",
+    "env:ps": "node infra/scripts/env.mjs ps",
+    "env:seed": "node infra/scripts/env.mjs seed",
+    "test:infra": "vitest run --project infra"
   },
   "devDependencies": {
     "@broker/eslint-config": "workspace:*",

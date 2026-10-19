@@ -3,6 +3,10 @@ packages:
   - 'packages/*'
   - 'contracts'
   - 'scenarios'
+  - 'infra'
 
 allowBuilds:
   unrs-resolver: false
+
+# Necessário para `pnpm deploy` copiar os pacotes do workspace para a imagem (D22).
+injectWorkspacePackages: true

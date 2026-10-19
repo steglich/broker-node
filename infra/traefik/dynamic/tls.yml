@@ -1,0 +1,10 @@
+# Certificado gerado pelo serviço one-shot `certs` (mkcert).
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/broker.localhost.pem
+        keyFile: /certs/broker.localhost-key.pem
+  options:
+    default:
+      minVersion: VersionTLS12

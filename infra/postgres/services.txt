@@ -1,0 +1,30 @@
+# Catálogo de serviços com banco próprio (RN-DB-001).
+# Um nome por linha (identificador SQL: minúsculas e _). Para cada nome o init cria:
+#   database <svc>, usuário <svc>_app (DML) e usuário <svc>_migrator (DDL, dono do schema).
+# Linhas com # e em branco são ignoradas.
+scheduler
+audit
+identity
+customer
+ledger
+reference_data
+market_data
+notification
+trading_session
+matching_engine
+market_maker
+risk
+oms
+clearing
+custody
+engagement
+reporting
+approval
+corporate_actions
+tax
+securities_lending
+pix_simulator
+kyc_simulator
+message_sink
+# Serviço de exemplo da Fase 0 (valida Dockerfile e migração one-shot).
+example

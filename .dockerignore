@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+.git
+broker-docs
+openspec
+estudos
+.claude
+.opencode
+.agents
+infra/secrets
+infra/certs

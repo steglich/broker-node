@@ -151,3 +151,7 @@ vite.config.ts.timestamp-*
 # DOCS
 broker-docs/
 broker-docs
+# Infra local (segredos e certificados gerados)
+infra/secrets/*
+!infra/secrets/README.md
+infra/certs/

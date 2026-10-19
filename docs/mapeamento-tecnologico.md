@@ -86,3 +86,20 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 - **Banco por serviço**: localmente há uma única instância PostgreSQL; o isolamento é por database e credencial, não por processo (D4).
 - **Rateio com empate (RN-FEE-031)**: o resíduo vai para o menor `trade_id` (UUID v7, o mais antigo). O domínio só exige desempate determinístico (D5).
 - **Partições dos streams**: 3 por padrão no ambiente local; a tabela de RN-MSG-B-002 vale para `staging` (D6).
+- **Imagem do MinIO**: a MinIO deixou de publicar imagens da edição comunitária no Docker Hub e no Quay. O ambiente usa `pgsty/minio` (build comunitário do código oficial, mantido pelo projeto Pigsty) com tag fixa. A imagem já traz o cliente `mc`, usado no init dos buckets.
+- **mkcert em contêiner**: a CA local e o certificado são gerados por um serviço one-shot (`certs`), para não exigir o mkcert instalado na máquina (RN-ENV-030). Para o navegador confiar, importe `infra/certs/ca/rootCA.pem`.
+- **WORM do `audit-anchors`**: S3 não impede um novo `PUT` na mesma chave; com versionamento e object lock em modo `COMPLIANCE`, o `PUT` cria outra versão e a versão gravada não pode ser alterada nem apagada até o fim da retenção (10 anos por padrão).
+
+## Versões da infraestrutura local
+
+| Componente      | Imagem                                     |
+| --------------- | ------------------------------------------ |
+| PostgreSQL      | `postgres:17.11-alpine`                    |
+| RabbitMQ        | `rabbitmq:4.3.6-management-alpine`         |
+| Valkey          | `valkey/valkey:8.1.10-alpine`              |
+| MinIO           | `pgsty/minio:RELEASE.2026-08-04T00-00-00Z` |
+| Mailpit         | `axllent/mailpit:v1.31.6`                  |
+| Observabilidade | `grafana/otel-lgtm:0.37.0`                 |
+| Traefik         | `traefik:v3.7.15`                          |
+| mkcert          | `v1.4.4` (binário verificado por SHA-256)  |
+| Runtime         | `node:24-slim`                             |

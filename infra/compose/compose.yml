@@ -1,0 +1,283 @@
+# Ambiente local do broker-node (D22, spec local-environment).
+#
+# Perfis:
+#   (sem perfil) infra   infraestrutura + simuladores; sobe sempre
+#   core                 + serviços do núcleo (identity, ledger, oms, risk, motor, gateways...)
+#   full                 + todos os serviços do catálogo
+# Use `pnpm env:up [infra|core|full]`, que gera segredos e certificados antes de subir.
+name: broker
+
+x-limits: &small
+  deploy:
+    resources:
+      limits:
+        memory: 256m
+
+networks:
+  broker:
+    name: broker
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  minio-data:
+  lgtm-data:
+
+secrets:
+  postgres_password:
+    file: ../secrets/postgres_password
+  rabbitmq_password:
+    file: ../secrets/rabbitmq_password
+  valkey_password:
+    file: ../secrets/valkey_password
+  minio_root_password:
+    file: ../secrets/minio_root_password
+  grafana_admin_password:
+    file: ../secrets/grafana_admin_password
+  db_example_app:
+    file: ../secrets/db/example_app
+  db_example_migrator:
+    file: ../secrets/db/example_migrator
+
+services:
+  # ---------------------------------------------------------------- infraestrutura
+  postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../postgres/init:/docker-entrypoint-initdb.d:ro
+      - ../postgres/services.txt:/etc/broker/services.txt:ro
+      # Senhas por serviço: o init lê todas; cada serviço recebe só as suas como secret.
+      - ../secrets/db:/run/secrets/db:ro
+    ports: ['${POSTGRES_PORT:-5432}:5432']
+    networks: [broker]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  rabbitmq:
+    image: rabbitmq:4.3.6-management-alpine
+    hostname: rabbitmq
+    # A senha do usuário padrão vem do secret, gravada num conf.d antes do servidor subir.
+    entrypoint:
+      - sh
+      - -c
+      - |
+        printf 'default_pass = %s\n' "$$(cat /run/secrets/rabbitmq_password)" > /etc/rabbitmq/conf.d/90-secret.conf
+        exec docker-entrypoint.sh rabbitmq-server
+    secrets: [rabbitmq_password]
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ../rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ../rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/10-broker.conf:ro
+    ports:
+      - '${RABBITMQ_PORT:-5672}:5672'
+      - '${RABBITMQ_STREAM_PORT:-5552}:5552'
+      - '${RABBITMQ_UI_PORT:-15672}:15672'
+    networks: [broker]
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'rabbitmq-diagnostics -q check_port_listener 5552 && rabbitmq-diagnostics -q check_running',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  valkey:
+    image: valkey/valkey:8.1.10-alpine
+    # Cache efêmero: sem RDB e sem AOF (D16). Reiniciar o contêiner zera o conteúdo.
+    command:
+      - sh
+      - -c
+      - exec valkey-server --save '' --appendonly no --requirepass "$$(cat /run/secrets/valkey_password)"
+    secrets: [valkey_password]
+    ports: ['${VALKEY_PORT:-6380}:6379']
+    networks: [broker]
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'valkey-cli -a "$$(cat /run/secrets/valkey_password)" --no-auth-warning ping | grep -q PONG',
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    <<: *small
+
+  minio:
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: broker
+      MINIO_ROOT_PASSWORD_FILE: minio_root_password
+    secrets: [minio_root_password]
+    volumes:
+      - minio-data:/data
+    ports:
+      - '${MINIO_PORT:-9000}:9000'
+      - '${MINIO_CONSOLE_PORT:-9001}:9001'
+    networks: [broker]
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  minio-init:
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    entrypoint: ['/bin/sh', '/init.sh']
+    secrets: [minio_root_password]
+    volumes:
+      - ../minio/init.sh:/init.sh:ro
+    networks: [broker]
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: 'no'
+
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    ports:
+      - '${MAILPIT_SMTP_PORT:-1025}:1025'
+      - '${MAILPIT_UI_PORT:-8025}:8025'
+    networks: [broker]
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.mail.rule: Host(`mail.broker.localhost`)
+      traefik.http.routers.mail.entrypoints: websecure
+      traefik.http.services.mail.loadbalancer.server.port: '8025'
+    <<: *small
+
+  lgtm:
+    image: grafana/otel-lgtm:0.37.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+    secrets: [grafana_admin_password]
+    volumes:
+      - lgtm-data:/data
+    ports:
+      - '${GRAFANA_PORT:-3000}:3000'
+      - '${OTLP_GRPC_PORT:-4317}:4317'
+      - '${OTLP_HTTP_PORT:-4318}:4318'
+    networks: [broker]
+    healthcheck:
+      # O run-all.sh do otel-lgtm cria /tmp/ready quando todos os componentes respondem.
+      test: ['CMD-SHELL', 'test -f /tmp/ready']
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+
+  certs:
+    build: ../mkcert
+    image: broker/mkcert:local
+    volumes:
+      - ../certs:/certs
+    restart: 'no'
+
+  traefik:
+    image: traefik:v3.7.15
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/dynamic:/etc/traefik/dynamic:ro
+      - ../certs:/certs:ro
+    ports:
+      - '${HTTP_PORT:-80}:80'
+      - '${HTTPS_PORT:-443}:443'
+    networks: [broker]
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    <<: *small
+
+  # ---------------------------------------------------------------- serviços
+  # Padrão de um serviço: imagem do Dockerfile único (SERVICE=<pacote>), um one-shot de
+  # migração com o usuário <svc>_migrator e o serviço com <svc>_app, que só sobe depois
+  # que a migração termina com sucesso.
+
+  # Serviço de exemplo da Fase 0 (perfil full). Sai quando houver serviços reais.
+  example-migrate:
+    profiles: [full]
+    image: broker/example-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/example-service'
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: example
+      DB_USER: example_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_example_migrator
+    secrets: [db_example_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  example-service:
+    profiles: [full]
+    image: broker/example-service:local
+    environment:
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: example
+      DB_USER: example_app
+      DB_PASSWORD_FILE: /run/secrets/db_example_app
+    secrets: [db_example_app]
+    networks: [broker]
+    depends_on:
+      example-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:8080/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    <<: *small

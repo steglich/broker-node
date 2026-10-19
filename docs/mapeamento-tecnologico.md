@@ -15,7 +15,8 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 | Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint     | D3      |
 | Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random` | D3, D15 |
 | Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`          | D5      |
-| Identificadores                          | UUID v7 e formatos legíveis em `@broker/ids`                                            | D1      |
+| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`             | D1      |
+| Geradores de teste                       | `@broker/testing`: PRNG com semente (mulberry32) e gerador de CPF por penúltimo dígito  | D20     |
 | Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                  | D15     |
 | Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`      | D15     |
 | Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier          | D3      |
@@ -84,7 +85,11 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 - **Cofre de segredos**: Docker secrets simulam o cofre localmente (D18).
 - **Banco por serviço**: localmente há uma única instância PostgreSQL; o isolamento é por database e credencial, não por processo (D4).
-- **Rateio com empate (RN-FEE-031)**: o resíduo vai para o menor `trade_id` (UUID v7, o mais antigo). O domínio só exige desempate determinístico (D5).
+- **Rateio (ADR-0004, RN-FEE-031)**: o ADR fala em "maior resto com resíduo para o maior valor". A implementação (`allocate` em `@broker/domain-kernel`) combina as duas regras: cada item recebe a parte truncada em centavos, e os centavos que sobram (no máximo n − 1) vão um por item na ordem **maior resto → maior peso (notional) → menor `trade_id`** (UUID v7, o mais antigo). O domínio só exige desempate determinístico (D5).
+- **Formatos legíveis não definidos no domínio (RN-PAD-061)**: número da nota = sequencial por conta exibido com 9 dígitos (`000000042`); protocolo = `PREFIXO-AAAAMMDD-XXXXXXXX` com 8 caracteres Crockford base32 aleatórios (ex.: `SAQ-20261019-7K3M9Q2X`), não sequencial (RN-PAD-062).
+- **DV da conta (RN-ACC-001)**: módulo 11 com pesos 2..9 da direita para a esquerda; restos que dariam DV 10 ou 11 viram 0. Por isso uma troca de dígito que leva a soma entre esses dois restos não é detectada (limitação conhecida do módulo 11).
+- **Tempo sem `Temporal`**: o Node 24 ainda não tem a API `Temporal`. `Instant` (ms UTC) e `BusinessDate` (data civil) ficam em `@broker/domain-kernel`, e o fuso `America/Sao_Paulo` é resolvido com `Intl.DateTimeFormat`.
+- **Grade da Quarta-feira de Cinzas**: o domínio só diz "pregão a partir das 13:00". A semente desloca as fases anteriores na mesma proporção da grade padrão (pré-pregão 12:00, pré-abertura 12:45).
 - **Partições dos streams**: 3 por padrão no ambiente local; a tabela de RN-MSG-B-002 vale para `staging` (D6).
 - **Imagem do MinIO**: a MinIO deixou de publicar imagens da edição comunitária no Docker Hub e no Quay. O ambiente usa `pgsty/minio` (build comunitário do código oficial, mantido pelo projeto Pigsty) com tag fixa. A imagem já traz o cliente `mc`, usado no init dos buckets.
 - **mkcert em contêiner**: a CA local e o certificado são gerados por um serviço one-shot (`certs`), para não exigir o mkcert instalado na máquina (RN-ENV-030). Para o navegador confiar, importe `infra/certs/ca/rootCA.pem`.

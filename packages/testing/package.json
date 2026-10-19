@@ -1,0 +1,30 @@
+{
+  "name": "@broker/testing",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Utilitários de teste: geradores determinísticos (CPF, PRNG com semente).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@broker/domain-kernel": "workspace:*"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

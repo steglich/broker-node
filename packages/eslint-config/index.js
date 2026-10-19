@@ -8,7 +8,12 @@ import importX from 'eslint-plugin-import-x';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-const DOMAIN_FILES = ['**/domain/**/*.{ts,mts,cts,js,mjs}'];
+// `domain/` dos serviços e os pacotes de domínio puro compartilhados (D1, D3).
+const DOMAIN_FILES = [
+  '**/domain/**/*.{ts,mts,cts,js,mjs}',
+  '**/packages/domain-kernel/src/**/*.ts',
+  '**/packages/calendar/src/**/*.ts',
+];
 
 /** Bibliotecas de infraestrutura que o domínio nunca importa. */
 export const INFRA_MODULES = [

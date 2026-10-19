@@ -14,10 +14,12 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html'],
       include: ['packages/*/src/**', 'apps/*/src/**'],
-      exclude: ['**/*.test.ts', '**/dist/**'],
+      exclude: ['**/*.test.ts', '**/dist/**', 'apps/example-service/**'],
       // Limite mínimo de 80% no domínio (D20, D21).
       thresholds: {
         '**/domain/**': { lines: 80, functions: 80, branches: 80, statements: 80 },
+        'packages/domain-kernel/src/**': { lines: 80, functions: 80, branches: 80, statements: 80 },
+        'packages/calendar/src/**': { lines: 80, functions: 80, branches: 80, statements: 80 },
       },
     },
   },

@@ -1,0 +1,31 @@
+{
+  "name": "@broker/domain-kernel",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Objetos de valor compartilhados: Money, Price, Quantity, Percentage, TaxId, BusinessDate, Instant, rateio.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "decimal.js": "10.6.0"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

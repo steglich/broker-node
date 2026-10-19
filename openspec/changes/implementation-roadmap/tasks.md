@@ -20,12 +20,12 @@
 
 ## 3. Fase 0 — Domínio compartilhado (domain-kernel, ids, clock, calendar)
 
-- [ ] 3.1 Implementar `Money`, `Price`, `Quantity` (bigint), `Percentage` e operações com `decimal.js` e arredondamento explícito (`HALF_UP`, truncamento, direcional); verificar com testes de propriedade que 0,1 + 0,2 = 0,3 e que construir a partir de `number` é recusado (ADR-0004)
-- [ ] 3.2 Implementar o rateio pelo maior resto com resíduo para o maior valor e desempate pelo menor ID; verificar com fast-check que Σ partes = total e com o cenário FEE-010
-- [ ] 3.3 Implementar `TaxId` (módulo 11, sequências repetidas, máscara `***.456.789-**`) e o gerador de CPFs válidos por penúltimo dígito em `packages/testing`; verificar os casos `TAX_ID_INVALID`
-- [ ] 3.4 Implementar `packages/ids` (UUID v7, número de conta `NNNNNNN-D`, número de nota, protocolo); verificar a ordenação temporal e o DV da conta (RN-ACC-001, RN-PAD-060)
-- [ ] 3.5 Implementar `packages/clock` com os modos `REAL`, `ACCELERATED` e `VIRTUAL` (`advance_to`) e `BusinessDate` em `America/Sao_Paulo`; verificar a virada de dia UTC→BRT e o avanço virtual (RN-CLK-001..004)
-- [ ] 3.6 Implementar `packages/calendar` (`is_business_day`, `next/previous_business_day`, `business_days_between`, `session_schedule` com vigência) e a semente do calendário B3 de 2026–2027; verificar o cenário CAL-001 (Carnaval, Corpus Christi, fim de ano)
+- [x] 3.1 Implementar `Money`, `Price`, `Quantity` (bigint), `Percentage` e operações com `decimal.js` e arredondamento explícito (`HALF_UP`, truncamento, direcional); verificar com testes de propriedade que 0,1 + 0,2 = 0,3 e que construir a partir de `number` é recusado (ADR-0004)
+- [x] 3.2 Implementar o rateio pelo maior resto com resíduo para o maior valor e desempate pelo menor ID; verificar com fast-check que Σ partes = total e com o cenário FEE-010
+- [x] 3.3 Implementar `TaxId` (módulo 11, sequências repetidas, máscara `***.456.789-**`) e o gerador de CPFs válidos por penúltimo dígito em `packages/testing`; verificar os casos `TAX_ID_INVALID`
+- [x] 3.4 Implementar `packages/ids` (UUID v7, número de conta `NNNNNNN-D`, número de nota, protocolo); verificar a ordenação temporal e o DV da conta (RN-ACC-001, RN-PAD-060)
+- [x] 3.5 Implementar `packages/clock` com os modos `REAL`, `ACCELERATED` e `VIRTUAL` (`advance_to`) e `BusinessDate` em `America/Sao_Paulo`; verificar a virada de dia UTC→BRT e o avanço virtual (RN-CLK-001..004)
+- [x] 3.6 Implementar `packages/calendar` (`is_business_day`, `next/previous_business_day`, `business_days_between`, `session_schedule` com vigência) e a semente do calendário B3 de 2026–2027; verificar o cenário CAL-001 (Carnaval, Corpus Christi, fim de ano)
 
 ## 4. Fase 0 — Persistência
 

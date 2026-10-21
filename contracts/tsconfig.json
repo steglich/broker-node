@@ -1,0 +1,8 @@
+{
+  "extends": "@broker/tsconfig/library.json",
+  "compilerOptions": {
+    // Os contratos ficam fora de src/ (D8: contracts/events/<eventType>/v<N>.ts, contracts/http/<serviço>.ts).
+    "rootDir": "${configDir}"
+  },
+  "include": ["${configDir}/src", "${configDir}/events", "${configDir}/http"]
+}

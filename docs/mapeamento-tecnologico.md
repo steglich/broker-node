@@ -6,20 +6,20 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Plataforma e código
 
-| Conceito                                 | Tecnologia                                                                                                                                          | Decisão |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)                                                                      | D1      |
-| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento                                                              | D2      |
-| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                                                                                         | D2      |
-| Framework HTTP                           | Express 5 via `@broker/service-kit` (`createService` + `service.route`): contexto, correlação, Problem Details, health/info e encerramento gracioso | D2      |
-| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint                                                                 | D3      |
-| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random`                                                             | D3, D15 |
-| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`                                                                      | D5      |
-| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`                                                                         | D1      |
-| Geradores de teste                       | `@broker/testing`: PRNG com semente (mulberry32) e gerador de CPF por penúltimo dígito                                                              | D20     |
-| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                                                                              | D15     |
-| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`                                                                  | D15     |
-| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier                                                                      | D3      |
+| Conceito                                 | Tecnologia                                                                                                                                                    | Decisão |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)                                                                                | D1      |
+| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento                                                                        | D2      |
+| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                                                                                                   | D2      |
+| Framework HTTP                           | Express 5 via `@broker/service-kit` (`createService` + `service.route`): contexto, correlação, Problem Details, health/info e encerramento gracioso           | D2      |
+| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint                                                                           | D3      |
+| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random`                                                                       | D3, D15 |
+| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`                                                                                | D5      |
+| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`                                                                                   | D1      |
+| Geradores de teste                       | `@broker/testing`: builders (`defineBuilder`), relógio virtual (`testClock`), PRNG com semente, CPF por penúltimo dígito, Testcontainers e utilitários de E2E | D20     |
+| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                                                                                        | D15     |
+| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`                                                                            | D15     |
+| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier                                                                                | D3      |
 
 ## Barramento e mensageria
 
@@ -34,7 +34,7 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 | Outbox / inbox                       | `EventPublisher` grava na `outbox_event` + `pg_notify`; `OutboxRelay` com `LISTEN/NOTIFY`, polling, `FOR UPDATE SKIP LOCKED` e `publishingId` = `seq` (deduplicação no broker); `processed_event` + `consumer_offset` na transação do efeito | D7      |
 | Envelope e esquemas em runtime       | TypeBox 1.x (`typebox`) + Ajv 2020 com `ajv-formats`; envelope de RN-MSG-B §4; tolerant reader                                                                                                                                               | D2      |
 | Ferramenta de DLQ                    | `DlqAdmin` + API HTTP `/admin/dlq` (sem framework) + CLI `broker-dlq`; descarte gera `messaging.dead_letter_discarded` auditável                                                                                                             | D6      |
-| Registro de esquemas (RN-BE-081)     | `contracts/` versionado no monorepo: TypeBox → JSON Schema + AsyncAPI 3; verificação de compatibilidade no CI                                                                                                                                | D8      |
+| Registro de esquemas (RN-BE-081)     | `contracts/` versionado no monorepo: TypeBox → JSON Schema + AsyncAPI 3 em `contracts/generated/` (`pnpm contracts:generate`); `pnpm contracts:check` compara com o `main`                                                                   | D8      |
 | Contrato de API síncrona (RN-BE-080) | TypeBox → OpenAPI 3.1 em `contracts/http/`                                                                                                                                                                                                   | D8      |
 | RPC síncrono interno                 | HTTP/JSON com `undici`, disjuntor `opossum`, timeout explícito                                                                                                                                                                               | D11     |
 
@@ -82,7 +82,7 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 | Unitários e componente  | Vitest (cobertura v8, ≥ 80% em `domain/`); `supertest` para HTTP                                    | D20     |
 | Testes de propriedade   | fast-check                                                                                          | D20     |
 | Integração              | Testcontainers (PostgreSQL e RabbitMQ)                                                              | D20     |
-| Golden master           | YAML em `scenarios/` + runner com relógio virtual e semente                                         | D20     |
+| Golden master           | YAML em `scenarios/<domínio>/<ID>.yaml` + runner com relógio virtual e semente (`pnpm scenarios`)   | D20     |
 | Carga e caos            | k6 em contêiner; Toxiproxy                                                                          | D20     |
 | CI                      | GitHub Actions + Turborepo; Semgrep, `osv-scanner`, `gitleaks`, `syft` (SBOM), `cosign`             | D21     |
 | Contêineres e ambientes | Dockerfile multi-stage (`node:24-slim`, não-root) e Docker Compose com perfis `infra`/`core`/`full` | D22     |

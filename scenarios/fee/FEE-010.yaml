@@ -1,0 +1,16 @@
+cenario: FEE-010 rateio com resíduo de centavos
+regras: [RN-FEE-031]
+entradas:
+  operacao: rateio
+  # R$ 0,10 entre três negócios de notional igual: 3,33… centavos cada.
+  total: '0.10'
+  itens:
+    - { id: 0192a3c0-0000-7000-8000-000000000003, peso: '1000.00' }
+    - { id: 0192a3c0-0000-7000-8000-000000000001, peso: '1000.00' }
+    - { id: 0192a3c0-0000-7000-8000-000000000002, peso: '1000.00' }
+saidas_esperadas:
+  # Restos e pesos empatados: o centavo que sobra vai para o menor trade_id. Σ = 0,10.
+  partes:
+    0192a3c0-0000-7000-8000-000000000001: '0.04'
+    0192a3c0-0000-7000-8000-000000000002: '0.03'
+    0192a3c0-0000-7000-8000-000000000003: '0.03'

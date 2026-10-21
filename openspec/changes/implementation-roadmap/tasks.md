@@ -58,9 +58,9 @@
 
 ## 7. Fase 0 — Contratos, cenários e testes compartilhados
 
-- [ ] 7.1 Criar `contracts/` com a geração de JSON Schema, AsyncAPI 3 e OpenAPI 3.1 a partir do TypeBox e o script de compatibilidade contra o `main`; verificar que remover um campo obrigatório sem subir a versão reprova o script (RN-MSG-B-020..023)
-- [ ] 7.2 Criar `packages/testing` com builders por agregado, relógio virtual, Testcontainers (Postgres, RabbitMQ) e utilitários de E2E; verificar com um teste de integração de exemplo (RN-QA-020/021)
-- [ ] 7.3 Criar o formato YAML de cenários em `scenarios/` e o runner de golden master (entradas, saídas esperadas, semente); verificar com um cenário trivial passando e outro falhando com diff legível
+- [x] 7.1 Criar `contracts/` com a geração de JSON Schema, AsyncAPI 3 e OpenAPI 3.1 a partir do TypeBox e o script de compatibilidade contra o `main`; verificar que remover um campo obrigatório sem subir a versão reprova o script (RN-MSG-B-020..023)
+- [x] 7.2 Criar `packages/testing` com builders por agregado, relógio virtual, Testcontainers (Postgres, RabbitMQ) e utilitários de E2E; verificar com um teste de integração de exemplo (RN-QA-020/021)
+- [x] 7.3 Criar o formato YAML de cenários em `scenarios/` e o runner de golden master (entradas, saídas esperadas, semente); verificar com um cenário trivial passando e outro falhando com diff legível
 
 ## 8. Fase 0 — Simuladores externos
 

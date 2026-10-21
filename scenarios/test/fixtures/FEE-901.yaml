@@ -1,0 +1,14 @@
+# Fixture que FALHA de propósito: verifica o diff legível do runner (test/runner.test.ts).
+cenario: FEE-901 rateio com resultado esperado errado
+entradas:
+  operacao: rateio
+  total: '0.10'
+  itens:
+    - { id: a, peso: '1' }
+    - { id: b, peso: '1' }
+    - { id: c, peso: '1' }
+saidas_esperadas:
+  partes:
+    a: '0.04'
+    b: '0.04'
+    c: '0.03'

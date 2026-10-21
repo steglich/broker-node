@@ -6,3 +6,6 @@ openspec
 .agents
 coverage
 dist
+
+# Gerado por `pnpm contracts:generate`; o check do CI compara byte a byte.
+contracts/generated/

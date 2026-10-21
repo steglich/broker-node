@@ -2,7 +2,7 @@
   "name": "@broker/testing",
   "version": "0.0.0",
   "private": true,
-  "description": "Utilitários de teste: geradores determinísticos (CPF, PRNG com semente) e contêineres (PostgreSQL, RabbitMQ).",
+  "description": "Utilitários de teste: builders (RN-QA-020), relógio virtual, geradores determinísticos (CPF, PRNG com semente), contêineres (PostgreSQL, RabbitMQ, Valkey) e utilitários de E2E.",
   "type": "module",
   "exports": {
     ".": {
@@ -24,7 +24,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@broker/clock": "workspace:*",
     "@broker/domain-kernel": "workspace:*",
+    "@broker/ids": "workspace:*",
     "@testcontainers/postgresql": "12.2.0",
     "testcontainers": "12.2.0"
   },

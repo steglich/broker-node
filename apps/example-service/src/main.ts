@@ -3,10 +3,11 @@
 // publica no RabbitMQ; o consumidor marca o ping como processado. Com a telemetria ligada
 // (`node --import @broker/service-kit/telemetry`), o caminho todo aparece num único trace.
 import { RealClock } from '@broker/clock';
+import { ExamplePingedV1 as Pinged } from '@broker/contracts/events/example.pinged/v1';
+import { exampleServiceHttp } from '@broker/contracts/http/example-service';
 import { uuidv7 } from '@broker/ids';
 import {
   connectStream,
-  defineEvent,
   ensureSuperStream,
   EventConsumer,
   EventPublisher,
@@ -64,11 +65,6 @@ const stream = {
   password: config.STREAM_PASSWORD,
 };
 
-const Pinged = defineEvent({
-  eventType: 'example.pinged',
-  eventVersion: 1,
-  payload: Type.Object({ pingId: Type.String({ format: 'uuid' }) }),
-});
 const SUPER_STREAM = topicName(config.ENVIRONMENT, 'example');
 
 const client = await connectStream(stream, config.SERVICE_NAME);
@@ -152,7 +148,7 @@ service.route({
   method: 'get',
   path: '/v1/pings/:id',
   auth: 'public',
-  validate: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
+  validate: { params: exampleServiceHttp.routes.getPing.params },
   handler: async (req) => {
     const row = (
       await sql<{

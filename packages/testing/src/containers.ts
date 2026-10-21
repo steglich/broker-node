@@ -106,3 +106,15 @@ export async function startValkey(): Promise<StartedValkey> {
     .start();
   return { container, host: container.getHost(), port: container.getMappedPort(6379) };
 }
+
+/** Credenciais de um papel do database de um serviço (`<svc>_app` ou `<svc>_migrator`). */
+export function databaseConfig(
+  pg: Pick<StartedPostgres, 'host' | 'port' | 'passwords'>,
+  service: string,
+  kind: 'app' | 'migrator',
+): { host: string; port: number; database: string; user: string; password: string } {
+  const user = `${service}_${kind}`;
+  const password = pg.passwords[user];
+  if (password === undefined) throw new Error(`o contêiner não criou o serviço ${service}`);
+  return { host: pg.host, port: pg.port, database: service, user, password };
+}

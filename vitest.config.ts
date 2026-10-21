@@ -6,7 +6,8 @@ export default defineConfig({
     projects: [
       'packages/*/vitest.config.ts',
       'apps/*/vitest.config.ts',
-      'contracts/*/vitest.config.ts',
+      'contracts/vitest.config.ts',
+      'scenarios/vitest.config.ts',
       // Testes contra o ambiente Docker rodando: fora do `pnpm test`, rodam com `pnpm test:infra`.
       'infra/vitest.config.ts',
       'apps/example-service/vitest.e2e.config.ts',

@@ -20,7 +20,10 @@
     "env:logs": "node infra/scripts/env.mjs logs",
     "env:ps": "node infra/scripts/env.mjs ps",
     "env:seed": "node infra/scripts/env.mjs seed",
-    "test:infra": "vitest run --project infra --project example-service-e2e"
+    "test:infra": "vitest run --project infra --project example-service-e2e",
+    "contracts:generate": "pnpm --filter @broker/contracts generate",
+    "contracts:check": "pnpm --filter @broker/contracts check --",
+    "scenarios": "pnpm --filter @broker/scenarios run run --"
   },
   "devDependencies": {
     "@broker/eslint-config": "workspace:*",

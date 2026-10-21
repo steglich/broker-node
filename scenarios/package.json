@@ -1,0 +1,36 @@
+{
+  "name": "@broker/scenarios",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Cenários de referência (golden master) em YAML, independentes de tecnologia, e o runner que os executa contra o domínio puro com relógio virtual e semente (D20).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "run": "tsx --conditions=source src/bin/run.ts"
+  },
+  "dependencies": {
+    "@broker/calendar": "workspace:*",
+    "@broker/clock": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/testing": "workspace:*",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "broker-node: eventos",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/events (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "defaultContentType": "application/json",
+  "channels": {
+    "example": {
+      "address": "{environment}.example.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "example.pinged.v1": {
+          "$ref": "#/components/messages/example.pinged.v1"
+        }
+      }
+    }
+  },
+  "operations": {
+    "example-service.send.example.pinged.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/example"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/example/messages/example.pinged.v1"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "Envelope": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "eventType",
+          "eventVersion",
+          "source",
+          "environment",
+          "occurredAt",
+          "partitionKey",
+          "correlationId",
+          "actor",
+          "auditable",
+          "payload"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9_]*)+$"
+          },
+          "eventVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "environment": {
+            "type": "string",
+            "minLength": 1
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "partitionKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "correlationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "causationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actor": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "USER"
+                  },
+                  {
+                    "type": "string",
+                    "const": "SERVICE"
+                  },
+                  {
+                    "type": "string",
+                    "const": "SYSTEM"
+                  },
+                  {
+                    "type": "string",
+                    "const": "BACKOFFICE"
+                  }
+                ]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "traceparent": {
+            "type": "string"
+          },
+          "auditable": {
+            "type": "boolean"
+          },
+          "payload": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {}
+            }
+          }
+        }
+      },
+      "example.pinged.v1": {
+        "type": "object",
+        "required": [
+          "pingId"
+        ],
+        "properties": {
+          "pingId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    "messages": {
+      "example.pinged.v1": {
+        "name": "example.pinged",
+        "title": "example.pinged v1",
+        "summary": "Um ping foi registrado e aguarda processamento.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "example.pinged"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/example.pinged.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "example-service",
+        "x-consumers": [
+          "example-service"
+        ]
+      }
+    }
+  }
+}

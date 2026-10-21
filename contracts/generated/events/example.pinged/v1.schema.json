@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:example.pinged:v1",
+  "title": "example.pinged v1",
+  "description": "Um ping foi registrado e aguarda processamento.",
+  "x-producer": "example-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "pingId"
+  ],
+  "properties": {
+    "pingId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+cenario: CAL-001 next_business_day com Carnaval, Corpus Christi e fim de ano
+regras: [RN-CAL-002]
+entradas:
+  calendario: b3-2026-2027
+  consultas:
+    - { id: sexta_antes_do_carnaval_2026, op: next_business_day, data: '2026-02-13' }
+    - { id: tipo_quarta_de_cinzas_2026, op: day_type, data: '2026-02-18' }
+    - { id: sexta_antes_do_carnaval_2027, op: next_business_day, data: '2027-02-05' }
+    - { id: vespera_de_corpus_christi_2026, op: next_business_day, data: '2026-06-03' }
+    - { id: vespera_de_corpus_christi_2027, op: next_business_day, data: '2027-05-26' }
+    - { id: tipo_31_12_2026, op: day_type, data: '2026-12-31' }
+    - { id: fim_de_ano_2026, op: next_business_day, data: '2026-12-30' }
+    - { id: natal_2026, op: next_business_day, data: '2026-12-23' }
+    - { id: d_mais_2_no_carnaval, op: next_business_day, data: '2026-02-12', n: 2 }
+    - { id: d_menos_1_da_virada, op: previous_business_day, data: '2027-01-04' }
+saidas_esperadas:
+  resultados:
+    sexta_antes_do_carnaval_2026: '2026-02-18'
+    tipo_quarta_de_cinzas_2026: LATE_OPEN
+    sexta_antes_do_carnaval_2027: '2027-02-10'
+    vespera_de_corpus_christi_2026: '2026-06-05'
+    vespera_de_corpus_christi_2027: '2027-05-28'
+    tipo_31_12_2026: NO_TRADING
+    fim_de_ano_2026: '2027-01-04'
+    natal_2026: '2026-12-28'
+    d_mais_2_no_carnaval: '2026-02-18'
+    d_menos_1_da_virada: '2026-12-30'

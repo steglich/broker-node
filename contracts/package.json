@@ -1,0 +1,45 @@
+{
+  "name": "@broker/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Registro de esquemas: eventos (TypeBox → JSON Schema + AsyncAPI 3), rotas HTTP (OpenAPI 3.1) e verificação de compatibilidade contra o main (D8, RN-MSG-B-020..023).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./events/*": {
+      "source": "./events/*.ts",
+      "types": "./dist/events/*.d.ts",
+      "default": "./dist/events/*.js"
+    },
+    "./http/*": {
+      "source": "./http/*.ts",
+      "types": "./dist/http/*.d.ts",
+      "default": "./dist/http/*.js"
+    }
+  },
+  "files": [
+    "dist",
+    "generated"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "generate": "tsx --conditions=source src/bin/generate.ts",
+    "check": "tsx --conditions=source src/bin/check.ts"
+  },
+  "dependencies": {
+    "@broker/messaging": "workspace:*",
+    "typebox": "1.3.34"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

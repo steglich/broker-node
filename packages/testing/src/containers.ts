@@ -90,3 +90,19 @@ export async function startRabbitMq(): Promise<StartedRabbitMq> {
     password,
   };
 }
+
+export interface StartedValkey {
+  container: StartedTestContainer;
+  host: string;
+  port: number;
+}
+
+/** Valkey como no ambiente local: sem persistência (D16). */
+export async function startValkey(): Promise<StartedValkey> {
+  const container = await new GenericContainer('valkey/valkey:8.1.10-alpine')
+    .withCommand(['valkey-server', '--save', '', '--appendonly', 'no'])
+    .withExposedPorts(6379)
+    .withWaitStrategy(Wait.forLogMessage(/Ready to accept connections/))
+    .start();
+  return { container, host: container.getHost(), port: container.getMappedPort(6379) };
+}

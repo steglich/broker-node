@@ -9,6 +9,7 @@ export default defineConfig({
       'contracts/*/vitest.config.ts',
       // Testes contra o ambiente Docker rodando: fora do `pnpm test`, rodam com `pnpm test:infra`.
       'infra/vitest.config.ts',
+      'apps/example-service/vitest.e2e.config.ts',
     ],
     coverage: {
       provider: 'v8',

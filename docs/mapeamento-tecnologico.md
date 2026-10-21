@@ -6,20 +6,20 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Plataforma e código
 
-| Conceito                                 | Tecnologia                                                                              | Decisão |
-| ---------------------------------------- | --------------------------------------------------------------------------------------- | ------- |
-| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)          | D1      |
-| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento  | D2      |
-| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                             | D2      |
-| Framework HTTP                           | Express 5 com middlewares do `@broker/service-kit`                                      | D2      |
-| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint     | D3      |
-| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random` | D3, D15 |
-| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`          | D5      |
-| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`             | D1      |
-| Geradores de teste                       | `@broker/testing`: PRNG com semente (mulberry32) e gerador de CPF por penúltimo dígito  | D20     |
-| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                  | D15     |
-| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`      | D15     |
-| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier          | D3      |
+| Conceito                                 | Tecnologia                                                                                                                                          | Decisão |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)                                                                      | D1      |
+| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento                                                              | D2      |
+| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                                                                                         | D2      |
+| Framework HTTP                           | Express 5 via `@broker/service-kit` (`createService` + `service.route`): contexto, correlação, Problem Details, health/info e encerramento gracioso | D2      |
+| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint                                                                 | D3      |
+| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random`                                                             | D3, D15 |
+| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`                                                                      | D5      |
+| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`                                                                         | D1      |
+| Geradores de teste                       | `@broker/testing`: PRNG com semente (mulberry32) e gerador de CPF por penúltimo dígito                                                              | D20     |
+| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                                                                              | D15     |
+| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`                                                                  | D15     |
+| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier                                                                      | D3      |
 
 ## Barramento e mensageria
 
@@ -54,21 +54,26 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Segurança e borda
 
-| Conceito                  | Tecnologia                                                                                                        | Decisão |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------- |
-| Cofre de segredos         | Docker secrets (`/run/secrets/*`), atrás de uma interface trocável por OpenBao/Vault                              | D18     |
-| Feature flags             | Configuração validada por ambiente + sobrescrita por conta no serviço dono                                        | D18     |
-| Proxy de borda e TLS      | Traefik com certificados `mkcert` em `*.broker.localhost`                                                         | D9      |
-| API gateway e BFFs        | Express (`api-gateway`, `bff-*`)                                                                                  | D9      |
-| Identidade e autenticação | `identity-service` próprio: OAuth 2.1 + PKCE, `jose` (ES256/JWKS), `argon2id`, `otplib`, `@simplewebauthn/server` | D10     |
+| Conceito                    | Tecnologia                                                                                                                                                               | Decisão    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| Cofre de segredos           | Docker secrets (`/run/secrets/*`), atrás de uma interface trocável por OpenBao/Vault                                                                                     | D18        |
+| Feature flags               | Configuração validada por ambiente + sobrescrita por conta no serviço dono                                                                                               | D18        |
+| Configuração                | TypeBox + Ajv com coerção e padrões; `X_FILE` lê Docker secrets; falha rápida com a lista das variáveis inválidas, sem valores                                           | D18        |
+| Autenticação nos serviços   | `jose` (JWT ES256 pela JWKS, validade no relógio do ambiente); token de serviço por client credentials (`ServiceTokenProvider`); política de acesso obrigatória por rota | D10        |
+| Idempotência e concorrência | `IdempotencyStore` (reserva em `idempotency_record` + caminho rápido no Valkey com `iovalkey`); `If-Match`/`ETag` com `version`                                          | D16        |
+| RPC interno                 | `RpcClient`: pool `undici` por dependência (bulkhead), timeout por tentativa, `opossum` (só falhas de disponibilidade contam), retentativa só idempotente                | D11        |
+| Sagas                       | `SagaOrchestrator` sobre `saga_instance`, com lease por passo (`deadline_at`) e retomada após reinício                                                                   | RN-PAD-030 |
+| Proxy de borda e TLS        | Traefik com certificados `mkcert` em `*.broker.localhost`                                                                                                                | D9         |
+| API gateway e BFFs          | Express (`api-gateway`, `bff-*`)                                                                                                                                         | D9         |
+| Identidade e autenticação   | `identity-service` próprio: OAuth 2.1 + PKCE, `jose` (ES256/JWKS), `argon2id`, `otplib`, `@simplewebauthn/server`                                                        | D10        |
 
 ## Observabilidade
 
-| Conceito                | Tecnologia                                                                                                      | Decisão |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------- | ------- |
-| Traces, métricas e logs | SDK OpenTelemetry para Node → contêiner `grafana/otel-lgtm` (collector, Tempo, Prometheus/Mimir, Loki, Grafana) | D17     |
-| Logs estruturados       | `pino` em JSON com mascaramento por redact paths, exportação OTLP                                               | D17     |
-| Painéis e alertas       | Versionados em `infra/observability/`                                                                           | D17     |
+| Conceito                | Tecnologia                                                                                                                                                                                                                                                     | Decisão |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Traces, métricas e logs | SDK OpenTelemetry (`node --import @broker/service-kit/telemetry`, hook ESM `import-in-the-middle`): HTTP, Express, `pg`, `amqplib` e `undici` automáticos; spans manuais nos consumidores a partir do `traceparent` do envelope; OTLP para `grafana/otel-lgtm` | D17     |
+| Logs estruturados       | `pino` JSON com `timestamp` (relógio do ambiente), `wall_clock_at` (máquina), `correlation_id`, `trace_id` e mascaramento por nome de campo em qualquer profundidade                                                                                           | D17     |
+| Painéis e alertas       | Versionados em `infra/observability/`                                                                                                                                                                                                                          | D17     |
 
 ## Testes, CI e ambiente
 
@@ -105,6 +110,12 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 - **Filas por consumidor**: as filas de retentativa e a DLQ usam o nome do consumidor (`<env>.<consumidor>.dlq`), que é o `<svc>` do design quando o serviço tem um consumidor só. Um serviço com vários consumidores tem uma DLQ para cada.
 - **Contador de entregas no RabbitMQ 4**: um `nack` com requeue não incrementa o `x-delivery-count` das filas quorum, então o limite de entregas da fila não pegava jobs que falham sempre (voltavam em laço). O worker de jobs conta as falhas num cabeçalho próprio e manda para a DLQ no limite.
 - **Contornos do cliente de streams**: ver [ADR-0001](adr/0001-rabbitmq-streams.md).
+
+- **Feature flag desligada**: a resposta é `403 FEATURE_UNAVAILABLE`. O domínio só diz "erro de funcionalidade indisponível"; `503` sugeriria "tente de novo" e `404` esconderia a rota.
+- **`If-Match` ausente**: `428 IF_MATCH_REQUIRED` (RFC 6585), para o cliente não sobrescrever sem saber a versão.
+- **Idempotência**: a chave é reservada no banco antes do caso de uso; uma segunda requisição simultânea recebe `409 IDEMPOTENCY_REQUEST_IN_PROGRESS`. Respostas `5xx` não são guardadas (o cliente pode repetir); erros `4xx` de negócio são guardados como resposta final.
+- **Migrações fora de ordem**: o migrador aceita migrações-base novas (`0000_platform_*`) depois das do serviço (`0001_*`), porque são independentes. Sem isso, cada migração nova da plataforma quebraria os serviços já implantados.
+- **Lease da saga**: o passo interrompido por uma queda roda de novo quando o lease vence; por isso passos retomáveis precisam ser idempotentes.
 
 ## Versões da infraestrutura local
 

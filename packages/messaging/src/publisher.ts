@@ -3,6 +3,7 @@ import { sql, type Kysely } from 'kysely';
 import type { Actor, Environment } from './envelope.js';
 import { PublishRejectedError } from './errors.js';
 import type { EventDefinition, PayloadOf } from './events.js';
+import { activeTraceparent } from './tracing.js';
 import { validationErrors } from './validation.js';
 
 /** Tamanho máximo do payload serializado (RN-MSG-B-014). */
@@ -133,13 +134,15 @@ export class EventPublisher {
     }
 
     const eventId = this.options.newId();
+    // Sem traceparent explícito, usa o do span ativo (ex.: a requisição HTTP que causou o evento).
+    const traceparent = context.traceparent ?? activeTraceparent();
     const headers = {
       source: this.options.source,
       environment: this.options.environment,
       correlationId: context.correlationId ?? eventId,
       ...(context.causationId ? { causationId: context.causationId } : {}),
       actor: context.actor,
-      ...(context.traceparent ? { traceparent: context.traceparent } : {}),
+      ...(traceparent ? { traceparent } : {}),
       auditable: definition.auditable,
     };
     await sql`

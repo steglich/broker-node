@@ -10,6 +10,7 @@ import { parseEnvelope, type Envelope } from './envelope.js';
 import { InvalidMessageError, isPermanent } from './errors.js';
 import type { EventDefinition } from './events.js';
 import { SerialQueue } from './serial-queue.js';
+import { withConsumerSpan } from './tracing.js';
 import { connectStream, type StreamSettings } from './stream/connection.js';
 import { validationErrors } from './validation.js';
 
@@ -213,12 +214,15 @@ export class EventConsumer {
       });
       return;
     }
-    await this.process(envelope, {
-      origin,
-      checkBlocked: this.options.ordered,
-      takeOverBlock: false,
-      stage: 0,
-    });
+    // Span de consumidor filho do traceparent do envelope: produtor e consumidor no mesmo trace.
+    await withConsumerSpan(this.options.name, envelope, () =>
+      this.process(envelope, {
+        origin,
+        checkBlocked: this.options.ordered,
+        takeOverBlock: false,
+        stage: 0,
+      }),
+    );
   }
 
   private handlerFor(envelope: Envelope): EventHandler | undefined {

@@ -30,6 +30,20 @@ const compose = (args, profile = 'full') =>
  */
 async function waitReady(profile, timeoutMs = 300_000) {
   const deadline = Date.now() + timeoutMs;
+  // Só os serviços do perfil pedido: contêineres parados de outros perfis (ex.: um serviço do
+  // perfil full que caiu quando a máquina desligou) não contam.
+  const services = new Set(
+    execFileSync(
+      'docker',
+      ['compose', '-f', composeFile, ...profileArgs(profile), 'config', '--services'],
+      {
+        cwd: root,
+        encoding: 'utf8',
+      },
+    )
+      .trim()
+      .split('\n'),
+  );
   for (;;) {
     const out = execFileSync(
       'docker',
@@ -40,7 +54,8 @@ async function waitReady(profile, timeoutMs = 300_000) {
       .trim()
       .split('\n')
       .filter(Boolean)
-      .map((l) => JSON.parse(l));
+      .map((l) => JSON.parse(l))
+      .filter((c) => services.has(c.Service));
     const failed = containers.filter((c) => c.State === 'exited' && c.ExitCode !== 0);
     if (failed.length) {
       throw new Error(

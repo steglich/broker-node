@@ -258,26 +258,42 @@ services:
   example-service:
     profiles: [full]
     image: broker/example-service:local
+    # A telemetria precisa ser carregada antes do código do serviço (ESM).
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
     environment:
+      SERVICE_NAME: example-service
+      SERVICE_VERSION: 0.0.1
+      ENVIRONMENT: local
       PORT: '8080'
       DB_HOST: postgres
       DB_NAME: example
       DB_USER: example_app
       DB_PASSWORD_FILE: /run/secrets/db_example_app
-    secrets: [db_example_app]
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets: [db_example_app, rabbitmq_password]
     networks: [broker]
     depends_on:
       example-migrate:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
       test:
         [
           'CMD',
           'node',
           '-e',
-          "fetch('http://localhost:8080/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+          "fetch('http://localhost:8080/health/ready').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
         ]
       interval: 5s
       timeout: 3s
       retries: 20
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.example.rule: Host(`example.broker.localhost`)
+      traefik.http.routers.example.entrypoints: websecure
+      traefik.http.services.example.loadbalancer.server.port: '8080'
     <<: *small

@@ -54,3 +54,4 @@ export { PartitionedProducer, type ProducedMessage } from './stream/producer.js'
 export { murmur32, partitionIndex } from './stream/routing.js';
 export { ensureSuperStream, topicName, type SuperStreamOptions } from './stream/topology.js';
 export { runDlqCli } from './bin/dlq-cli.js';
+export { activeTraceparent, withConsumerSpan } from './tracing.js';

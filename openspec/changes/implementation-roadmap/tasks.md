@@ -47,14 +47,14 @@
 
 ## 6. Fase 0 — Service kit
 
-- [ ] 6.1 Implementar o bootstrap Express 5 com config validada por TypeBox (falha rápida), leitura de Docker secrets, encerramento gracioso e `/health/live`, `/health/ready`, `/info`; verificar que a falta de uma variável encerra o processo com mensagem clara (RN-BE-061, RN-OBS §5)
-- [ ] 6.2 Implementar os middlewares de correlação, contexto de execução, validação por esquema, Problem Details (RFC 9457) e conversão de erros técnicos; verificar as respostas `400`, `422` e `503` com `correlationId` (RN-BE-011, RN-BE-030..032)
-- [ ] 6.3 Implementar o middleware de idempotência (`Idempotency-Key`, hash do corpo, 24 h, Valkey + banco) e a concorrência otimista com `If-Match`/`ETag`; verificar a repetição (mesma resposta) e o reuso com outro corpo (`409 IDEMPOTENCY_KEY_REUSED`)
-- [ ] 6.4 Implementar logs `pino` JSON com campos mínimos, `wall_clock_at` e redact de campos sensíveis; verificar que `password`, `token` e `taxId` saem mascarados (RN-BE-050/051)
-- [ ] 6.5 Integrar o OpenTelemetry (HTTP, pg, amqp, undici e spans manuais nos consumidores via `traceparent` do envelope) e métricas RED; verificar no Grafana um trace HTTP→evento→consumidor (RN-OBS §4)
-- [ ] 6.6 Implementar a autenticação de usuário (JWT/JWKS) e de serviço (client credentials com escopos), o helper de autorização por propriedade (`404` para recurso alheio) e o cliente RPC (`undici`, timeout, `opossum`, retentativa só idempotente); verificar o disjuntor abrindo com a dependência lenta (RN-ARQ-002, RN-AUTHZ-002)
-- [ ] 6.7 Implementar paginação por cursor (limite padrão 50, máximo 200), filtros e ordenação permitida, e um helper de saga orquestrada (`saga_instance`, timeouts, retomada); verificar a retomada da saga após reinício (RN-API-020..023, RN-PAD-030/031)
-- [ ] 6.8 Implementar as feature flags por ambiente com sobrescrita por conta; verificar uma rota bloqueada com a flag desligada (RN-PAD-072)
+- [x] 6.1 Implementar o bootstrap Express 5 com config validada por TypeBox (falha rápida), leitura de Docker secrets, encerramento gracioso e `/health/live`, `/health/ready`, `/info`; verificar que a falta de uma variável encerra o processo com mensagem clara (RN-BE-061, RN-OBS §5)
+- [x] 6.2 Implementar os middlewares de correlação, contexto de execução, validação por esquema, Problem Details (RFC 9457) e conversão de erros técnicos; verificar as respostas `400`, `422` e `503` com `correlationId` (RN-BE-011, RN-BE-030..032)
+- [x] 6.3 Implementar o middleware de idempotência (`Idempotency-Key`, hash do corpo, 24 h, Valkey + banco) e a concorrência otimista com `If-Match`/`ETag`; verificar a repetição (mesma resposta) e o reuso com outro corpo (`409 IDEMPOTENCY_KEY_REUSED`)
+- [x] 6.4 Implementar logs `pino` JSON com campos mínimos, `wall_clock_at` e redact de campos sensíveis; verificar que `password`, `token` e `taxId` saem mascarados (RN-BE-050/051)
+- [x] 6.5 Integrar o OpenTelemetry (HTTP, pg, amqp, undici e spans manuais nos consumidores via `traceparent` do envelope) e métricas RED; verificar no Grafana um trace HTTP→evento→consumidor (RN-OBS §4)
+- [x] 6.6 Implementar a autenticação de usuário (JWT/JWKS) e de serviço (client credentials com escopos), o helper de autorização por propriedade (`404` para recurso alheio) e o cliente RPC (`undici`, timeout, `opossum`, retentativa só idempotente); verificar o disjuntor abrindo com a dependência lenta (RN-ARQ-002, RN-AUTHZ-002)
+- [x] 6.7 Implementar paginação por cursor (limite padrão 50, máximo 200), filtros e ordenação permitida, e um helper de saga orquestrada (`saga_instance`, timeouts, retomada); verificar a retomada da saga após reinício (RN-API-020..023, RN-PAD-030/031)
+- [x] 6.8 Implementar as feature flags por ambiente com sobrescrita por conta; verificar uma rota bloqueada com a flag desligada (RN-PAD-072)
 
 ## 7. Fase 0 — Contratos, cenários e testes compartilhados
 

@@ -20,6 +20,10 @@ export async function migrateToLatest(
     provider: { getMigrations: () => Promise.resolve(migrations) },
     migrationTableName: MIGRATION_TABLE,
     migrationLockTableName: `${MIGRATION_TABLE}_lock`,
+    // A plataforma pode ganhar migrações-base (`0000_platform_*`) depois que o serviço já aplicou
+    // as dele (`0001_*`): elas precisam rodar mesmo "fora de ordem". São independentes das do
+    // serviço, então a ordem entre os dois grupos não importa.
+    allowUnorderedMigrations: true,
   });
   const result = await migrator.migrateToLatest();
   if (result.error) throw result.error;

@@ -1,0 +1,92 @@
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { randomBytes } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { GenericContainer, Wait, type StartedTestContainer } from 'testcontainers';
+
+const infraFile = (path: string) =>
+  fileURLToPath(new URL(`../../../infra/${path}`, import.meta.url));
+
+export interface StartedPostgres {
+  container: StartedPostgreSqlContainer;
+  host: string;
+  port: number;
+  /** Senha de cada papel `<svc>_app` e `<svc>_migrator`. */
+  passwords: Record<string, string>;
+  superuser: { user: string; password: string };
+}
+
+/**
+ * PostgreSQL 17 com o MESMO script de init do ambiente local (infra/postgres/init): um database
+ * e as credenciais `<svc>_app` e `<svc>_migrator` para cada serviço de `services`.
+ */
+export async function startPostgres(services: readonly string[]): Promise<StartedPostgres> {
+  const passwords: Record<string, string> = {};
+  const secretFiles = services.flatMap((svc) =>
+    (['app', 'migrator'] as const).map((kind) => {
+      const role = `${svc}_${kind}`;
+      passwords[role] = randomBytes(16).toString('hex');
+      return { content: passwords[role], target: `/run/secrets/db/${role}` };
+    }),
+  );
+  const container = await new PostgreSqlContainer('postgres:17.11-alpine')
+    .withUsername('postgres')
+    .withPassword('postgres')
+    .withCopyContentToContainer([
+      { content: `${services.join('\n')}\n`, target: '/etc/broker/services.txt' },
+      {
+        content: readFileSync(infraFile('postgres/init/01-services.sh'), 'utf8'),
+        target: '/docker-entrypoint-initdb.d/01-services.sh',
+      },
+      ...secretFiles,
+    ])
+    .start();
+  return {
+    container,
+    host: container.getHost(),
+    port: container.getPort(),
+    passwords,
+    superuser: { user: 'postgres', password: 'postgres' },
+  };
+}
+
+export interface StartedRabbitMq {
+  container: StartedTestContainer;
+  host: string;
+  amqpPort: number;
+  streamPort: number;
+  managementPort: number;
+  user: string;
+  password: string;
+}
+
+/** RabbitMQ 4 com os plugins e a configuração do ambiente local (infra/rabbitmq). */
+export async function startRabbitMq(): Promise<StartedRabbitMq> {
+  const password = randomBytes(12).toString('hex');
+  const container = await new GenericContainer('rabbitmq:4.3.6-management-alpine')
+    .withHostname('rabbitmq')
+    .withExposedPorts(5672, 5552, 15672)
+    .withCopyContentToContainer([
+      {
+        content: readFileSync(infraFile('rabbitmq/enabled_plugins'), 'utf8'),
+        target: '/etc/rabbitmq/enabled_plugins',
+      },
+      {
+        content: readFileSync(infraFile('rabbitmq/rabbitmq.conf'), 'utf8'),
+        target: '/etc/rabbitmq/conf.d/10-broker.conf',
+      },
+      { content: `default_pass = ${password}\n`, target: '/etc/rabbitmq/conf.d/90-secret.conf' },
+    ])
+    .withWaitStrategy(Wait.forLogMessage(/Server startup complete/))
+    .withStartupTimeout(120_000)
+    .start();
+  return {
+    container,
+    host: container.getHost(),
+    amqpPort: container.getMappedPort(5672),
+    streamPort: container.getMappedPort(5552),
+    managementPort: container.getMappedPort(15672),
+    user: 'broker',
+    password,
+  };
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@broker/messaging",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Envelope, EventPublisher, outbox relay, EventConsumer com inbox, retentativas, DLQ, bloqueio por chave e filas de jobs (RabbitMQ).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@broker/clock": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/ids": "workspace:*",
+    "@broker/persistence": "workspace:*",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "amqplib": "2.2.0",
+    "kysely": "0.29.6",
+    "pg": "8.23.1",
+    "rabbitmq-stream-js-client": "1.1.0",
+    "typebox": "1.3.34"
+  },
+  "devDependencies": {
+    "@broker/testing": "workspace:*",
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  },
+  "bin": {
+    "broker-dlq": "./dist/bin/dlq-cli.js"
+  }
+}

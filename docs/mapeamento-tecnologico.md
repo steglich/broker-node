@@ -23,18 +23,20 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Barramento e mensageria
 
-| Conceito                             | Tecnologia                                                                                                    | Decisão |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ------- |
-| Barramento de eventos e comandos     | RabbitMQ 4 com **super streams** (partição por `partitionKey`, releitura por offset/timestamp)                | D6      |
-| Consumo ordenado por chave           | Single Active Consumer por partição, offset gravado no banco do serviço                                       | D6      |
-| Retentativas e DLQ                   | Quorum queues com TTL (`retry.1m/10m/1h`) e DLQ `<env>.<svc>.dlq` + tabela `dead_letter`                      | D6      |
-| Bloqueio por chave (DLQ ordenada)    | Tabelas `blocked_key` e `parked_message` (implementação própria)                                              | D6      |
-| Filas de jobs                        | Quorum queues com ack manual e prefetch                                                                       | D6      |
-| Clientes                             | `rabbitmq-stream-js-client` (streams) e `amqplib` (filas), atrás das portas de `@broker/messaging`            | D6      |
-| Outbox / inbox                       | `outbox_event` + relay com `LISTEN/NOTIFY` e `FOR UPDATE SKIP LOCKED`; `processed_event` + `consumer_offset`  | D7      |
-| Registro de esquemas (RN-BE-081)     | `contracts/` versionado no monorepo: TypeBox → JSON Schema + AsyncAPI 3; verificação de compatibilidade no CI | D8      |
-| Contrato de API síncrona (RN-BE-080) | TypeBox → OpenAPI 3.1 em `contracts/http/`                                                                    | D8      |
-| RPC síncrono interno                 | HTTP/JSON com `undici`, disjuntor `opossum`, timeout explícito                                                | D11     |
+| Conceito                             | Tecnologia                                                                                                                                                                                                                                   | Decisão |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Barramento de eventos e comandos     | RabbitMQ 4 com **super streams** (partição por `partitionKey`, releitura por offset/timestamp)                                                                                                                                               | D6      |
+| Consumo ordenado por chave           | Um consumidor SAC por partição com `consumerUpdateListener` (retoma do `consumer_offset` do banco) e fila serial por partição (`EventConsumer`); ver [ADR-0001](adr/0001-rabbitmq-streams.md)                                                | D6      |
+| Retentativas e DLQ                   | 5 tentativas locais com backoff; quorum queues `<env>.<consumidor>.retry.1m/10m/1h` com TTL e dead-letter para `retry.return`; DLQ `<env>.<consumidor>.dlq` + tabela `dead_letter`                                                           | D6      |
+| Bloqueio por chave                   | `blocked_key` e `parked_message`; em consumidor ordenado a chave é bloqueada já na retentativa atrasada (design D6)                                                                                                                          | D6      |
+| Filas de jobs                        | Quorum queues com ack manual, prefetch e DLQ por fila (`JobQueue`, `startJobWorker`); o worker conta as falhas                                                                                                                               | D6      |
+| Clientes                             | `rabbitmq-stream-js-client` 1.1.0 (streams, com adaptador próprio: roteamento murmur3 e publisher por partição com confirmação) e `amqplib` 2 (filas), atrás de `@broker/messaging`                                                          | D6      |
+| Outbox / inbox                       | `EventPublisher` grava na `outbox_event` + `pg_notify`; `OutboxRelay` com `LISTEN/NOTIFY`, polling, `FOR UPDATE SKIP LOCKED` e `publishingId` = `seq` (deduplicação no broker); `processed_event` + `consumer_offset` na transação do efeito | D7      |
+| Envelope e esquemas em runtime       | TypeBox 1.x (`typebox`) + Ajv 2020 com `ajv-formats`; envelope de RN-MSG-B §4; tolerant reader                                                                                                                                               | D2      |
+| Ferramenta de DLQ                    | `DlqAdmin` + API HTTP `/admin/dlq` (sem framework) + CLI `broker-dlq`; descarte gera `messaging.dead_letter_discarded` auditável                                                                                                             | D6      |
+| Registro de esquemas (RN-BE-081)     | `contracts/` versionado no monorepo: TypeBox → JSON Schema + AsyncAPI 3; verificação de compatibilidade no CI                                                                                                                                | D8      |
+| Contrato de API síncrona (RN-BE-080) | TypeBox → OpenAPI 3.1 em `contracts/http/`                                                                                                                                                                                                   | D8      |
+| RPC síncrono interno                 | HTTP/JSON com `undici`, disjuntor `opossum`, timeout explícito                                                                                                                                                                               | D11     |
 
 ## Dados
 
@@ -98,6 +100,11 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 - **Tabelas append-only**: duas barreiras independentes. O usuário `<svc>_app` perde UPDATE/DELETE/TRUNCATE, e o gatilho `forbid_mutation()` recusa essas operações até para o dono da tabela (`makeAppendOnly`).
 - **Limite da eleição de líder**: entre a queda real da conexão e o próximo heartbeat, o antigo líder ainda pode se achar líder. Quem escreve sob liderança deve escrever no mesmo banco (a queda da sessão derruba a transação) ou usar um _fencing token_.
 - **Datas técnicas no relógio do banco**: `created_at`, `processed_at` e afins das tabelas técnicas usam `now()` do PostgreSQL. Instantes de negócio (`occurred_at`) vêm sempre do relógio do ambiente (RN-CLK-004).
+
+- **Ordem com retentativa atrasada (design D6)**: o design bloqueava a chave só na DLQ, o que deixaria mensagens seguintes passarem na frente durante até ~1h11 de retentativas. Decisão do grupo 5: nos consumidores ordenados, a chave é bloqueada já na primeira retentativa atrasada (`blocked_key.reason = 'RETRYING'`).
+- **Filas por consumidor**: as filas de retentativa e a DLQ usam o nome do consumidor (`<env>.<consumidor>.dlq`), que é o `<svc>` do design quando o serviço tem um consumidor só. Um serviço com vários consumidores tem uma DLQ para cada.
+- **Contador de entregas no RabbitMQ 4**: um `nack` com requeue não incrementa o `x-delivery-count` das filas quorum, então o limite de entregas da fila não pegava jobs que falham sempre (voltavam em laço). O worker de jobs conta as falhas num cabeçalho próprio e manda para a DLQ no limite.
+- **Contornos do cliente de streams**: ver [ADR-0001](adr/0001-rabbitmq-streams.md).
 
 ## Versões da infraestrutura local
 

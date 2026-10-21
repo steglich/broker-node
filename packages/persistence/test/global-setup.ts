@@ -1,18 +1,8 @@
-import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { randomBytes } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { startPostgres } from '@broker/testing/containers';
 import type { TestProject } from 'vitest/node';
 
 /** Databases criados para os testes: um por arquivo, para isolar o estado. */
-export const TEST_SERVICES = [
-  'migrations',
-  'appendonly',
-  'crypto',
-  'leader',
-  'ledger',
-  'oms',
-] as const;
+export const TEST_SERVICES = ['migrations', 'appendonly', 'crypto', 'leader'] as const;
 
 export interface PostgresInfo {
   host: string;
@@ -28,47 +18,19 @@ declare module 'vitest' {
   }
 }
 
-const initScript = fileURLToPath(
-  new URL('../../../infra/postgres/init/01-services.sh', import.meta.url),
-);
-
-let container: StartedPostgreSqlContainer | undefined;
-
 /**
- * Sobe um PostgreSQL 17 real (Testcontainers) e roda nele o MESMO script de init do ambiente
- * local (infra/postgres/init), com um catálogo de teste. Assim os testes usam as credenciais
- * reais `<svc>_app` (DML) e `<svc>_migrator` (DDL).
+ * Sobe um PostgreSQL 17 real (Testcontainers) com o MESMO script de init do ambiente local.
+ * Assim os testes usam as credenciais reais `<svc>_app` (DML) e `<svc>_migrator` (DDL).
  */
 export default async function setup(project: TestProject): Promise<() => Promise<void>> {
-  const passwords: Record<string, string> = {};
-  const secretFiles = TEST_SERVICES.flatMap((svc) =>
-    (['app', 'migrator'] as const).map((kind) => {
-      const role = `${svc}_${kind}`;
-      passwords[role] = randomBytes(16).toString('hex');
-      return { content: passwords[role], target: `/run/secrets/db/${role}` };
-    }),
-  );
-
-  container = await new PostgreSqlContainer('postgres:17.11-alpine')
-    .withUsername('postgres')
-    .withPassword('postgres')
-    .withCopyContentToContainer([
-      { content: `${TEST_SERVICES.join('\n')}\n`, target: '/etc/broker/services.txt' },
-      {
-        content: readFileSync(initScript, 'utf8'),
-        target: '/docker-entrypoint-initdb.d/01-services.sh',
-      },
-      ...secretFiles,
-    ])
-    .start();
-
+  const pg = await startPostgres(TEST_SERVICES);
   project.provide('postgres', {
-    host: container.getHost(),
-    port: container.getPort(),
-    passwords,
-    superuser: { user: 'postgres', password: 'postgres' },
+    host: pg.host,
+    port: pg.port,
+    passwords: pg.passwords,
+    superuser: pg.superuser,
   });
   return async () => {
-    await container?.stop();
+    await pg.container.stop();
   };
 }

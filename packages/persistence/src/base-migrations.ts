@@ -169,4 +169,26 @@ export const baseMigrations: Record<string, Migration> = {
       await sql`DROP FUNCTION IF EXISTS forbid_mutation()`.execute(db);
     },
   },
+
+  // Decisão do grupo 5 (design D6): nos consumidores ordenados, a chave é bloqueada já quando a
+  // mensagem vai para a retentativa atrasada, antes de existir registro na DLQ.
+  '0000_platform_blocked_key_retry': {
+    async up(db: Kysely<unknown>) {
+      await sql`
+        ALTER TABLE blocked_key
+          ALTER COLUMN dead_letter_id DROP NOT NULL,
+          ADD COLUMN event_id uuid,
+          ADD COLUMN reason text NOT NULL DEFAULT 'DEAD_LETTER'
+            CHECK (reason IN ('RETRYING', 'DEAD_LETTER'))`.execute(db);
+      await sql`
+        ALTER TABLE blocked_key ADD CONSTRAINT blocked_key_reason_ref CHECK (
+          (reason = 'RETRYING' AND event_id IS NOT NULL) OR (reason = 'DEAD_LETTER' AND dead_letter_id IS NOT NULL)
+        )`.execute(db);
+    },
+    async down(db: Kysely<unknown>) {
+      await sql`ALTER TABLE blocked_key DROP CONSTRAINT blocked_key_reason_ref, DROP COLUMN reason, DROP COLUMN event_id`.execute(
+        db,
+      );
+    },
+  },
 };

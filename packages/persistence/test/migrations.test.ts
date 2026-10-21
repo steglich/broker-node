@@ -51,6 +51,7 @@ describe('migrador (RN-DB-020)', () => {
     const first = await migrateToLatest(migrator, migrations);
     expect(first.results?.map((r) => [r.migrationName, r.status])).toEqual([
       ['0000_platform_base', 'Success'],
+      ['0000_platform_blocked_key_retry', 'Success'],
       ['0001_account_balance', 'Success'],
     ]);
     const second = await migrateToLatest(migrator, migrations);
@@ -58,7 +59,11 @@ describe('migrador (RN-DB-020)', () => {
     const applied = await sql<{
       name: string;
     }>`SELECT name FROM ${sql.table(MIGRATION_TABLE)} ORDER BY name`.execute(migrator);
-    expect(applied.rows.map((r) => r.name)).toEqual(['0000_platform_base', '0001_account_balance']);
+    expect(applied.rows.map((r) => r.name)).toEqual([
+      '0000_platform_base',
+      '0000_platform_blocked_key_retry',
+      '0001_account_balance',
+    ]);
   });
 
   it('RN-DB-032: o usuário da aplicação não consegue migrar (sem DDL)', async () => {

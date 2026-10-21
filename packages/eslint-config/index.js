@@ -60,6 +60,15 @@ export default tseslint.config(
     // Todo o código roda em Node.js (serviços, scripts e testes).
     languageOptions: { globals: globals.node },
   },
+  {
+    rules: {
+      // `_nome` marca o que é ignorado de propósito (ex.: `{ eventId: _omit, ...resto }`).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
+    },
+  },
   ...tseslint.configs.recommended,
   {
     plugins: { import: importX },

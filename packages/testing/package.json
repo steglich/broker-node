@@ -2,13 +2,18 @@
   "name": "@broker/testing",
   "version": "0.0.0",
   "private": true,
-  "description": "Utilitários de teste: geradores determinísticos (CPF, PRNG com semente).",
+  "description": "Utilitários de teste: geradores determinísticos (CPF, PRNG com semente) e contêineres (PostgreSQL, RabbitMQ).",
   "type": "module",
   "exports": {
     ".": {
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./containers": {
+      "source": "./src/containers.ts",
+      "types": "./dist/containers.d.ts",
+      "default": "./dist/containers.js"
     }
   },
   "files": [
@@ -19,7 +24,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@broker/domain-kernel": "workspace:*"
+    "@broker/domain-kernel": "workspace:*",
+    "@testcontainers/postgresql": "12.2.0",
+    "testcontainers": "12.2.0"
   },
   "devDependencies": {
     "@broker/tsconfig": "workspace:*",

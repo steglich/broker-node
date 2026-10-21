@@ -36,14 +36,14 @@
 
 ## 5. Fase 0 — Mensageria (RabbitMQ streams)
 
-- [ ] 5.1 Spike: com `rabbitmq-stream-js-client`, criar um super stream de 3 partições, publicar por chave e consumir com Single Active Consumer em duas instâncias; verificar a ordem por chave, o failover e a releitura por offset. Registrar o resultado em `docs/adr/0001-rabbitmq-streams.md`
-- [ ] 5.2 Definir o envelope padrão em TypeBox e o `EventPublisher` (validação de esquema, limite de 256 KB, bloqueio de dados pessoais por lista de campos); verificar que um payload de 300 KB é recusado no produtor (RN-MSG-B §4, RN-MSG-B-013/014)
-- [ ] 5.3 Implementar o outbox relay (LISTEN/NOTIFY + polling, `SKIP LOCKED`, série por `partition_key`, confirmação do broker, limpeza de 7 dias); verificar que matar o relay entre publicar e marcar não gera efeito duplicado (ADR-0008)
-- [ ] 5.4 Implementar o `EventConsumer` com SAC, offset e inbox na transação do efeito, rejeição de `environment` diferente e tolerant reader; verificar a idempotência com evento duplicado e a retomada pelo offset salvo (RN-MSG-B-030..032)
-- [ ] 5.5 Implementar as retentativas locais com backoff, as filas quorum `retry.1m|10m|1h` com TTL/DLX e a DLQ por serviço; verificar a sequência completa com erro transitório forçado e o envio direto para a DLQ em erro de esquema (RN-MSG-B-033/034)
-- [ ] 5.6 Implementar o bloqueio por chave (`blocked_key`, `parked_message`) com flag por consumidor (ordenado ou não); verificar que a chave A fica retida enquanto a B segue e que a liberação reprocessa em ordem (RN-MSG-B-035)
-- [ ] 5.7 Implementar a ferramenta de DLQ (CLI + API administrativa: listar, inspecionar, reprocessar, descartar com justificativa auditada); verificar o reprocessamento que desbloqueia a chave (RN-MSG-B-036)
-- [ ] 5.8 Implementar o publicador e o consumidor de filas de jobs (quorum, ack manual, prefetch); verificar a reentrega quando o worker morre sem ack
+- [x] 5.1 Spike: com `rabbitmq-stream-js-client`, criar um super stream de 3 partições, publicar por chave e consumir com Single Active Consumer em duas instâncias; verificar a ordem por chave, o failover e a releitura por offset. Registrar o resultado em `docs/adr/0001-rabbitmq-streams.md`
+- [x] 5.2 Definir o envelope padrão em TypeBox e o `EventPublisher` (validação de esquema, limite de 256 KB, bloqueio de dados pessoais por lista de campos); verificar que um payload de 300 KB é recusado no produtor (RN-MSG-B §4, RN-MSG-B-013/014)
+- [x] 5.3 Implementar o outbox relay (LISTEN/NOTIFY + polling, `SKIP LOCKED`, série por `partition_key`, confirmação do broker, limpeza de 7 dias); verificar que matar o relay entre publicar e marcar não gera efeito duplicado (ADR-0008)
+- [x] 5.4 Implementar o `EventConsumer` com SAC, offset e inbox na transação do efeito, rejeição de `environment` diferente e tolerant reader; verificar a idempotência com evento duplicado e a retomada pelo offset salvo (RN-MSG-B-030..032)
+- [x] 5.5 Implementar as retentativas locais com backoff, as filas quorum `retry.1m|10m|1h` com TTL/DLX e a DLQ por serviço; verificar a sequência completa com erro transitório forçado e o envio direto para a DLQ em erro de esquema (RN-MSG-B-033/034)
+- [x] 5.6 Implementar o bloqueio por chave (`blocked_key`, `parked_message`) com flag por consumidor (ordenado ou não); verificar que a chave A fica retida enquanto a B segue e que a liberação reprocessa em ordem (RN-MSG-B-035)
+- [x] 5.7 Implementar a ferramenta de DLQ (CLI + API administrativa: listar, inspecionar, reprocessar, descartar com justificativa auditada); verificar o reprocessamento que desbloqueia a chave (RN-MSG-B-036)
+- [x] 5.8 Implementar o publicador e o consumidor de filas de jobs (quorum, ack manual, prefetch); verificar a reentrega quando o worker morre sem ack
 
 ## 6. Fase 0 — Service kit
 

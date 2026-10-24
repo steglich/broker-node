@@ -147,8 +147,14 @@ describe('retentativas (RN-MSG-B-033/034)', () => {
       }>`SELECT reason FROM blocked_key WHERE partition_key = 'acc-exhausted'`.execute(db)
     ).rows[0];
     expect(block?.reason).toBe('DEAD_LETTER');
-    expect(alerts).toContain('acc-exhausted');
-    expect(await queueDepth('prod.oms.hold-tracker.dlq')).toBeGreaterThanOrEqual(1);
+    // A cópia na fila DLQ e o alerta vêm depois do commit no banco: espera por eles.
+    await waitUntil(
+      async () => (await queueDepth('prod.oms.hold-tracker.dlq')) >= 1,
+      5000,
+      'cópia na fila DLQ',
+    );
+    await waitUntil(() => alerts.includes('acc-exhausted'), 5000, 'alerta crítico');
+    expect(alerts.filter((k) => k === 'acc-exhausted')).toHaveLength(1);
   });
 
   it('RN-MSG-B-034: erro de esquema vai direto para a DLQ, sem retentativa', async () => {

@@ -38,6 +38,8 @@ export const DEFAULT_ROUTINES: readonly RoutineDefinition[] = [
     'brokerage_notes',
     'negative_balance_interest',
   ]),
+  // Verificação da cadeia da trilha e âncora do dia (RN-AUD-001/002), depois do expediente.
+  trading('audit_chain_verify', 'audit-service', { at: '23:30' }),
   {
     name: 'custody_fee',
     owner: 'ledger-service',

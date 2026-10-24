@@ -89,9 +89,9 @@
 
 ## 12. Fase 1 — audit-service
 
-- [ ] 12.1 Implementar `audit_record` append-only com `seq` e hash encadeado sobre o conteúdo canônico, consumindo eventos `auditable` e `audit.*`; verificar que a adulteração manual é detectada pela verificação (RN-AUD-001, RN-AUD-BO-002)
-- [ ] 12.2 Implementar a verificação diária da cadeia com alerta crítico e a ancoragem do hash diário no bucket com object lock; verificar que a âncora não pode ser sobrescrita (RN-AUD-002)
-- [ ] 12.3 Implementar a consulta (ator, ação, recurso, período) restrita a `BO_AUDITOR`/`BO_ADMIN`, auditando a própria consulta; verificar o `403` para `BO_FINANCE` (RN-AUD-005)
+- [x] 12.1 Implementar `audit_record` append-only com `seq` e hash encadeado sobre o conteúdo canônico, consumindo eventos `auditable` e `audit.*`; verificar que a adulteração manual é detectada pela verificação (RN-AUD-001, RN-AUD-BO-002)
+- [x] 12.2 Implementar a verificação diária da cadeia com alerta crítico e a ancoragem do hash diário no bucket com object lock; verificar que a âncora não pode ser sobrescrita (RN-AUD-002)
+- [x] 12.3 Implementar a consulta (ator, ação, recurso, período) restrita a `BO_AUDITOR`/`BO_ADMIN`, auditando a própria consulta; verificar o `403` para `BO_FINANCE` (RN-AUD-005)
 
 ## 13. Fase 1 — identity-service
 

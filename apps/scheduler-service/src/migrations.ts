@@ -63,4 +63,14 @@ export const migrations: Record<string, Migration> = {
       }
     },
   },
+  '0003_audit_chain_verify': {
+    // Rotina da auditoria (grupo 12): verificação diária da cadeia e âncora (RN-AUD-001/002).
+    async up(db: Kysely<unknown>) {
+      const r = DEFAULT_ROUTINES.find((d) => d.name === 'audit_chain_verify')!;
+      await sql`
+        INSERT INTO routine_definition (name, owner, schedule, days, depends_on, enabled)
+        VALUES (${r.name}, ${r.owner}, ${JSON.stringify(r.schedule)}, ${r.days}, ${[...r.dependsOn]}, ${r.enabled})
+        ON CONFLICT (name) DO NOTHING`.execute(db);
+    },
+  },
 };

@@ -66,6 +66,10 @@ secrets:
     file: ../secrets/db/scheduler_app
   db_scheduler_migrator:
     file: ../secrets/db/scheduler_migrator
+  db_audit_app:
+    file: ../secrets/db/audit_app
+  db_audit_migrator:
+    file: ../secrets/db/audit_migrator
   db_pix_simulator_app:
     file: ../secrets/db/pix_simulator_app
   db_pix_simulator_migrator:
@@ -467,7 +471,8 @@ services:
       CLOCK_MODE: ${CLOCK_MODE:-REAL}
       CLOCK_START: ${CLOCK_START:-}
       CLOCK_SPEED_FACTOR: ${CLOCK_SPEED_FACTOR:-1}
-      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-}
+      # Tópicos de onde vêm os routine.completed/failed dos donos das rotinas.
+      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-audit}
       ADMIN_API_ENABLED: 'true'
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets: [db_scheduler_app, rabbitmq_password]
@@ -475,6 +480,9 @@ services:
     depends_on:
       scheduler-migrate:
         condition: service_completed_successfully
+      # Os tópicos de ROUTINE_RESULT_CONTEXTS precisam existir antes dos consumidores.
+      audit-service:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     <<: [*ready-check, *small]
@@ -483,6 +491,71 @@ services:
       traefik.http.routers.scheduler.rule: Host(`scheduler.broker.localhost`)
       traefik.http.routers.scheduler.entrypoints: websecure
       traefik.http.services.scheduler.loadbalancer.server.port: '8080'
+
+  audit-migrate:
+    profiles: [core]
+    image: broker/audit-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/audit-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: audit
+      DB_USER: audit_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_audit_migrator
+    secrets: [db_audit_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Trilha de auditoria (RN-AUD-001..005): consome os eventos auditable/audit.* dos tópicos de
+  # AUDIT_SOURCE_CONTEXTS, verifica a cadeia e grava a âncora diária no bucket audit-anchors.
+  audit-service:
+    profiles: [core]
+    image: broker/audit-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: audit-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: audit
+      DB_USER: audit_app
+      DB_PASSWORD_FILE: /run/secrets/db_audit_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUDIT_SOURCE_CONTEXTS: ${AUDIT_SOURCE_CONTEXTS:-}
+      ANCHOR_S3_ENDPOINT: http://minio:9000
+      ANCHOR_S3_ACCESS_KEY: broker
+      ANCHOR_S3_SECRET_KEY_FILE: /run/secrets/minio_root_password
+      # identity-service (grupo 13): JWKS e emissor do realm do backoffice.
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost/backoffice
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets: [db_audit_app, rabbitmq_password, minio_root_password]
+    networks: [broker]
+    depends_on:
+      audit-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.audit.rule: Host(`audit.broker.localhost`)
+      traefik.http.routers.audit.entrypoints: websecure
+      traefik.http.services.audit.loadbalancer.server.port: '8080'
 
   # ---------------------------------------------------------------- serviços
   # Padrão de um serviço: imagem do Dockerfile único (SERVICE=<pacote>), um one-shot de

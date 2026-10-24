@@ -42,6 +42,10 @@ export interface EventConsumerOptions {
   stream: StreamSettings;
   /** Conexão da aplicação (`<svc>_app`) com as migrações-base aplicadas. */
   db: Kysely<unknown>;
+  /**
+   * Handler por `eventType`. A chave `'*'` recebe os tipos sem handler próprio (ex.: a trilha de
+   * auditoria, que grava todo evento `auditable` de um tópico); ela não confere versão.
+   */
   handlers: Readonly<Record<string, EventHandler>>;
   /** Fluxo em que a ordem importa (ledger, custódia, ordens, Motor): DLQ e retentativa bloqueiam a chave. */
   ordered: boolean;
@@ -226,7 +230,7 @@ export class EventConsumer {
   }
 
   private handlerFor(envelope: Envelope): EventHandler | undefined {
-    const handler = this.options.handlers[envelope.eventType];
+    const handler = this.options.handlers[envelope.eventType] ?? this.options.handlers['*'];
     if (!handler) return undefined;
     if (handler.definition && handler.definition.eventVersion !== envelope.eventVersion)
       return undefined;

@@ -16,6 +16,8 @@ let db: Kysely<unknown>;
 let valkey: Valkey;
 let deposits: number;
 let failNext = false;
+/** Trava opcional do handler: segura a requisição "em andamento" até o teste liberar. */
+let gate: { entered: () => void; release: Promise<void> } | undefined;
 
 const Deposit = Type.Object({ amount: Type.String({ pattern: '^\\d+\\.\\d{2}$' }) });
 
@@ -33,7 +35,14 @@ function app(withValkey = true) {
         failNext = false;
         throw serviceUnavailable();
       }
-      await sleep(50);
+      if (gate) {
+        const current = gate;
+        gate = undefined;
+        current.entered();
+        await current.release;
+      } else {
+        await sleep(50);
+      }
       deposits++;
       return {
         status: 201,
@@ -145,18 +154,24 @@ describe('idempotência de comandos (RN-PAD §4)', () => {
   it('duas requisições simultâneas com a mesma chave: só uma executa', async () => {
     const service = app();
     const before = deposits;
-    const [a, b] = await Promise.all([
+    // A 1ª fica presa no handler (chave "em andamento") enquanto a 2ª chega: a sobreposição é
+    // garantida pela trava, não pela sorte do agendamento (sem ela, no CI a 2ª chegava depois).
+    let release!: () => void;
+    const entered = new Promise<void>((resolve) => {
+      gate = { entered: resolve, release: new Promise<void>((r) => (release = r)) };
+    });
+    const send = () =>
       request(service.app)
         .post('/v1/me/deposits')
         .set('Idempotency-Key', 'key-concurrent1')
-        .send({ amount: '1.00' }),
-      request(service.app)
-        .post('/v1/me/deposits')
-        .set('Idempotency-Key', 'key-concurrent1')
-        .send({ amount: '1.00' }),
-    ]);
-    expect([a.status, b.status].sort()).toEqual([201, 409]);
-    expect([a.body.code, b.body.code]).toContain('IDEMPOTENCY_REQUEST_IN_PROGRESS');
+        .send({ amount: '1.00' });
+    const first = send().then((r) => r);
+    await entered;
+    const second = await send();
+    release();
+    expect((await first).status).toBe(201);
+    expect(second.status).toBe(409);
+    expect(second.body.code).toBe('IDEMPOTENCY_REQUEST_IN_PROGRESS');
     expect(deposits).toBe(before + 1);
   });
 

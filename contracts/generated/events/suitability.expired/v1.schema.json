@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:suitability.expired:v1",
+  "title": "suitability.expired v1",
+  "description": "Suitability vencido: novas compras exigem refazer o questionário.",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "customerId",
+    "validUntil"
+  ],
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

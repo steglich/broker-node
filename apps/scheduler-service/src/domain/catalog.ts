@@ -40,6 +40,9 @@ export const DEFAULT_ROUTINES: readonly RoutineDefinition[] = [
   ]),
   // Verificação da cadeia da trilha e âncora do dia (RN-AUD-001/002), depois do expediente.
   trading('audit_chain_verify', 'audit-service', { at: '23:30' }),
+  // Expirações do onboarding (30 dias), do suitability (24 meses) e do cadastro (RN-ONB-002,
+  // RN-SUI-012, RN-CAD-003), depois do pregão.
+  trading('customer_daily', 'customer-service', { at: '22:00' }),
   {
     name: 'custody_fee',
     owner: 'ledger-service',

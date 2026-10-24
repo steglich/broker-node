@@ -104,14 +104,14 @@
 
 ## 14. Fase 1 — customer-service
 
-- [ ] 14.1 Implementar `onboarding_application` com a máquina de estados, as etapas como rascunho, as validações cadastrais e a unicidade por CPF (hash com chave); verificar `UNDERAGE`, `TAX_ID_ALREADY_REGISTERED` e a retomada (RN-ONB-001/004)
-- [ ] 14.2 Implementar o upload de documentos por URL pré-assinada do MinIO com verificação de tipo pelo conteúdo, tamanho e resolução; verificar `DOCUMENT_INVALID_FORMAT` para 12 MB
-- [ ] 14.3 Implementar o adaptador ACL do KYC (submissão, webhook assinado, `kyc_check` com payload bruto, idempotência por `check_id`) e as regras de decisão (FACE_MATCH, PEP e residência fiscal → revisão manual); verificar os quatro cenários de KYC (RN-ONB-010/011/020..022)
-- [ ] 14.4 Implementar a saga de abertura (aprovação → conta `NNNNNNN-D` → `customer.created`/`account.opened`) com retomada após reinício; verificar a criação única da conta após reinício no meio
-- [ ] 14.5 Implementar o suitability (questionário versionado, pesos, faixas parametrizáveis, validade de 24 meses, `suitability.expiring/expired`) e os termos (aceite com hash, nova versão bloqueia operações); verificar a pontuação 32 → `AGGRESSIVE` e `TERMS_PENDING` (RN-SUI-*, RN-TER-*)
-- [ ] 14.6 Implementar o status da conta com a matriz de permissões, `account.status_changed`, o consumidor de saldo devedor e o encerramento com lista de pendências; verificar `RESTRICTED` por `NEGATIVE_BALANCE` e o retorno a `ACTIVE` (RN-ACC-010..012, RN-DEV-002/005)
-- [ ] 14.7 Implementar as contas de saque (até 3, titularidade via simulador, assinatura, carência de 24 h) e a manutenção cadastral (OTP duplo, revisão manual de nome/documento, histórico, vencimento em 24 meses); verificar a chave de terceiro → `BANK_ACCOUNT_NOT_ALLOWED` (RN-ACC-020/021, RN-CAD-*)
-- [ ] 14.8 Implementar a expiração do onboarding (30 dias) e a criação da conta no Banco Simulado ao abrir a conta; verificar com o relógio virtual (RN-ONB-002)
+- [x] 14.1 Implementar `onboarding_application` com a máquina de estados, as etapas como rascunho, as validações cadastrais e a unicidade por CPF (hash com chave); verificar `UNDERAGE`, `TAX_ID_ALREADY_REGISTERED` e a retomada (RN-ONB-001/004)
+- [x] 14.2 Implementar o upload de documentos por URL pré-assinada do MinIO com verificação de tipo pelo conteúdo, tamanho e resolução; verificar `DOCUMENT_INVALID_FORMAT` para 12 MB
+- [x] 14.3 Implementar o adaptador ACL do KYC (submissão, webhook assinado, `kyc_check` com payload bruto, idempotência por `check_id`) e as regras de decisão (FACE_MATCH, PEP e residência fiscal → revisão manual); verificar os quatro cenários de KYC (RN-ONB-010/011/020..022)
+- [x] 14.4 Implementar a saga de abertura (aprovação → conta `NNNNNNN-D` → `customer.created`/`account.opened`) com retomada após reinício; verificar a criação única da conta após reinício no meio
+- [x] 14.5 Implementar o suitability (questionário versionado, pesos, faixas parametrizáveis, validade de 24 meses, `suitability.expiring/expired`) e os termos (aceite com hash, nova versão bloqueia operações); verificar a pontuação 32 → `AGGRESSIVE` e `TERMS_PENDING` (RN-SUI-*, RN-TER-*)
+- [x] 14.6 Implementar o status da conta com a matriz de permissões, `account.status_changed`, o consumidor de saldo devedor e o encerramento com lista de pendências; verificar `RESTRICTED` por `NEGATIVE_BALANCE` e o retorno a `ACTIVE` (RN-ACC-010..012, RN-DEV-002/005)
+- [x] 14.7 Implementar as contas de saque (até 3, titularidade via simulador, assinatura, carência de 24 h) e a manutenção cadastral (OTP duplo, revisão manual de nome/documento, histórico, vencimento em 24 meses); verificar a chave de terceiro → `BANK_ACCOUNT_NOT_ALLOWED` (RN-ACC-020/021, RN-CAD-*)
+- [x] 14.8 Implementar a expiração do onboarding (30 dias) e a criação da conta no Banco Simulado ao abrir a conta; verificar com o relógio virtual (RN-ONB-002)
 
 ## 15. Fase 1 — ledger-service
 

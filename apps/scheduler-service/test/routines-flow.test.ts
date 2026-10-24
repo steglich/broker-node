@@ -114,7 +114,7 @@ describe('dependências e catch-up (11.2, RN-ROT-002/003)', () => {
     const lastPreviousDay = events.map((e) => e.businessDate).lastIndexOf('2026-03-03');
     expect(lastPreviousDay).toBeLessThan(firstNextDay);
     // D inteiro, em atraso; D+1 só até o que venceu às 08:30.
-    expect(events.filter((e) => e.businessDate === '2026-03-03')).toHaveLength(18);
+    expect(events.filter((e) => e.businessDate === '2026-03-03')).toHaveLength(19);
     expect(events.filter((e) => e.businessDate === '2026-03-03').every((e) => e.catchUp)).toBe(
       true,
     );

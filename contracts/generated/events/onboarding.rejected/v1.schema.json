@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:onboarding.rejected:v1",
+  "title": "onboarding.rejected v1",
+  "description": "Abertura reprovada.",
+  "x-producer": "customer-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "applicationId"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reasonCode": {
+      "type": "string"
+    },
+    "decidedBy": {
+      "type": "string"
+    }
+  }
+}

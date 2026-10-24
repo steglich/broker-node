@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:ledger.negative_balance_detected:v1",
+  "title": "ledger.negative_balance_detected v1",
+  "description": "Saldo liquidado negativo (RN-DEV-002).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "accountId",
+    "settledBalance"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "settledBalance": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:suitability.assessed:v1",
+  "title": "suitability.assessed v1",
+  "description": "Novo perfil de investidor (RN-SUI-003).",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "customerId",
+    "profile",
+    "score",
+    "validUntil",
+    "questionnaireVersion"
+  ],
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "profile": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CONSERVATIVE"
+        },
+        {
+          "type": "string",
+          "const": "MODERATE"
+        },
+        {
+          "type": "string",
+          "const": "AGGRESSIVE"
+        }
+      ]
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date"
+    },
+    "questionnaireVersion": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

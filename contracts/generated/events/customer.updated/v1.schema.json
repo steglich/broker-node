@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:customer.updated:v1",
+  "title": "customer.updated v1",
+  "description": "Dados cadastrais alterados (RN-CAD-004).",
+  "x-producer": "customer-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "customerId",
+    "changedFields"
+  ],
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "changedFields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "declaredNetWorth": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    }
+  }
+}

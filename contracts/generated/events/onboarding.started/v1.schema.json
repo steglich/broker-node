@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:onboarding.started:v1",
+  "title": "onboarding.started v1",
+  "description": "Solicitação de abertura iniciada (login criado).",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "applicationId",
+    "userId"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

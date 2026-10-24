@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:onboarding.kyc_completed:v1",
+  "title": "onboarding.kyc_completed v1",
+  "description": "Resultado do KYC simulado (RN-ONB-020..022).",
+  "x-producer": "customer-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "applicationId",
+    "outcome",
+    "checks"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "APPROVED"
+        },
+        {
+          "type": "string",
+          "const": "MANUAL_REVIEW"
+        },
+        {
+          "type": "string",
+          "const": "REJECTED"
+        }
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "result"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -23,6 +23,39 @@
         },
         "customer.created.v1": {
           "$ref": "#/components/messages/customer.created.v1"
+        },
+        "customer.updated.v1": {
+          "$ref": "#/components/messages/customer.updated.v1"
+        },
+        "onboarding.approved.v1": {
+          "$ref": "#/components/messages/onboarding.approved.v1"
+        },
+        "onboarding.kyc_completed.v1": {
+          "$ref": "#/components/messages/onboarding.kyc_completed.v1"
+        },
+        "onboarding.rejected.v1": {
+          "$ref": "#/components/messages/onboarding.rejected.v1"
+        },
+        "onboarding.started.v1": {
+          "$ref": "#/components/messages/onboarding.started.v1"
+        },
+        "onboarding.step_completed.v1": {
+          "$ref": "#/components/messages/onboarding.step_completed.v1"
+        },
+        "onboarding.submitted.v1": {
+          "$ref": "#/components/messages/onboarding.submitted.v1"
+        },
+        "suitability.assessed.v1": {
+          "$ref": "#/components/messages/suitability.assessed.v1"
+        },
+        "suitability.expired.v1": {
+          "$ref": "#/components/messages/suitability.expired.v1"
+        },
+        "suitability.expiring.v1": {
+          "$ref": "#/components/messages/suitability.expiring.v1"
+        },
+        "terms.accepted.v1": {
+          "$ref": "#/components/messages/terms.accepted.v1"
         }
       }
     },
@@ -89,6 +122,22 @@
         }
       }
     },
+    "ledger": {
+      "address": "{environment}.ledger.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "ledger.negative_balance_cleared.v1": {
+          "$ref": "#/components/messages/ledger.negative_balance_cleared.v1"
+        },
+        "ledger.negative_balance_detected.v1": {
+          "$ref": "#/components/messages/ledger.negative_balance_detected.v1"
+        }
+      }
+    },
     "owner-topics": {
       "address": "{environment}.{context}.events",
       "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
@@ -152,6 +201,17 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/customer.created.v1"
+        }
+      ]
+    },
+    "customer-service.send.customer.updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/customer.updated.v1"
         }
       ]
     },
@@ -254,6 +314,94 @@
         }
       ]
     },
+    "ledger-service.send.ledger.negative_balance_cleared.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/ledger.negative_balance_cleared.v1"
+        }
+      ]
+    },
+    "ledger-service.send.ledger.negative_balance_detected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/ledger.negative_balance_detected.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.approved.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.approved.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.kyc_completed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.kyc_completed.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.rejected.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.started.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.started.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.step_completed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.step_completed.v1"
+        }
+      ]
+    },
+    "customer-service.send.onboarding.submitted.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/onboarding.submitted.v1"
+        }
+      ]
+    },
     "routine-owner.send.routine.completed.v1": {
       "action": "send",
       "channel": {
@@ -284,6 +432,50 @@
       "messages": [
         {
           "$ref": "#/channels/scheduler/messages/routine.triggered.v1"
+        }
+      ]
+    },
+    "customer-service.send.suitability.assessed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/suitability.assessed.v1"
+        }
+      ]
+    },
+    "customer-service.send.suitability.expired.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/suitability.expired.v1"
+        }
+      ]
+    },
+    "customer-service.send.suitability.expiring.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/suitability.expiring.v1"
+        }
+      ]
+    },
+    "customer-service.send.terms.accepted.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/terms.accepted.v1"
         }
       ]
     }
@@ -527,6 +719,29 @@
           }
         }
       },
+      "customer.updated.v1": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "changedFields"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "changedFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "declaredNetWorth": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          }
+        }
+      },
       "example.pinged.v1": {
         "type": "object",
         "required": [
@@ -724,6 +939,177 @@
           }
         }
       },
+      "ledger.negative_balance_cleared.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "settledBalance"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "settledBalance": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          }
+        }
+      },
+      "ledger.negative_balance_detected.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "settledBalance"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "settledBalance": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          }
+        }
+      },
+      "onboarding.approved.v1": {
+        "type": "object",
+        "required": [
+          "applicationId"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "decidedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "onboarding.kyc_completed.v1": {
+        "type": "object",
+        "required": [
+          "applicationId",
+          "outcome",
+          "checks"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "APPROVED"
+              },
+              {
+                "type": "string",
+                "const": "MANUAL_REVIEW"
+              },
+              {
+                "type": "string",
+                "const": "REJECTED"
+              }
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "type",
+                "result"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "onboarding.rejected.v1": {
+        "type": "object",
+        "required": [
+          "applicationId"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "decidedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "onboarding.started.v1": {
+        "type": "object",
+        "required": [
+          "applicationId",
+          "userId"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "onboarding.step_completed.v1": {
+        "type": "object",
+        "required": [
+          "applicationId",
+          "step"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "step": {
+            "type": "string"
+          }
+        }
+      },
+      "onboarding.submitted.v1": {
+        "type": "object",
+        "required": [
+          "applicationId"
+        ],
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "routine.completed.v1": {
         "type": "object",
         "required": [
@@ -819,6 +1205,114 @@
           },
           "catchUp": {
             "type": "boolean"
+          }
+        }
+      },
+      "suitability.assessed.v1": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "profile",
+          "score",
+          "validUntil",
+          "questionnaireVersion"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CONSERVATIVE"
+              },
+              {
+                "type": "string",
+                "const": "MODERATE"
+              },
+              {
+                "type": "string",
+                "const": "AGGRESSIVE"
+              }
+            ]
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date"
+          },
+          "questionnaireVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "suitability.expired.v1": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "validUntil"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "suitability.expiring.v1": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "validUntil"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "terms.accepted.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "termsCode",
+          "version",
+          "acceptedAt"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "termsCode": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }
@@ -970,6 +1464,40 @@
           "tax-service",
           "notification-service",
           "identity-service"
+        ]
+      },
+      "customer.updated.v1": {
+        "name": "customer.updated",
+        "title": "customer.updated v1",
+        "summary": "Dados cadastrais alterados (RN-CAD-004).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "customer.updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/customer.updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "risk-service"
         ]
       },
       "example.pinged.v1": {
@@ -1284,6 +1812,285 @@
           "audit-service"
         ]
       },
+      "ledger.negative_balance_cleared.v1": {
+        "name": "ledger.negative_balance_cleared",
+        "title": "ledger.negative_balance_cleared v1",
+        "summary": "Saldo devedor coberto (RN-DEV-005).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "ledger.negative_balance_cleared"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/ledger.negative_balance_cleared.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "customer-service",
+          "risk-service",
+          "notification-service"
+        ]
+      },
+      "ledger.negative_balance_detected.v1": {
+        "name": "ledger.negative_balance_detected",
+        "title": "ledger.negative_balance_detected v1",
+        "summary": "Saldo liquidado negativo (RN-DEV-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "ledger.negative_balance_detected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/ledger.negative_balance_detected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "customer-service",
+          "risk-service",
+          "notification-service"
+        ]
+      },
+      "onboarding.approved.v1": {
+        "name": "onboarding.approved",
+        "title": "onboarding.approved v1",
+        "summary": "Abertura aprovada (automática ou pelo backoffice).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.approved"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.approved.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "onboarding.kyc_completed.v1": {
+        "name": "onboarding.kyc_completed",
+        "title": "onboarding.kyc_completed v1",
+        "summary": "Resultado do KYC simulado (RN-ONB-020..022).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.kyc_completed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.kyc_completed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "onboarding.rejected.v1": {
+        "name": "onboarding.rejected",
+        "title": "onboarding.rejected v1",
+        "summary": "Abertura reprovada.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "onboarding.started.v1": {
+        "name": "onboarding.started",
+        "title": "onboarding.started v1",
+        "summary": "Solicitação de abertura iniciada (login criado).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.started"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.started.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service"
+        ]
+      },
+      "onboarding.step_completed.v1": {
+        "name": "onboarding.step_completed",
+        "title": "onboarding.step_completed v1",
+        "summary": "Etapa do onboarding concluída (funil).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.step_completed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.step_completed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "reporting-service"
+        ]
+      },
+      "onboarding.submitted.v1": {
+        "name": "onboarding.submitted",
+        "title": "onboarding.submitted v1",
+        "summary": "Solicitação submetida para análise.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "onboarding.submitted"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/onboarding.submitted.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service"
+        ]
+      },
       "routine.completed.v1": {
         "name": "routine.completed",
         "title": "routine.completed v1",
@@ -1384,6 +2191,146 @@
         "x-producer": "scheduler-service",
         "x-consumers": [
           "routine-owner"
+        ]
+      },
+      "suitability.assessed.v1": {
+        "name": "suitability.assessed",
+        "title": "suitability.assessed v1",
+        "summary": "Novo perfil de investidor (RN-SUI-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "suitability.assessed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/suitability.assessed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "risk-service",
+          "oms-service"
+        ]
+      },
+      "suitability.expired.v1": {
+        "name": "suitability.expired",
+        "title": "suitability.expired v1",
+        "summary": "Suitability vencido: novas compras exigem refazer o questionário.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "suitability.expired"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/suitability.expired.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service",
+          "risk-service"
+        ]
+      },
+      "suitability.expiring.v1": {
+        "name": "suitability.expiring",
+        "title": "suitability.expiring v1",
+        "summary": "Faltam 30 dias para o suitability vencer (RN-SUI-012).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "suitability.expiring"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/suitability.expiring.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "notification-service",
+          "risk-service"
+        ]
+      },
+      "terms.accepted.v1": {
+        "name": "terms.accepted",
+        "title": "terms.accepted v1",
+        "summary": "Aceite de termo (RN-TER-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "terms.accepted"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/terms.accepted.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "risk-service",
+          "audit-service"
         ]
       }
     }

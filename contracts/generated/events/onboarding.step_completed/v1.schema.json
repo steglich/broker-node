@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:onboarding.step_completed:v1",
+  "title": "onboarding.step_completed v1",
+  "description": "Etapa do onboarding concluída (funil).",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "applicationId",
+    "step"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "step": {
+      "type": "string"
+    }
+  }
+}

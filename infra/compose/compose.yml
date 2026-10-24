@@ -74,6 +74,14 @@ secrets:
     file: ../secrets/crypto/identity_field_master_key
   identity_blind_index_key:
     file: ../secrets/crypto/identity_blind_index_key
+  db_customer_app:
+    file: ../secrets/db/customer_app
+  db_customer_migrator:
+    file: ../secrets/db/customer_migrator
+  customer_field_master_key:
+    file: ../secrets/crypto/customer_field_master_key
+  customer_blind_index_key:
+    file: ../secrets/crypto/customer_blind_index_key
   db_audit_app:
     file: ../secrets/db/audit_app
   db_audit_migrator:
@@ -480,7 +488,7 @@ services:
       CLOCK_START: ${CLOCK_START:-}
       CLOCK_SPEED_FACTOR: ${CLOCK_SPEED_FACTOR:-1}
       # Tópicos de onde vêm os routine.completed/failed dos donos das rotinas.
-      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-audit}
+      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-audit,customer}
       ADMIN_API_ENABLED: 'true'
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets: [db_scheduler_app, rabbitmq_password]
@@ -490,6 +498,8 @@ services:
         condition: service_completed_successfully
       # Os tópicos de ROUTINE_RESULT_CONTEXTS precisam existir antes dos consumidores.
       audit-service:
+        condition: service_healthy
+      customer-service:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -548,8 +558,8 @@ services:
       AUTH_ISSUER: https://auth.broker.localhost
       SMTP_HOST: mailpit
       MESSAGE_SINK_URL: http://message-sink:8080
-      # Liga quando o customer-service (grupo 14) publicar no tópico `customer`.
-      CONSUME_CUSTOMER_EVENTS: ${IDENTITY_CONSUME_CUSTOMER_EVENTS:-false}
+      # customer.created e account.opened (account_id do token) e account.status_changed.
+      CONSUME_CUSTOMER_EVENTS: ${IDENTITY_CONSUME_CUSTOMER_EVENTS:-true}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets:
       - db_identity_app
@@ -571,6 +581,92 @@ services:
       traefik.http.routers.identity.rule: Host(`auth.broker.localhost`)
       traefik.http.routers.identity.entrypoints: websecure
       traefik.http.services.identity.loadbalancer.server.port: '8080'
+
+  customer-migrate:
+    profiles: [core]
+    image: broker/customer-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/customer-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: customer
+      DB_USER: customer_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_customer_migrator
+    secrets: [db_customer_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Onboarding, KYC (simulador), saga de abertura, suitability, termos, status da conta e cadastro.
+  customer-service:
+    profiles: [core]
+    image: broker/customer-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: customer-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: customer
+      DB_USER: customer_app
+      DB_PASSWORD_FILE: /run/secrets/db_customer_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      FIELD_MASTER_KEY_FILE: /run/secrets/customer_field_master_key
+      BLIND_INDEX_KEY_FILE: /run/secrets/customer_blind_index_key
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      DOCUMENTS_S3_ENDPOINT: http://minio:9000
+      # As URLs de upload vão para o navegador, que enxerga o MinIO pela porta publicada.
+      DOCUMENTS_S3_PUBLIC_ENDPOINT: http://localhost:${MINIO_PORT:-9000}
+      DOCUMENTS_S3_ACCESS_KEY: broker
+      DOCUMENTS_S3_SECRET_KEY_FILE: /run/secrets/minio_root_password
+      KYC_URL: http://kyc-simulator:8080
+      KYC_WEBHOOK_SECRET_FILE: /run/secrets/webhook_kyc_simulator
+      PIX_URL: http://pix-simulator:8080
+      SMTP_HOST: mailpit
+      MESSAGE_SINK_URL: http://message-sink:8080
+      # Liga quando o ledger-service (grupo 15) publicar ledger.negative_balance_*.
+      CONSUME_LEDGER_EVENTS: ${CUSTOMER_CONSUME_LEDGER_EVENTS:-false}
+      # Donos das pendências de encerramento (RN-ACC-012); sem os cinco, o encerramento fica indisponível.
+      CLOSURE_CHECK_URLS: ${CUSTOMER_CLOSURE_CHECK_URLS:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_customer_app
+      - rabbitmq_password
+      - valkey_password
+      - minio_root_password
+      - webhook_kyc_simulator
+      - customer_field_master_key
+      - customer_blind_index_key
+    networks: [broker]
+    depends_on:
+      customer-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.customer.rule: Host(`customer.broker.localhost`)
+      traefik.http.routers.customer.entrypoints: websecure
+      traefik.http.services.customer.loadbalancer.server.port: '8080'
 
   audit-migrate:
     profiles: [core]

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:terms.accepted:v1",
+  "title": "terms.accepted v1",
+  "description": "Aceite de termo (RN-TER-002).",
+  "x-producer": "customer-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "userId",
+    "termsCode",
+    "version",
+    "acceptedAt"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "termsCode": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "acceptedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

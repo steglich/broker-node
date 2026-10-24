@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:suitability.expiring:v1",
+  "title": "suitability.expiring v1",
+  "description": "Faltam 30 dias para o suitability vencer (RN-SUI-012).",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "customerId",
+    "validUntil"
+  ],
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

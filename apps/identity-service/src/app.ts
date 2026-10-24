@@ -84,6 +84,8 @@ export async function createIdentityService(d: IdentityServiceDeps) {
       onError: (err) => d.logger.error({ event: 'outbox.relay_failed', err }, 'falha no relay'),
     });
     if (d.consumeCustomerEvents) {
+      // O customer-service pode subir depois (e ele consome o nosso tópico): garante o dele.
+      await ensureSuperStream(client, topicName(environment, 'customer'), { maxAge: '30D' });
       consumers.push(
         new EventConsumer({
           name: 'identity.customer',

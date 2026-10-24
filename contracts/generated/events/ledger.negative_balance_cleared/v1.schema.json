@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:ledger.negative_balance_cleared:v1",
+  "title": "ledger.negative_balance_cleared v1",
+  "description": "Saldo devedor coberto (RN-DEV-005).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "accountId",
+    "settledBalance"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "settledBalance": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    }
+  }
+}

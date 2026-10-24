@@ -1,0 +1,1609 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "customer-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/me/onboarding": {
+      "get": {
+        "operationId": "onboarding",
+        "summary": "Estado da solicitação, próxima etapa e rascunho salvo (RN-ONB-001).",
+        "responses": {
+          "200": {
+            "description": "Solicitação."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/contact": {
+      "put": {
+        "operationId": "contact",
+        "summary": "E-mail e celular; envia um código para cada.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "phone"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "maxLength": 254
+                  },
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 16
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "422": {
+            "description": "EMAIL_ALREADY_IN_USE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/contact/verify": {
+      "post": {
+        "operationId": "verifyContact",
+        "summary": "Confirma os códigos do e-mail e do celular (CONTACT_VERIFIED).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "emailCode",
+                  "phoneCode"
+                ],
+                "properties": {
+                  "emailCode": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  },
+                  "phoneCode": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/personal-data": {
+      "put": {
+        "operationId": "personalData",
+        "summary": "Dados pessoais (Onboarding §4.1).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fullName",
+                  "taxId",
+                  "birthDate",
+                  "nationality",
+                  "maritalStatus",
+                  "motherName",
+                  "idDocument"
+                ],
+                "properties": {
+                  "fullName": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "socialName": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "taxId": {
+                    "type": "string",
+                    "maxLength": 14
+                  },
+                  "birthDate": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  "nationality": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "BRAZILIAN"
+                      },
+                      {
+                        "type": "string",
+                        "const": "FOREIGN_RESIDENT"
+                      }
+                    ]
+                  },
+                  "maritalStatus": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "SINGLE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "MARRIED"
+                      },
+                      {
+                        "type": "string",
+                        "const": "STABLE_UNION"
+                      },
+                      {
+                        "type": "string",
+                        "const": "DIVORCED"
+                      },
+                      {
+                        "type": "string",
+                        "const": "WIDOWED"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SEPARATED"
+                      }
+                    ]
+                  },
+                  "motherName": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "gender": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "idDocument": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "number",
+                      "issuer",
+                      "issuerState",
+                      "issueDate"
+                    ],
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": "RG"
+                          },
+                          {
+                            "type": "string",
+                            "const": "CNH"
+                          },
+                          {
+                            "type": "string",
+                            "const": "RNE"
+                          }
+                        ]
+                      },
+                      "number": {
+                        "type": "string",
+                        "maxLength": 30
+                      },
+                      "issuer": {
+                        "type": "string",
+                        "maxLength": 30
+                      },
+                      "issuerState": {
+                        "type": "string",
+                        "maxLength": 2
+                      },
+                      "issueDate": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "422": {
+            "description": "UNDERAGE ou TAX_ID_ALREADY_REGISTERED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/address": {
+      "put": {
+        "operationId": "address",
+        "summary": "Endereço (Onboarding §4.2).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "zipCode",
+                  "street",
+                  "number",
+                  "district",
+                  "city",
+                  "state"
+                ],
+                "properties": {
+                  "zipCode": {
+                    "type": "string",
+                    "maxLength": 8
+                  },
+                  "street": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "number": {
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "complement": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "district": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "city": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state": {
+                    "type": "string",
+                    "maxLength": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/financial-profile": {
+      "put": {
+        "operationId": "financialProfile",
+        "summary": "Perfil financeiro, PEP e residência fiscal (Onboarding §4.3).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "occupation",
+                  "monthlyIncome",
+                  "declaredNetWorth",
+                  "pep",
+                  "linkedPerson",
+                  "fundsOrigin",
+                  "foreignTaxResidency"
+                ],
+                "properties": {
+                  "occupation": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "monthlyIncome": {
+                    "type": "string",
+                    "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                  },
+                  "declaredNetWorth": {
+                    "type": "string",
+                    "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                  },
+                  "pep": {
+                    "type": "boolean"
+                  },
+                  "linkedPerson": {
+                    "type": "boolean"
+                  },
+                  "fundsOrigin": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "foreignTaxResidency": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/documents/upload-url": {
+      "post": {
+        "operationId": "uploadUrl",
+        "summary": "URL pré-assinada para enviar um documento direto ao storage.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "contentType",
+                  "sizeBytes"
+                ],
+                "properties": {
+                  "type": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "ID_FRONT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ID_BACK"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PROOF_OF_ADDRESS"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SELFIE"
+                      }
+                    ]
+                  },
+                  "contentType": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "sizeBytes": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "URL de upload.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "documentId",
+                    "uploadUrl",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "documentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "uploadUrl": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "DOCUMENT_INVALID_FORMAT (tipo ou mais de 10 MB).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/documents": {
+      "post": {
+        "operationId": "registerDocument",
+        "summary": "Registra o documento enviado: tipo pelo conteúdo, tamanho e resolução.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "documentId"
+                ],
+                "properties": {
+                  "documentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Aceito."
+          },
+          "422": {
+            "description": "DOCUMENT_INVALID_FORMAT.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/submit": {
+      "post": {
+        "operationId": "submit",
+        "summary": "Submete a solicitação ao KYC simulado (UNDER_REVIEW).",
+        "responses": {
+          "202": {
+            "description": "Em análise."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/webhooks/kyc-simulator": {
+      "post": {
+        "operationId": "kycWebhook",
+        "summary": "Webhook assinado do KYC simulado (check.verification_completed e check.completed).",
+        "responses": {
+          "204": {
+            "description": "Recebido."
+          },
+          "401": {
+            "description": "INVALID_WEBHOOK_SIGNATURE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/suitability/questionnaire": {
+      "get": {
+        "operationId": "questionnaire",
+        "summary": "Questionário vigente (RN-SUI-001).",
+        "responses": {
+          "200": {
+            "description": "Questionário."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/suitability/assessments": {
+      "post": {
+        "operationId": "assess",
+        "summary": "Responde o questionário: pontuação, perfil e validade de 24 meses.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "questionnaireVersion",
+                  "answers"
+                ],
+                "properties": {
+                  "questionnaireVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "answers": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^.*$": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Perfil."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/terms/pending": {
+      "get": {
+        "operationId": "pendingTerms",
+        "summary": "Termos vigentes ainda sem aceite.",
+        "responses": {
+          "200": {
+            "description": "Termos."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/terms/{termsId}/accept": {
+      "post": {
+        "operationId": "acceptTerms",
+        "summary": "Aceite com hash do conteúdo, IP, user agent e canal (RN-TER-002).",
+        "parameters": [
+          {
+            "name": "termsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile": {
+      "get": {
+        "operationId": "profile",
+        "summary": "Cadastro, conta (status e permissões), perfil e termos pendentes.",
+        "responses": {
+          "200": {
+            "description": "Perfil."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/contact-changes": {
+      "post": {
+        "operationId": "contactChange",
+        "summary": "Troca de e-mail, celular ou endereço: assinatura (SETTINGS) + OTP no canal antigo e no novo (RN-CAD-001).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "EMAIL"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PHONE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ADDRESS"
+                      }
+                    ]
+                  },
+                  "email": {
+                    "type": "string",
+                    "maxLength": 254
+                  },
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 16
+                  },
+                  "address": {
+                    "type": "object",
+                    "required": [
+                      "zipCode",
+                      "street",
+                      "number",
+                      "district",
+                      "city",
+                      "state"
+                    ],
+                    "properties": {
+                      "zipCode": {
+                        "type": "string",
+                        "maxLength": 8
+                      },
+                      "street": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "number": {
+                        "type": "string",
+                        "maxLength": 20
+                      },
+                      "complement": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "district": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "city": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "state": {
+                        "type": "string",
+                        "maxLength": 2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Códigos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "changeId"
+                  ],
+                  "properties": {
+                    "changeId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/contact-changes/{changeId}/confirm": {
+      "post": {
+        "operationId": "confirmContactChange",
+        "summary": "Confirma com os dois códigos.",
+        "parameters": [
+          {
+            "name": "changeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "oldCode",
+                  "newCode"
+                ],
+                "properties": {
+                  "oldCode": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  },
+                  "newCode": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/reviewed-changes": {
+      "post": {
+        "operationId": "reviewedChange",
+        "summary": "Troca de nome ou documento: novo documento + revisão manual (RN-CAD-002).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "NAME"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ID_DOCUMENT"
+                      }
+                    ]
+                  },
+                  "fullName": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "idDocument": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "number",
+                      "issuer",
+                      "issuerState",
+                      "issueDate"
+                    ],
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": "RG"
+                          },
+                          {
+                            "type": "string",
+                            "const": "CNH"
+                          },
+                          {
+                            "type": "string",
+                            "const": "RNE"
+                          }
+                        ]
+                      },
+                      "number": {
+                        "type": "string",
+                        "maxLength": 30
+                      },
+                      "issuer": {
+                        "type": "string",
+                        "maxLength": 30
+                      },
+                      "issuerState": {
+                        "type": "string",
+                        "maxLength": 2
+                      },
+                      "issueDate": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pendente de revisão; URL para o documento."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/confirm": {
+      "post": {
+        "operationId": "confirmRegistration",
+        "summary": "Confirma que o cadastro está atualizado: mais 24 meses (RN-CAD-003).",
+        "responses": {
+          "200": {
+            "description": "Nova validade."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/history": {
+      "get": {
+        "operationId": "history",
+        "summary": "Histórico de alterações cadastrais (RN-CAD-004).",
+        "responses": {
+          "200": {
+            "description": "Histórico."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawal-accounts": {
+      "get": {
+        "operationId": "withdrawalAccounts",
+        "summary": "Contas de saque (chave mascarada, carência).",
+        "responses": {
+          "200": {
+            "description": "Contas."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "addWithdrawalAccount",
+        "summary": "Cadastra chave PIX de mesma titularidade (até 3, carência de 24 h); assinatura e MFA recente.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "pixKey"
+                ],
+                "properties": {
+                  "pixKey": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 77
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cadastrada."
+          },
+          "422": {
+            "description": "BANK_ACCOUNT_NOT_ALLOWED ou WITHDRAWAL_ACCOUNT_LIMIT.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawal-accounts/{id}": {
+      "delete": {
+        "operationId": "removeWithdrawalAccount",
+        "summary": "Remove uma conta de saque (assinatura).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/account/close": {
+      "post": {
+        "operationId": "closeAccount",
+        "summary": "Encerramento: lista as pendências ou encerra (RN-ACC-012).",
+        "responses": {
+          "200": {
+            "description": "Encerrada."
+          },
+          "422": {
+            "description": "ACCOUNT_CLOSURE_PENDING com a lista.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/account/close/cancel": {
+      "post": {
+        "operationId": "cancelClose",
+        "summary": "Desiste do encerramento.",
+        "responses": {
+          "200": {
+            "description": "Ativa."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/onboarding/queue": {
+      "get": {
+        "operationId": "reviewQueue",
+        "summary": "Fila de revisão manual (BO_ONBOARDING, BO_ADMIN).",
+        "responses": {
+          "200": {
+            "description": "Fila."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/onboarding/{id}/approve": {
+      "post": {
+        "operationId": "approve",
+        "summary": "Aprova (PEP só com BO_ADMIN).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Aprovada."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/onboarding/{id}/reject": {
+      "post": {
+        "operationId": "reject",
+        "summary": "Reprova.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reprovada."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/onboarding/{id}/request-changes": {
+      "post": {
+        "operationId": "requestChanges",
+        "summary": "Pede correção ao cliente (PENDING_CUSTOMER).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devolvida."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/accounts/{id}/block": {
+      "post": {
+        "operationId": "block",
+        "summary": "Bloqueio total (BO_RISK, BO_FINANCE, BO_ADMIN; RN-ACC-011).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reasonCode"
+                ],
+                "properties": {
+                  "reasonCode": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_]{2,40}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bloqueada."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/accounts/{id}/unblock": {
+      "post": {
+        "operationId": "unblock",
+        "summary": "Desbloqueio (BO_ADMIN; a dupla aprovação vem com o approval-service).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reasonCode"
+                ],
+                "properties": {
+                  "reasonCode": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_]{2,40}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Desbloqueada."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/terms/{code}/versions": {
+      "post": {
+        "operationId": "publishTerms",
+        "summary": "Nova versão de um termo (BO_ADMIN).",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z_]{3,40}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "content"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Publicada."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/profile-changes": {
+      "get": {
+        "operationId": "profileChanges",
+        "summary": "Trocas de nome e documento à espera de revisão.",
+        "responses": {
+          "200": {
+            "description": "Fila."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/profile-changes/{id}/{decision}": {
+      "post": {
+        "operationId": "reviewProfileChange",
+        "summary": "Aprova ou reprova a troca (BO_ONBOARDING).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "decision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "approve"
+                },
+                {
+                  "type": "string",
+                  "const": "reject"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/internal/accounts/{id}/eligibility": {
+      "get": {
+        "operationId": "eligibility",
+        "summary": "Elegibilidade de uma operação: matriz de status, termos pendentes e suitability (token de serviço com customer:eligibility).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "operation",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "BUY"
+                },
+                {
+                  "type": "string",
+                  "const": "SELL"
+                },
+                {
+                  "type": "string",
+                  "const": "DEPOSIT"
+                },
+                {
+                  "type": "string",
+                  "const": "WITHDRAW"
+                },
+                {
+                  "type": "string",
+                  "const": "LOGIN"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ allowed, code?, status, restrictions }"
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

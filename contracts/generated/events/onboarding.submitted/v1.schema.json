@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:onboarding.submitted:v1",
+  "title": "onboarding.submitted v1",
+  "description": "Solicitação submetida para análise.",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "applicationId"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

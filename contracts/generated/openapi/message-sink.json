@@ -1,0 +1,498 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Gateway de SMS e push simulado",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/sms": {
+      "post": {
+        "operationId": "sendSms",
+        "summary": "Registra um SMS (nunca enviado a um telefone real).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "to",
+                  "body"
+                ],
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9]\\d{7,14}$"
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1600
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Registrado, com o status de entrega (RN-MSG-003).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message_id",
+                    "status",
+                    "error"
+                  ],
+                  "properties": {
+                    "message_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "DELIVERED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/push": {
+      "post": {
+        "operationId": "sendPush",
+        "summary": "Registra uma notificação push (nunca enviada a um aparelho real).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "device_token",
+                  "title",
+                  "body"
+                ],
+                "properties": {
+                  "device_token": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 4096
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  },
+                  "data": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^.*$": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Registrada, com o status de entrega (RN-MSG-003).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message_id",
+                    "status",
+                    "error"
+                  ],
+                  "properties": {
+                    "message_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "DELIVERED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/messages/{message_id}": {
+      "get": {
+        "operationId": "getMessage",
+        "summary": "Consulta uma mensagem e o status de entrega.",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A mensagem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message_id",
+                    "channel",
+                    "to",
+                    "title",
+                    "body",
+                    "data",
+                    "status",
+                    "error",
+                    "created_at"
+                  ],
+                  "properties": {
+                    "message_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "channel": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMS"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PUSH"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "body": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "DELIVERED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/messages": {
+      "get": {
+        "operationId": "listMessages",
+        "summary": "Lista as mensagens, opcionalmente por canal e destinatário.",
+        "parameters": [
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "SMS"
+                },
+                {
+                  "type": "string",
+                  "const": "PUSH"
+                }
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mensagens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "messages"
+                  ],
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "message_id",
+                          "channel",
+                          "to",
+                          "title",
+                          "body",
+                          "data",
+                          "status",
+                          "error",
+                          "created_at"
+                        ],
+                        "properties": {
+                          "message_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "channel": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "SMS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PUSH"
+                              }
+                            ]
+                          },
+                          "to": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "DELIVERED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "FAILED"
+                              }
+                            ]
+                          },
+                          "error": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

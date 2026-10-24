@@ -1,0 +1,2263 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Banco Simulado (PIX)",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/contas": {
+      "post": {
+        "operationId": "createAccount",
+        "summary": "Abre uma conta (cliente aprovado ou terceiro de teste) com chaves CPF e aleatória.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cpf",
+                  "nome"
+                ],
+                "properties": {
+                  "cpf": {
+                    "type": "string",
+                    "pattern": "^\\d{11}$"
+                  },
+                  "nome": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "tipo": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "CLIENTE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "TERCEIRO"
+                      }
+                    ]
+                  },
+                  "saldoInicial": {
+                    "type": "string",
+                    "pattern": "^\\d{1,13}\\.\\d{2}$",
+                    "description": "Valor em reais, ex.: \"100.00\"."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Já existia conta deste tipo para o CPF: devolve a mesma.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "agencia",
+                    "numero",
+                    "tipo",
+                    "titular",
+                    "saldo",
+                    "chaves",
+                    "criadaEm"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "agencia": {
+                      "type": "string"
+                    },
+                    "numero": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CLIENTE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TERCEIRO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CORRETORA"
+                        }
+                      ]
+                    },
+                    "titular": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "saldo": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "chaves": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "chave",
+                          "tipo"
+                        ],
+                        "properties": {
+                          "chave": {
+                            "type": "string"
+                          },
+                          "tipo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CPF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CNPJ"
+                              },
+                              {
+                                "type": "string",
+                                "const": "EVP"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "criadaEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Conta aberta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "agencia",
+                    "numero",
+                    "tipo",
+                    "titular",
+                    "saldo",
+                    "chaves",
+                    "criadaEm"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "agencia": {
+                      "type": "string"
+                    },
+                    "numero": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CLIENTE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TERCEIRO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CORRETORA"
+                        }
+                      ]
+                    },
+                    "titular": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "saldo": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "chaves": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "chave",
+                          "tipo"
+                        ],
+                        "properties": {
+                          "chave": {
+                            "type": "string"
+                          },
+                          "tipo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CPF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CNPJ"
+                              },
+                              {
+                                "type": "string",
+                                "const": "EVP"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "criadaEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "operationId": "listAccounts",
+        "summary": "Lista as contas.",
+        "responses": {
+          "200": {
+            "description": "Contas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "contas"
+                  ],
+                  "properties": {
+                    "contas": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "agencia",
+                          "numero",
+                          "tipo",
+                          "titular",
+                          "saldo",
+                          "chaves",
+                          "criadaEm"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "agencia": {
+                            "type": "string"
+                          },
+                          "numero": {
+                            "type": "string"
+                          },
+                          "tipo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CLIENTE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "TERCEIRO"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CORRETORA"
+                              }
+                            ]
+                          },
+                          "titular": {
+                            "type": "object",
+                            "required": [
+                              "nome"
+                            ],
+                            "properties": {
+                              "cpf": {
+                                "type": "string",
+                                "pattern": "^\\d{11}$"
+                              },
+                              "cnpj": {
+                                "type": "string",
+                                "pattern": "^\\d{14}$"
+                              },
+                              "nome": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "saldo": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "chaves": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "chave",
+                                "tipo"
+                              ],
+                              "properties": {
+                                "chave": {
+                                  "type": "string"
+                                },
+                                "tipo": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "const": "CPF"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "CNPJ"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "EVP"
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "criadaEm": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/contas/{id}": {
+      "get": {
+        "operationId": "getAccount",
+        "summary": "Consulta uma conta.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A conta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "agencia",
+                    "numero",
+                    "tipo",
+                    "titular",
+                    "saldo",
+                    "chaves",
+                    "criadaEm"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "agencia": {
+                      "type": "string"
+                    },
+                    "numero": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CLIENTE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TERCEIRO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CORRETORA"
+                        }
+                      ]
+                    },
+                    "titular": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "saldo": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "chaves": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "chave",
+                          "tipo"
+                        ],
+                        "properties": {
+                          "chave": {
+                            "type": "string"
+                          },
+                          "tipo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CPF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CNPJ"
+                              },
+                              {
+                                "type": "string",
+                                "const": "EVP"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "criadaEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conta inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/cob/{txid}": {
+      "put": {
+        "operationId": "createCharge",
+        "summary": "Cria uma cobrança imediata para a conta da corretora.",
+        "parameters": [
+          {
+            "name": "txid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{26,35}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "calendario",
+                  "valor"
+                ],
+                "properties": {
+                  "calendario": {
+                    "type": "object",
+                    "required": [
+                      "expiracao"
+                    ],
+                    "properties": {
+                      "expiracao": {
+                        "type": "integer",
+                        "minimum": 60,
+                        "maximum": 604800,
+                        "description": "Segundos."
+                      }
+                    }
+                  },
+                  "valor": {
+                    "type": "object",
+                    "required": [
+                      "original"
+                    ],
+                    "properties": {
+                      "original": {
+                        "type": "string",
+                        "pattern": "^\\d{1,13}\\.\\d{2}$",
+                        "description": "Valor em reais, ex.: \"100.00\"."
+                      }
+                    }
+                  },
+                  "devedor": {
+                    "type": "object",
+                    "required": [
+                      "cpf",
+                      "nome"
+                    ],
+                    "properties": {
+                      "cpf": {
+                        "type": "string",
+                        "pattern": "^\\d{11}$"
+                      },
+                      "nome": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "solicitacaoPagador": {
+                    "type": "string",
+                    "maxLength": 140
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Repetição com o mesmo corpo: a mesma cobrança.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "txid",
+                    "status",
+                    "calendario",
+                    "valor",
+                    "chave",
+                    "pixCopiaECola",
+                    "pix"
+                  ],
+                  "properties": {
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ATIVA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REMOVIDA_POR_EXPIRACAO"
+                        }
+                      ]
+                    },
+                    "calendario": {
+                      "type": "object",
+                      "required": [
+                        "criacao",
+                        "expiracao"
+                      ],
+                      "properties": {
+                        "criacao": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "expiracao": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "valor": {
+                      "type": "object",
+                      "required": [
+                        "original"
+                      ],
+                      "properties": {
+                        "original": {
+                          "type": "string",
+                          "pattern": "^\\d{1,13}\\.\\d{2}$",
+                          "description": "Valor em reais, ex.: \"100.00\"."
+                        }
+                      }
+                    },
+                    "chave": {
+                      "type": "string"
+                    },
+                    "devedor": {
+                      "type": "object",
+                      "required": [
+                        "cpf",
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "solicitacaoPagador": {
+                      "type": "string"
+                    },
+                    "pixCopiaECola": {
+                      "type": "string"
+                    },
+                    "pix": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "endToEndId",
+                          "valor",
+                          "horario"
+                        ],
+                        "properties": {
+                          "endToEndId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Cobrança criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "txid",
+                    "status",
+                    "calendario",
+                    "valor",
+                    "chave",
+                    "pixCopiaECola",
+                    "pix"
+                  ],
+                  "properties": {
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ATIVA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REMOVIDA_POR_EXPIRACAO"
+                        }
+                      ]
+                    },
+                    "calendario": {
+                      "type": "object",
+                      "required": [
+                        "criacao",
+                        "expiracao"
+                      ],
+                      "properties": {
+                        "criacao": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "expiracao": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "valor": {
+                      "type": "object",
+                      "required": [
+                        "original"
+                      ],
+                      "properties": {
+                        "original": {
+                          "type": "string",
+                          "pattern": "^\\d{1,13}\\.\\d{2}$",
+                          "description": "Valor em reais, ex.: \"100.00\"."
+                        }
+                      }
+                    },
+                    "chave": {
+                      "type": "string"
+                    },
+                    "devedor": {
+                      "type": "object",
+                      "required": [
+                        "cpf",
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "solicitacaoPagador": {
+                      "type": "string"
+                    },
+                    "pixCopiaECola": {
+                      "type": "string"
+                    },
+                    "pix": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "endToEndId",
+                          "valor",
+                          "horario"
+                        ],
+                        "properties": {
+                          "endToEndId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TXID_EM_USO: o txid já existe com outro conteúdo.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "operationId": "getCharge",
+        "summary": "Consulta uma cobrança e os PIX que a pagaram.",
+        "parameters": [
+          {
+            "name": "txid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{26,35}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A cobrança.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "txid",
+                    "status",
+                    "calendario",
+                    "valor",
+                    "chave",
+                    "pixCopiaECola",
+                    "pix"
+                  ],
+                  "properties": {
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ATIVA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REMOVIDA_POR_EXPIRACAO"
+                        }
+                      ]
+                    },
+                    "calendario": {
+                      "type": "object",
+                      "required": [
+                        "criacao",
+                        "expiracao"
+                      ],
+                      "properties": {
+                        "criacao": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "expiracao": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "valor": {
+                      "type": "object",
+                      "required": [
+                        "original"
+                      ],
+                      "properties": {
+                        "original": {
+                          "type": "string",
+                          "pattern": "^\\d{1,13}\\.\\d{2}$",
+                          "description": "Valor em reais, ex.: \"100.00\"."
+                        }
+                      }
+                    },
+                    "chave": {
+                      "type": "string"
+                    },
+                    "devedor": {
+                      "type": "object",
+                      "required": [
+                        "cpf",
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "solicitacaoPagador": {
+                      "type": "string"
+                    },
+                    "pixCopiaECola": {
+                      "type": "string"
+                    },
+                    "pix": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "endToEndId",
+                          "valor",
+                          "horario"
+                        ],
+                        "properties": {
+                          "endToEndId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cobrança inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/cob/{txid}/pagar": {
+      "post": {
+        "operationId": "payCharge",
+        "summary": "Paga a cobrança com a conta escolhida (é o que o cliente faz na UI; exposto para testes).",
+        "parameters": [
+          {
+            "name": "txid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{26,35}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contaPagadora"
+                ],
+                "properties": {
+                  "contaPagadora": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pago; o webhook `pix.recebido` é enviado à corretora.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "endToEndId",
+                    "tipo",
+                    "status",
+                    "valor",
+                    "horario",
+                    "pagador",
+                    "recebedor",
+                    "devolucoes"
+                  ],
+                  "properties": {
+                    "endToEndId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "COBRANCA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ENVIO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DEVOLUCAO"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NAO_REALIZADO"
+                        }
+                      ]
+                    },
+                    "motivo": {
+                      "type": "string"
+                    },
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "idEnvio": {
+                      "type": "string"
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pagador": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "recebedor": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "descricao": {
+                      "type": "string"
+                    },
+                    "devolucoes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "rtrId",
+                          "valor",
+                          "horario",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "rtrId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "const": "DEVOLVIDO"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "COBRANCA_EXPIRADA, COBRANCA_JA_PAGA ou SALDO_INSUFICIENTE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/pix": {
+      "post": {
+        "operationId": "sendPix",
+        "summary": "Envia um PIX da conta da corretora para uma chave (saque).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "idEnvio",
+                  "valor",
+                  "chave"
+                ],
+                "properties": {
+                  "idEnvio": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9]{1,35}$"
+                  },
+                  "valor": {
+                    "type": "string",
+                    "pattern": "^\\d{1,13}\\.\\d{2}$",
+                    "description": "Valor em reais, ex.: \"100.00\"."
+                  },
+                  "chave": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 77
+                  },
+                  "cpfRecebedor": {
+                    "type": "string",
+                    "pattern": "^\\d{11}$"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "maxLength": 140
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Repetição do mesmo idEnvio: o mesmo resultado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "endToEndId",
+                    "tipo",
+                    "status",
+                    "valor",
+                    "horario",
+                    "pagador",
+                    "recebedor",
+                    "devolucoes"
+                  ],
+                  "properties": {
+                    "endToEndId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "COBRANCA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ENVIO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DEVOLUCAO"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NAO_REALIZADO"
+                        }
+                      ]
+                    },
+                    "motivo": {
+                      "type": "string"
+                    },
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "idEnvio": {
+                      "type": "string"
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pagador": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "recebedor": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "descricao": {
+                      "type": "string"
+                    },
+                    "devolucoes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "rtrId",
+                          "valor",
+                          "horario",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "rtrId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "const": "DEVOLVIDO"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "PIX concluído.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "endToEndId",
+                    "tipo",
+                    "status",
+                    "valor",
+                    "horario",
+                    "pagador",
+                    "recebedor",
+                    "devolucoes"
+                  ],
+                  "properties": {
+                    "endToEndId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "COBRANCA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ENVIO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DEVOLUCAO"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NAO_REALIZADO"
+                        }
+                      ]
+                    },
+                    "motivo": {
+                      "type": "string"
+                    },
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "idEnvio": {
+                      "type": "string"
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pagador": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "recebedor": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "descricao": {
+                      "type": "string"
+                    },
+                    "devolucoes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "rtrId",
+                          "valor",
+                          "horario",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "rtrId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "const": "DEVOLVIDO"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "CHAVE_INEXISTENTE, TITULARIDADE_DIVERGENTE, SALDO_INSUFICIENTE ou PIX_REJEITADO.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "operationId": "listPix",
+        "summary": "Lista PIX por txid ou por período (reconciliação, RN-PIXS-002).",
+        "parameters": [
+          {
+            "name": "txid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{26,35}$"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "fim",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PIX encontrados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "pix"
+                  ],
+                  "properties": {
+                    "pix": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "endToEndId",
+                          "tipo",
+                          "status",
+                          "valor",
+                          "horario",
+                          "pagador",
+                          "recebedor",
+                          "devolucoes"
+                        ],
+                        "properties": {
+                          "endToEndId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "tipo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "COBRANCA"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ENVIO"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DEVOLUCAO"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CONCLUIDO"
+                              },
+                              {
+                                "type": "string",
+                                "const": "NAO_REALIZADO"
+                              }
+                            ]
+                          },
+                          "motivo": {
+                            "type": "string"
+                          },
+                          "txid": {
+                            "type": "string",
+                            "pattern": "^[a-zA-Z0-9]{26,35}$"
+                          },
+                          "idEnvio": {
+                            "type": "string"
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "pagador": {
+                            "type": "object",
+                            "required": [
+                              "nome"
+                            ],
+                            "properties": {
+                              "cpf": {
+                                "type": "string",
+                                "pattern": "^\\d{11}$"
+                              },
+                              "cnpj": {
+                                "type": "string",
+                                "pattern": "^\\d{14}$"
+                              },
+                              "nome": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "recebedor": {
+                            "type": "object",
+                            "required": [
+                              "nome"
+                            ],
+                            "properties": {
+                              "cpf": {
+                                "type": "string",
+                                "pattern": "^\\d{11}$"
+                              },
+                              "cnpj": {
+                                "type": "string",
+                                "pattern": "^\\d{14}$"
+                              },
+                              "nome": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "descricao": {
+                            "type": "string"
+                          },
+                          "devolucoes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "id",
+                                "rtrId",
+                                "valor",
+                                "horario",
+                                "status"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "rtrId": {
+                                  "type": "string",
+                                  "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                                  "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                                },
+                                "valor": {
+                                  "type": "string",
+                                  "pattern": "^\\d{1,13}\\.\\d{2}$",
+                                  "description": "Valor em reais, ex.: \"100.00\"."
+                                },
+                                "horario": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "const": "DEVOLVIDO"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/pix/{e2eid}": {
+      "get": {
+        "operationId": "getPix",
+        "summary": "Consulta um PIX pelo endToEndId.",
+        "parameters": [
+          {
+            "name": "e2eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+              "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O PIX.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "endToEndId",
+                    "tipo",
+                    "status",
+                    "valor",
+                    "horario",
+                    "pagador",
+                    "recebedor",
+                    "devolucoes"
+                  ],
+                  "properties": {
+                    "endToEndId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "COBRANCA"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ENVIO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DEVOLUCAO"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CONCLUIDO"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NAO_REALIZADO"
+                        }
+                      ]
+                    },
+                    "motivo": {
+                      "type": "string"
+                    },
+                    "txid": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9]{26,35}$"
+                    },
+                    "idEnvio": {
+                      "type": "string"
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "pagador": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "recebedor": {
+                      "type": "object",
+                      "required": [
+                        "nome"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string",
+                          "pattern": "^\\d{14}$"
+                        },
+                        "nome": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "descricao": {
+                      "type": "string"
+                    },
+                    "devolucoes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "rtrId",
+                          "valor",
+                          "horario",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "rtrId": {
+                            "type": "string",
+                            "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                            "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                          },
+                          "valor": {
+                            "type": "string",
+                            "pattern": "^\\d{1,13}\\.\\d{2}$",
+                            "description": "Valor em reais, ex.: \"100.00\"."
+                          },
+                          "horario": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "const": "DEVOLVIDO"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "PIX inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/pix/{e2eid}/devolucao/{id}": {
+      "put": {
+        "operationId": "refundPix",
+        "summary": "Devolve integralmente um PIX recebido pela corretora.",
+        "parameters": [
+          {
+            "name": "e2eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+              "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{1,35}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "valor"
+                ],
+                "properties": {
+                  "valor": {
+                    "type": "string",
+                    "pattern": "^\\d{1,13}\\.\\d{2}$",
+                    "description": "Valor em reais, ex.: \"100.00\"."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Repetição do mesmo id: a mesma devolução.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "rtrId",
+                    "valor",
+                    "horario",
+                    "status"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "rtrId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "type": "string",
+                      "const": "DEVOLVIDO"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Devolvido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "rtrId",
+                    "valor",
+                    "horario",
+                    "status"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "rtrId": {
+                      "type": "string",
+                      "pattern": "^ESIM\\d{14}[a-z0-9]{14}$",
+                      "description": "Identificador fim a fim (32 caracteres), sempre com o prefixo de simulação ESIM (RN-PIXS-001)."
+                    },
+                    "valor": {
+                      "type": "string",
+                      "pattern": "^\\d{1,13}\\.\\d{2}$",
+                      "description": "Valor em reais, ex.: \"100.00\"."
+                    },
+                    "horario": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "type": "string",
+                      "const": "DEVOLVIDO"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "PIX_JA_DEVOLVIDO com outro id.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALOR_DEVOLUCAO_INVALIDO, PIX_NAO_DEVOLVIVEL ou SALDO_INSUFICIENTE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/chaves/{chave}": {
+      "get": {
+        "operationId": "lookupKey",
+        "summary": "Consulta o titular de uma chave (CPF e nome mascarado).",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 77
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Titular.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "chave",
+                    "tipo",
+                    "titular"
+                  ],
+                  "properties": {
+                    "chave": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CPF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CNPJ"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EVP"
+                        }
+                      ]
+                    },
+                    "titular": {
+                      "type": "object",
+                      "required": [
+                        "nomeMascarado"
+                      ],
+                      "properties": {
+                        "cpf": {
+                          "type": "string",
+                          "pattern": "^\\d{11}$"
+                        },
+                        "cnpj": {
+                          "type": "string"
+                        },
+                        "nomeMascarado": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "CHAVE_INEXISTENTE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

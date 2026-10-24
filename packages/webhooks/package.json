@@ -1,0 +1,38 @@
+{
+  "name": "@broker/webhooks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Webhooks dos simuladores: assinatura HMAC-SHA256 (timestamp.corpo), verificador do receptor (desvio máximo de 5 min) e despachante com entrega pelo menos uma vez e backoff (RN-SIM-003/004).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@broker/clock": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/ids": "workspace:*",
+    "@broker/service-kit": "workspace:*",
+    "kysely": "0.29.6"
+  },
+  "devDependencies": {
+    "@broker/persistence": "workspace:*",
+    "@broker/testing": "workspace:*",
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

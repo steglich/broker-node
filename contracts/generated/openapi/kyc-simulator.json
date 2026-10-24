@@ -1,0 +1,337 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Provedor de KYC simulado",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/checks": {
+      "post": {
+        "operationId": "submitCheck",
+        "summary": "Submete uma verificação; o resultado chega depois, por webhook.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reference_id",
+                  "tax_id",
+                  "full_name",
+                  "birth_date",
+                  "documents"
+                ],
+                "properties": {
+                  "reference_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "tax_id": {
+                    "type": "string",
+                    "pattern": "^\\d{11}$"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "birth_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "url"
+                      ],
+                      "properties": {
+                        "type": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "ID_FRONT"
+                            },
+                            {
+                              "type": "string",
+                              "const": "ID_BACK"
+                            },
+                            {
+                              "type": "string",
+                              "const": "SELFIE"
+                            }
+                          ]
+                        },
+                        "url": {
+                          "type": "string",
+                          "format": "uri",
+                          "maxLength": 4096
+                        }
+                      }
+                    },
+                    "minItems": 1,
+                    "maxItems": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Aceita para análise.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "check_id",
+                    "status"
+                  ],
+                  "properties": {
+                    "check_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "type": "string",
+                      "const": "PROCESSING"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "DOCUMENT_URL_NOT_SIGNED: referência de documento sem assinatura.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/checks/{check_id}": {
+      "get": {
+        "operationId": "getCheck",
+        "summary": "Consulta uma verificação.",
+        "parameters": [
+          {
+            "name": "check_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A verificação.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "check_id",
+                    "reference_id",
+                    "status",
+                    "verifications",
+                    "created_at",
+                    "completed_at"
+                  ],
+                  "properties": {
+                    "check_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "reference_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        }
+                      ]
+                    },
+                    "verifications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "type",
+                          "status",
+                          "details"
+                        ],
+                        "properties": {
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "TAX_ID_STATUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DOCUMENT_QUALITY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "FACE_MATCH"
+                              },
+                              {
+                                "type": "string",
+                                "const": "WATCHLIST"
+                              },
+                              {
+                                "type": "string",
+                                "const": "LIVENESS"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PASSED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ATTENTION"
+                              },
+                              {
+                                "type": "string",
+                                "const": "FAILED"
+                              }
+                            ]
+                          },
+                          "score": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "details": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

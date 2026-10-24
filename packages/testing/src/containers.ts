@@ -118,3 +118,28 @@ export function databaseConfig(
   if (password === undefined) throw new Error(`o contêiner não criou o serviço ${service}`);
   return { host: pg.host, port: pg.port, database: service, user, password };
 }
+
+export interface StartedMinio {
+  container: StartedTestContainer;
+  /** `http://host:porta` da API S3. */
+  endpoint: string;
+  accessKey: string;
+  secretKey: string;
+}
+
+/** MinIO com a mesma imagem do ambiente local (D16), para testar URLs pré-assinadas. */
+export async function startMinio(): Promise<StartedMinio> {
+  const secretKey = randomBytes(16).toString('hex');
+  const container = await new GenericContainer('pgsty/minio:RELEASE.2026-08-04T00-00-00Z')
+    .withCommand(['server', '/data'])
+    .withEnvironment({ MINIO_ROOT_USER: 'broker', MINIO_ROOT_PASSWORD: secretKey })
+    .withExposedPorts(9000)
+    .withWaitStrategy(Wait.forHttp('/minio/health/live', 9000))
+    .start();
+  return {
+    container,
+    endpoint: `http://${container.getHost()}:${container.getMappedPort(9000)}`,
+    accessKey: 'broker',
+    secretKey,
+  };
+}

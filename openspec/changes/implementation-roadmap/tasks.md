@@ -64,11 +64,11 @@
 
 ## 8. Fase 0 — Simuladores externos
 
-- [ ] 8.1 Implementar a biblioteca de webhooks dos simuladores (HMAC-SHA256 `timestamp.corpo`, `X-Signature`/`X-Timestamp`, retentativa 1 s→1 h) e o verificador do lado receptor (desvio > 5 min recusado); verificar a assinatura inválida e o reenvio até `2xx` (RN-SIM-003/004)
-- [ ] 8.2 Implementar o `pix-simulator` (contas, cobrança, pagamento, envio, consulta de chave, devolução, consulta de transação, `end_to_end_id` com prefixo de simulação, latência e erros configuráveis); verificar com testes de componente cada operação (Sistemas simulados §2)
-- [ ] 8.3 Adicionar ao `pix-simulator` os cenários forçáveis (pagamento duplicado, webhook atrasado, chave inexistente, indisponibilidade de 10 min, saldo insuficiente) e a UI de inspeção; verificar o webhook duplicado (RN-PIXS-003, RN-SIM-005)
-- [ ] 8.4 Implementar o `kyc-simulator` (submissão `202` com `check_id`, regras pelo penúltimo dígito, webhook por verificação, leitura de documentos só por URL assinada, UI de inspeção); verificar os dígitos 0–6, 7, 8 e 9 (RN-ONB §5.2, RN-KYCS-001)
-- [ ] 8.5 Implementar o `message-sink` (SMS e push registrados com UI) e integrar o Mailpit para e-mail com lista de permissão; verificar que um e-mail fora da lista fica só na caixa de captura (RN-MSG-001..003)
+- [x] 8.1 Implementar a biblioteca de webhooks dos simuladores (HMAC-SHA256 `timestamp.corpo`, `X-Signature`/`X-Timestamp`, retentativa 1 s→1 h) e o verificador do lado receptor (desvio > 5 min recusado); verificar a assinatura inválida e o reenvio até `2xx` (RN-SIM-003/004)
+- [x] 8.2 Implementar o `pix-simulator` (contas, cobrança, pagamento, envio, consulta de chave, devolução, consulta de transação, `end_to_end_id` com prefixo de simulação, latência e erros configuráveis); verificar com testes de componente cada operação (Sistemas simulados §2)
+- [x] 8.3 Adicionar ao `pix-simulator` os cenários forçáveis (pagamento duplicado, webhook atrasado, chave inexistente, indisponibilidade de 10 min, saldo insuficiente) e a UI de inspeção; verificar o webhook duplicado (RN-PIXS-003, RN-SIM-005)
+- [x] 8.4 Implementar o `kyc-simulator` (submissão `202` com `check_id`, regras pelo penúltimo dígito, webhook por verificação, leitura de documentos só por URL assinada, UI de inspeção); verificar os dígitos 0–6, 7, 8 e 9 (RN-ONB §5.2, RN-KYCS-001)
+- [x] 8.5 Implementar o `message-sink` (SMS e push registrados com UI) e integrar o Mailpit para e-mail com lista de permissão; verificar que um e-mail fora da lista fica só na caixa de captura (RN-MSG-001..003)
 
 ## 9. Fase 0 — Pipeline de CI
 

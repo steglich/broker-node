@@ -34,6 +34,9 @@ export function generateSecrets() {
   add('valkey_password');
   add('minio_root_password');
   add('grafana_admin_password');
+  // HMAC dos webhooks dos simuladores (RN-SIM-003), compartilhado com o receptor do núcleo.
+  add('webhook/pix_simulator');
+  add('webhook/kyc_simulator');
   for (const svc of serviceCatalog()) {
     add(`db/${svc}_app`);
     add(`db/${svc}_migrator`);

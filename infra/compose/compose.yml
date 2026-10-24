@@ -13,6 +13,31 @@ x-limits: &small
       limits:
         memory: 256m
 
+# Base dos simuladores externos (Sistemas simulados): mesma imagem única, latência e falhas
+# configuráveis por variável (RN-SIM-002), UI de inspeção em /ui (RN-SIM-005).
+x-simulator-env: &simulator-env
+  SERVICE_VERSION: 0.0.1
+  ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+  PORT: '8080'
+  DB_HOST: postgres
+  SIM_LATENCY_MS: ${SIM_LATENCY_MS:-0}
+  SIM_TRANSIENT_ERROR_RATE: ${SIM_TRANSIENT_ERROR_RATE:-0}
+  SIM_DEFINITIVE_ERROR_RATE: ${SIM_DEFINITIVE_ERROR_RATE:-0}
+  SIM_UNAVAILABLE: ${SIM_UNAVAILABLE:-}
+
+x-ready-check: &ready-check
+  healthcheck:
+    test:
+      [
+        'CMD',
+        'node',
+        '-e',
+        "fetch('http://localhost:8080/health/ready').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+      ]
+    interval: 5s
+    timeout: 3s
+    retries: 20
+
 networks:
   broker:
     name: broker
@@ -38,6 +63,23 @@ secrets:
     file: ../secrets/db/example_app
   db_example_migrator:
     file: ../secrets/db/example_migrator
+  db_pix_simulator_app:
+    file: ../secrets/db/pix_simulator_app
+  db_pix_simulator_migrator:
+    file: ../secrets/db/pix_simulator_migrator
+  db_kyc_simulator_app:
+    file: ../secrets/db/kyc_simulator_app
+  db_kyc_simulator_migrator:
+    file: ../secrets/db/kyc_simulator_migrator
+  db_message_sink_app:
+    file: ../secrets/db/message_sink_app
+  db_message_sink_migrator:
+    file: ../secrets/db/message_sink_migrator
+  # Segredos HMAC dos webhooks (RN-SIM-003): o simulador assina, o receptor do núcleo confere.
+  webhook_pix_simulator:
+    file: ../secrets/webhook/pix_simulator
+  webhook_kyc_simulator:
+    file: ../secrets/webhook/kyc_simulator
 
 services:
   # ---------------------------------------------------------------- infraestrutura
@@ -157,9 +199,22 @@ services:
 
   mailpit:
     image: axllent/mailpit:v1.31.6
+    # Caixa de captura de e-mail (RN-MSG-001): TODA mensagem fica aqui. Só os destinatários da lista
+    # de permissão MAIL_RELAY_ALLOWLIST (regex, ex.: ^dev@exemplo\.com$) são repassados a um SMTP
+    # real, e só se MAIL_RELAY_HOST estiver definido. Lista vazia: nada sai, nem pelo "release" da UI.
+    # Verificado por apps/message-sink/test/mailpit-allowlist.test.ts, que lê este bloco.
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 'true'
       MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+      MP_SMTP_RELAY_HOST: ${MAIL_RELAY_HOST:-}
+      MP_SMTP_RELAY_PORT: ${MAIL_RELAY_PORT:-587}
+      MP_SMTP_RELAY_STARTTLS: ${MAIL_RELAY_STARTTLS:-true}
+      MP_SMTP_RELAY_ALLOW_INSECURE: ${MAIL_RELAY_ALLOW_INSECURE:-false}
+      MP_SMTP_RELAY_AUTH: ${MAIL_RELAY_AUTH:-none}
+      MP_SMTP_RELAY_USERNAME: ${MAIL_RELAY_USERNAME:-}
+      MP_SMTP_RELAY_PASSWORD: ${MAIL_RELAY_PASSWORD:-}
+      MP_SMTP_RELAY_MATCHING: ${MAIL_RELAY_ALLOWLIST:-}
+      MP_SMTP_RELAY_ALLOWED_RECIPIENTS: ${MAIL_RELAY_ALLOWLIST:-^$}
     ports:
       - '${MAILPIT_SMTP_PORT:-1025}:1025'
       - '${MAILPIT_UI_PORT:-8025}:8025'
@@ -227,6 +282,136 @@ services:
       timeout: 3s
       retries: 20
     <<: *small
+
+  # ---------------------------------------------------------------- simuladores externos
+  # Sem perfil: sobem com a infraestrutura. Cada um tem banco próprio e é acessado pelo núcleo
+  # só pela API, como um terceiro (RN-SIM-001).
+
+  pix-simulator-migrate:
+    image: broker/pix-simulator:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/pix-simulator'
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: pix_simulator
+      DB_USER: pix_simulator_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_pix_simulator_migrator
+    secrets: [db_pix_simulator_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  pix-simulator:
+    image: broker/pix-simulator:local
+    environment:
+      <<: *simulator-env
+      SERVICE_NAME: pix-simulator
+      DB_NAME: pix_simulator
+      DB_USER: pix_simulator_app
+      DB_PASSWORD_FILE: /run/secrets/db_pix_simulator_app
+      WEBHOOK_URL: ${PIX_WEBHOOK_URL:-http://ledger-service:8080/webhooks/pix-simulator}
+      WEBHOOK_SECRET_FILE: /run/secrets/webhook_pix_simulator
+    secrets: [db_pix_simulator_app, webhook_pix_simulator]
+    networks: [broker]
+    depends_on:
+      pix-simulator-migrate:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.bank.rule: Host(`bank.broker.localhost`)
+      traefik.http.routers.bank.entrypoints: websecure
+      traefik.http.services.bank.loadbalancer.server.port: '8080'
+
+  kyc-simulator-migrate:
+    image: broker/kyc-simulator:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/kyc-simulator'
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: kyc_simulator
+      DB_USER: kyc_simulator_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_kyc_simulator_migrator
+    secrets: [db_kyc_simulator_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  kyc-simulator:
+    image: broker/kyc-simulator:local
+    environment:
+      <<: *simulator-env
+      SERVICE_NAME: kyc-simulator
+      DB_NAME: kyc_simulator
+      DB_USER: kyc_simulator_app
+      DB_PASSWORD_FILE: /run/secrets/db_kyc_simulator_app
+      WEBHOOK_URL: ${KYC_WEBHOOK_URL:-http://customer-service:8080/webhooks/kyc-simulator}
+      WEBHOOK_SECRET_FILE: /run/secrets/webhook_kyc_simulator
+      KYC_RESULT_DELAY_MS: ${KYC_RESULT_DELAY_MS:-2000-10000}
+    secrets: [db_kyc_simulator_app, webhook_kyc_simulator]
+    networks: [broker]
+    depends_on:
+      kyc-simulator-migrate:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.kyc.rule: Host(`kyc.broker.localhost`)
+      traefik.http.routers.kyc.entrypoints: websecure
+      traefik.http.services.kyc.loadbalancer.server.port: '8080'
+
+  message-sink-migrate:
+    image: broker/message-sink:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/message-sink'
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: message_sink
+      DB_USER: message_sink_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_message_sink_migrator
+    secrets: [db_message_sink_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  message-sink:
+    image: broker/message-sink:local
+    environment:
+      <<: *simulator-env
+      SERVICE_NAME: message-sink
+      DB_NAME: message_sink
+      DB_USER: message_sink_app
+      DB_PASSWORD_FILE: /run/secrets/db_message_sink_app
+      MAILBOX_URL: https://mail.broker.localhost
+    secrets: [db_message_sink_app]
+    networks: [broker]
+    depends_on:
+      message-sink-migrate:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.sms.rule: Host(`sms.broker.localhost`)
+      traefik.http.routers.sms.entrypoints: websecure
+      traefik.http.services.sms.loadbalancer.server.port: '8080'
 
   # ---------------------------------------------------------------- serviços
   # Padrão de um serviço: imagem do Dockerfile único (SERVICE=<pacote>), um one-shot de

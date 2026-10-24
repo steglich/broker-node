@@ -2,7 +2,13 @@ import type { Server } from 'node:http';
 import type { Clock } from '@broker/clock';
 import { uuidv7 } from '@broker/ids';
 import { trace } from '@opentelemetry/api';
-import express, { type Express, type NextFunction, type Request, type Response } from 'express';
+import express, {
+  type Express,
+  type NextFunction,
+  type Request,
+  type RequestHandler,
+  type Response,
+} from 'express';
 import type { TSchema, Static } from 'typebox';
 import { authorize, type AccessPolicy, type Authenticator } from './auth.js';
 import type { BaseConfig } from './config.js';
@@ -20,6 +26,8 @@ export interface HandlerResult {
   status?: number;
   body?: unknown;
   headers?: Record<string, string>;
+  /** Tipo do conteúdo quando o corpo não é JSON (ex.: `text/html` das UIs dos simuladores). */
+  type?: string;
 }
 
 export interface RouteRequest<B, Q, P> {
@@ -27,6 +35,8 @@ export interface RouteRequest<B, Q, P> {
   query: Q;
   params: P;
   headers: Request['headers'];
+  /** Bytes exatos do corpo recebido (ex.: verificação de assinatura de webhook). */
+  rawBody: Buffer | undefined;
   /** Requisição Express original, para casos especiais. */
   raw: Request;
 }
@@ -87,7 +97,15 @@ export class Service {
     app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use((req, res, next) => this.withContext(req, res, next));
-    app.use(express.json({ limit: options.bodyLimit ?? '64kb' }));
+    app.use(
+      express.json({
+        limit: options.bodyLimit ?? '64kb',
+        // Guarda os bytes originais: a assinatura de um webhook é sobre o corpo exato (RN-SIM-003).
+        verify: (req, _res, buf) => {
+          (req as Request & { rawBody?: Buffer }).rawBody = buf;
+        },
+      }),
+    );
     this.mountHealth(app);
     app.use(this.routes);
     app.use((req, _res, next) =>
@@ -106,6 +124,14 @@ export class Service {
   /** Readiness falso enquanto o estado em memória é reconstruído (RN-OBS §5). */
   setReady(ready: boolean): void {
     this.ready = ready;
+  }
+
+  /**
+   * Middleware que roda antes das rotas registradas DEPOIS desta chamada (ex.: o comportamento
+   * configurável dos simuladores, RN-SIM-002). Os erros vão para o tratamento padrão (Problem Details).
+   */
+  use(...handlers: RequestHandler[]): void {
+    this.routes.use(...handlers);
   }
 
   /** Registra o que fechar no encerramento (consumidores, relay, pools). Roda na ordem inversa. */
@@ -142,6 +168,7 @@ export class Service {
           ? validateInput(def.validate.params, req.params, 'params')
           : req.params,
         headers: req.headers,
+        rawBody: (req as Request & { rawBody?: Buffer }).rawBody,
         raw: req,
       };
       if (def.accountData ?? true) res.setHeader('Cache-Control', 'no-store');
@@ -331,6 +358,13 @@ export class Service {
     const status = result.status ?? (result.body === undefined ? 204 : 200);
     if (result.body === undefined || status === 204) {
       res.status(status).end();
+      return;
+    }
+    if (result.type) {
+      res
+        .status(status)
+        .type(result.type)
+        .send(typeof result.body === 'string' ? result.body : JSON.stringify(result.body));
       return;
     }
     const isProblem =

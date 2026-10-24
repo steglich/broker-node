@@ -13,7 +13,7 @@ Tudo roda em Docker; na máquina só são necessários Docker, Node 24 e pnpm (v
 | `pnpm env:seed`                   | roda o script `seed` de cada serviço (idempotente)                     |
 | `pnpm test:infra`                 | testes de verificação contra o ambiente rodando                        |
 
-Perfis: `infra` sobe só a infraestrutura (para rodar serviços fora do contêiner), `core` acrescenta os serviços do núcleo e `full` todos os serviços.
+Perfis: `infra` sobe a infraestrutura e os simuladores externos (para rodar serviços fora do contêiner), `core` acrescenta os serviços do núcleo e `full` todos os serviços.
 
 ## Endereços
 
@@ -24,9 +24,17 @@ Perfis: `infra` sobe só a infraestrutura (para rodar serviços fora do contêin
 | Valkey                    | `localhost:6380` (6380 para não colidir com um Redis local) | senha em `secrets/valkey_password`        |
 | MinIO (S3/console)        | `localhost:9000` / http://localhost:9001                    | `broker`                                  |
 | Mailpit                   | https://mail.broker.localhost ou http://localhost:8025      | —                                         |
+| Banco Simulado (PIX)      | https://bank.broker.localhost/ui                            | —                                         |
+| KYC simulado              | https://kyc.broker.localhost/ui                             | —                                         |
+| SMS e push (message-sink) | https://sms.broker.localhost/ui                             | —                                         |
 | Grafana (LGTM)            | http://localhost:3000; OTLP em `4317`/`4318`                | `admin`                                   |
 
-As senhas ficam em `infra/secrets/` (fora do git). As portas podem ser trocadas por variáveis de ambiente (`POSTGRES_PORT`, `VALKEY_PORT`, `HTTP_PORT`...).
+### Falhas simuladas e e-mail real
+
+- Latência e falhas dos simuladores (RN-SIM-002): `SIM_LATENCY_MS` (`200` ou `100-500`), `SIM_TRANSIENT_ERROR_RATE`, `SIM_DEFINITIVE_ERROR_RATE` e `SIM_UNAVAILABLE` (`<início>/<fim>` ISO). Também mudam em tempo de execução pela UI de cada simulador ou por `PUT /admin/behavior`.
+- E-mail (RN-MSG-001): tudo fica no Mailpit. Para receber de verdade no seu e-mail, defina `MAIL_RELAY_HOST` (e `MAIL_RELAY_PORT`, `MAIL_RELAY_AUTH`, `MAIL_RELAY_USERNAME`, `MAIL_RELAY_PASSWORD`) e `MAIL_RELAY_ALLOWLIST` com uma regex, ex.: `^seu\.email@exemplo\.com$`. Só esses destinatários saem; os demais ficam só na caixa.
+
+As senhas ficam em `infra/secrets/` (fora do git), inclusive os segredos HMAC dos webhooks (`secrets/webhook/`). As portas podem ser trocadas por variáveis de ambiente (`POSTGRES_PORT`, `VALKEY_PORT`, `HTTP_PORT`...).
 
 ## Estrutura
 

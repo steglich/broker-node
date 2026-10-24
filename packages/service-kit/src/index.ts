@@ -2,7 +2,13 @@ export {
   authorize,
   Authenticator,
   ownedBy,
+  requireStepUp,
   ServiceTokenProvider,
+  signatureRequired,
+  SignatureVerifier,
+  STEP_UP_WINDOW_MS,
+  type SignatureScope,
+  type SignatureVerifierOptions,
   type AccessClaims,
   type AccessPolicy,
   type AuthenticatorOptions,
@@ -60,6 +66,7 @@ export {
 } from './idempotency.js';
 export { createLogger, maskSensitive, type Logger, type LoggerOptions } from './logger.js';
 export { recordHttpRequest } from './metrics.js';
+export { RevocationList } from './revocation.js';
 export {
   applyPage,
   DEFAULT_LIMIT,

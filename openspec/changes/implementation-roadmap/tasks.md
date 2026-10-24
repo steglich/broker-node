@@ -95,12 +95,12 @@
 
 ## 13. Fase 1 — identity-service
 
-- [ ] 13.1 Implementar o modelo (`user`, `credential`, `mfa_factor`, `session`, `device`, `refresh_token`, `role`, `permission`, `login_attempt`) com dois realms e o registro de cliente com política de senha (argon2id, lista de vazadas, sem CPF/nome/e-mail); verificar a recusa de senha com CPF (RN-AUTH-001)
-- [ ] 13.2 Implementar o Authorization Code + PKCE, o access token ES256 (claims completos), a JWKS rotacionável e o refresh opaco com rotação e detecção de reuso; verificar a revogação da família no reuso (Autenticação §4)
-- [ ] 13.3 Implementar o bloqueio por tentativas (atraso progressivo, bloqueio de 30 min, e-mail) com resposta indistinguível para e-mail inexistente; verificar a 10ª falha (RN-AUTH-002)
-- [ ] 13.4 Implementar TOTP, WebAuthn e OTP SMS simulado, sessões e dispositivos (listar, revogar, `new_device_detected`), inatividade por canal e lista de revogação no Valkey; verificar a revogação refletindo no gateway (RN-AUTH-003, RN-AUTH-012/013)
-- [ ] 13.5 Implementar a assinatura eletrônica (segredo próprio, token com escopo e validade, bloqueios 3/6), o step-up por `amr` e a recuperação de acesso (link de 15 min + segundo fator, revoga sessões, bloqueia assinatura por 24 h); verificar escopo errado → `TRADING_SIGNATURE_REQUIRED` (RN-SIG-*, RN-AUTHZ-003, RN-AUTH-004)
-- [ ] 13.6 Implementar o RBAC do backoffice com segregação (`BO_AUDITOR` exclusivo), MFA forte obrigatório no realm `backoffice`, client credentials para serviços e o consumidor de `account.status_changed` (BLOCKED revoga assinaturas); verificar a segregação e a revogação (RN-BO-001/002, RN-AUTH-014)
+- [x] 13.1 Implementar o modelo (`user`, `credential`, `mfa_factor`, `session`, `device`, `refresh_token`, `role`, `permission`, `login_attempt`) com dois realms e o registro de cliente com política de senha (argon2id, lista de vazadas, sem CPF/nome/e-mail); verificar a recusa de senha com CPF (RN-AUTH-001)
+- [x] 13.2 Implementar o Authorization Code + PKCE, o access token ES256 (claims completos), a JWKS rotacionável e o refresh opaco com rotação e detecção de reuso; verificar a revogação da família no reuso (Autenticação §4)
+- [x] 13.3 Implementar o bloqueio por tentativas (atraso progressivo, bloqueio de 30 min, e-mail) com resposta indistinguível para e-mail inexistente; verificar a 10ª falha (RN-AUTH-002)
+- [x] 13.4 Implementar TOTP, WebAuthn e OTP SMS simulado, sessões e dispositivos (listar, revogar, `new_device_detected`), inatividade por canal e lista de revogação no Valkey; verificar a revogação refletindo no gateway (RN-AUTH-003, RN-AUTH-012/013)
+- [x] 13.5 Implementar a assinatura eletrônica (segredo próprio, token com escopo e validade, bloqueios 3/6), o step-up por `amr` e a recuperação de acesso (link de 15 min + segundo fator, revoga sessões, bloqueia assinatura por 24 h); verificar escopo errado → `TRADING_SIGNATURE_REQUIRED` (RN-SIG-*, RN-AUTHZ-003, RN-AUTH-004)
+- [x] 13.6 Implementar o RBAC do backoffice com segregação (`BO_AUDITOR` exclusivo), MFA forte obrigatório no realm `backoffice`, client credentials para serviços e o consumidor de `account.status_changed` (BLOCKED revoga assinaturas); verificar a segregação e a revogação (RN-BO-001/002, RN-AUTH-014)
 
 ## 14. Fase 1 — customer-service
 

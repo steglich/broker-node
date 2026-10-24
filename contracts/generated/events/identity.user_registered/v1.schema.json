@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:identity.user_registered:v1",
+  "title": "identity.user_registered v1",
+  "description": "Credenciais criadas no realm (cadastro do cliente ou convite do backoffice).",
+  "x-producer": "identity-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "userId",
+    "realm",
+    "emailHash",
+    "registeredAt"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "realm": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "customers"
+        },
+        {
+          "type": "string",
+          "const": "backoffice"
+        }
+      ]
+    },
+    "emailHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

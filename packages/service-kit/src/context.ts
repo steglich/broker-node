@@ -22,6 +22,10 @@ export interface ExecutionContext {
   /** Escopos e papéis do token, para a autorização no caso de uso (RN-BE-012). */
   scopes: ReadonlySet<string>;
   roles: ReadonlySet<string>;
+  /** Sessão do access token (`session_id`), quando houver. */
+  sessionId?: string;
+  /** Instante do último MFA da sessão (`mfa_time`), para o step-up. */
+  mfaAt?: Instant;
 }
 
 const storage = new AsyncLocalStorage<ExecutionContext>();

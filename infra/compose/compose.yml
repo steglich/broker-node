@@ -66,6 +66,14 @@ secrets:
     file: ../secrets/db/scheduler_app
   db_scheduler_migrator:
     file: ../secrets/db/scheduler_migrator
+  db_identity_app:
+    file: ../secrets/db/identity_app
+  db_identity_migrator:
+    file: ../secrets/db/identity_migrator
+  identity_field_master_key:
+    file: ../secrets/crypto/identity_field_master_key
+  identity_blind_index_key:
+    file: ../secrets/crypto/identity_blind_index_key
   db_audit_app:
     file: ../secrets/db/audit_app
   db_audit_migrator:
@@ -492,6 +500,78 @@ services:
       traefik.http.routers.scheduler.entrypoints: websecure
       traefik.http.services.scheduler.loadbalancer.server.port: '8080'
 
+  identity-migrate:
+    profiles: [core]
+    image: broker/identity-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/identity-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: identity
+      DB_USER: identity_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_identity_migrator
+    secrets: [db_identity_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Identidade e acesso (Autenticação §1–§5): OAuth 2.1 + PKCE, JWKS, MFA, sessões, assinatura.
+  # E-mails de segurança vão direto para o Mailpit e o OTP por SMS para o message-sink.
+  identity-service:
+    profiles: [core]
+    image: broker/identity-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: identity-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: identity
+      DB_USER: identity_app
+      DB_PASSWORD_FILE: /run/secrets/db_identity_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      FIELD_MASTER_KEY_FILE: /run/secrets/identity_field_master_key
+      BLIND_INDEX_KEY_FILE: /run/secrets/identity_blind_index_key
+      AUTH_ISSUER: https://auth.broker.localhost
+      SMTP_HOST: mailpit
+      MESSAGE_SINK_URL: http://message-sink:8080
+      # Liga quando o customer-service (grupo 14) publicar no tópico `customer`.
+      CONSUME_CUSTOMER_EVENTS: ${IDENTITY_CONSUME_CUSTOMER_EVENTS:-false}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_identity_app
+      - rabbitmq_password
+      - valkey_password
+      - identity_field_master_key
+      - identity_blind_index_key
+    networks: [broker]
+    depends_on:
+      identity-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.identity.rule: Host(`auth.broker.localhost`)
+      traefik.http.routers.identity.entrypoints: websecure
+      traefik.http.services.identity.loadbalancer.server.port: '8080'
+
   audit-migrate:
     profiles: [core]
     image: broker/audit-service:local
@@ -537,9 +617,9 @@ services:
       ANCHOR_S3_ENDPOINT: http://minio:9000
       ANCHOR_S3_ACCESS_KEY: broker
       ANCHOR_S3_SECRET_KEY_FILE: /run/secrets/minio_root_password
-      # identity-service (grupo 13): JWKS e emissor do realm do backoffice.
+      # identity-service: um emissor para os dois realms; o realm vai no claim `realm`.
       AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
-      AUTH_ISSUER: https://auth.broker.localhost/backoffice
+      AUTH_ISSUER: https://auth.broker.localhost
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets: [db_audit_app, rabbitmq_password, minio_root_password]
     networks: [broker]

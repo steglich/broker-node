@@ -37,6 +37,9 @@ export function generateSecrets() {
   // HMAC dos webhooks dos simuladores (RN-SIM-003), compartilhado com o receptor do núcleo.
   add('webhook/pix_simulator');
   add('webhook/kyc_simulator');
+  // Cifra de campo (envelope encryption) e HMAC de busca do identity (RN-DB-031, D18): 32 bytes.
+  add('crypto/identity_field_master_key', randomBytes(32).toString('hex'));
+  add('crypto/identity_blind_index_key', randomBytes(32).toString('hex'));
   for (const svc of serviceCatalog()) {
     add(`db/${svc}_app`);
     add(`db/${svc}_migrator`);

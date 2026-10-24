@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:identity.login_failed:v1",
+  "title": "identity.login_failed v1",
+  "description": "Tentativa de login recusada (RN-AUTH-002).",
+  "x-producer": "identity-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "emailHash",
+    "reason",
+    "attemptCount"
+  ],
+  "properties": {
+    "emailHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "ipHash": {
+      "type": "string"
+    },
+    "attemptCount": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

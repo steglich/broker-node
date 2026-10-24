@@ -7,6 +7,25 @@
   },
   "defaultContentType": "application/json",
   "channels": {
+    "customer": {
+      "address": "{environment}.customer.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "account.opened.v1": {
+          "$ref": "#/components/messages/account.opened.v1"
+        },
+        "account.status_changed.v1": {
+          "$ref": "#/components/messages/account.status_changed.v1"
+        },
+        "customer.created.v1": {
+          "$ref": "#/components/messages/customer.created.v1"
+        }
+      }
+    },
     "scheduler": {
       "address": "{environment}.scheduler.events",
       "parameters": {
@@ -36,6 +55,40 @@
         }
       }
     },
+    "identity": {
+      "address": "{environment}.identity.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "identity.login_failed.v1": {
+          "$ref": "#/components/messages/identity.login_failed.v1"
+        },
+        "identity.login_succeeded.v1": {
+          "$ref": "#/components/messages/identity.login_succeeded.v1"
+        },
+        "identity.mfa_enabled.v1": {
+          "$ref": "#/components/messages/identity.mfa_enabled.v1"
+        },
+        "identity.new_device_detected.v1": {
+          "$ref": "#/components/messages/identity.new_device_detected.v1"
+        },
+        "identity.password_changed.v1": {
+          "$ref": "#/components/messages/identity.password_changed.v1"
+        },
+        "identity.session_revoked.v1": {
+          "$ref": "#/components/messages/identity.session_revoked.v1"
+        },
+        "identity.trading_signature_changed.v1": {
+          "$ref": "#/components/messages/identity.trading_signature_changed.v1"
+        },
+        "identity.user_registered.v1": {
+          "$ref": "#/components/messages/identity.user_registered.v1"
+        }
+      }
+    },
     "owner-topics": {
       "address": "{environment}.{context}.events",
       "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
@@ -58,6 +111,28 @@
     }
   },
   "operations": {
+    "customer-service.send.account.opened.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/account.opened.v1"
+        }
+      ]
+    },
+    "customer-service.send.account.status_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/account.status_changed.v1"
+        }
+      ]
+    },
     "scheduler-service.send.clock.ticked.v1": {
       "action": "send",
       "channel": {
@@ -69,6 +144,17 @@
         }
       ]
     },
+    "customer-service.send.customer.created.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/customer"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/customer/messages/customer.created.v1"
+        }
+      ]
+    },
     "example-service.send.example.pinged.v1": {
       "action": "send",
       "channel": {
@@ -77,6 +163,94 @@
       "messages": [
         {
           "$ref": "#/channels/example/messages/example.pinged.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.login_failed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.login_failed.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.login_succeeded.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.login_succeeded.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.mfa_enabled.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.mfa_enabled.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.new_device_detected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.new_device_detected.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.password_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.password_changed.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.session_revoked.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.session_revoked.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.trading_signature_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.trading_signature_changed.v1"
+        }
+      ]
+    },
+    "identity-service.send.identity.user_registered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/identity"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/identity/messages/identity.user_registered.v1"
         }
       ]
     },
@@ -219,6 +393,80 @@
           }
         }
       },
+      "account.opened.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "customerId",
+          "accountNumber",
+          "openedAt"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "openedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "account.status_changed.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "from",
+          "to",
+          "reasonCode",
+          "actor"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "from": {
+            "type": "string",
+            "pattern": "^[A-Z_]+$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[A-Z_]+$"
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "restrictions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actor": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "clock.ticked.v1": {
         "type": "object",
         "required": [
@@ -249,6 +497,36 @@
           }
         }
       },
+      "customer.created.v1": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "userId",
+          "displayName",
+          "declaredNetWorth",
+          "pep"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "declaredNetWorth": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "pep": {
+            "type": "boolean"
+          }
+        }
+      },
       "example.pinged.v1": {
         "type": "object",
         "required": [
@@ -258,6 +536,191 @@
           "pingId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "identity.login_failed.v1": {
+        "type": "object",
+        "required": [
+          "emailHash",
+          "reason",
+          "attemptCount"
+        ],
+        "properties": {
+          "emailHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "ipHash": {
+            "type": "string"
+          },
+          "attemptCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "identity.login_succeeded.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "sessionId",
+          "deviceId",
+          "channel",
+          "newDevice"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "ipHash": {
+            "type": "string"
+          },
+          "newDevice": {
+            "type": "boolean"
+          }
+        }
+      },
+      "identity.mfa_enabled.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "at"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "identity.new_device_detected.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "deviceId",
+          "channel"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channel": {
+            "type": "string"
+          }
+        }
+      },
+      "identity.password_changed.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "at"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "identity.session_revoked.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "sessionId",
+          "reason"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "identity.trading_signature_changed.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "at"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "identity.user_registered.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "realm",
+          "emailHash",
+          "registeredAt"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "realm": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "customers"
+              },
+              {
+                "type": "string",
+                "const": "backoffice"
+              }
+            ]
+          },
+          "emailHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "registeredAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -361,6 +824,83 @@
       }
     },
     "messages": {
+      "account.opened.v1": {
+        "name": "account.opened",
+        "title": "account.opened v1",
+        "summary": "Conta aberta; o identity passa a pôr o account_id no token do usuário.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "account.opened"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/account.opened.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "ledger-service",
+          "custody-service",
+          "risk-service",
+          "engagement-service",
+          "notification-service",
+          "identity-service"
+        ]
+      },
+      "account.status_changed.v1": {
+        "name": "account.status_changed",
+        "title": "account.status_changed v1",
+        "summary": "Status da conta mudou; BLOCKED revoga as assinaturas do titular (RN-AUTH-014).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "account.status_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/account.status_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "identity-service",
+          "oms-service",
+          "risk-service",
+          "ledger-service",
+          "notification-service"
+        ]
+      },
       "clock.ticked.v1": {
         "name": "clock.ticked",
         "title": "clock.ticked v1",
@@ -395,6 +935,43 @@
           "all-services"
         ]
       },
+      "customer.created.v1": {
+        "name": "customer.created",
+        "title": "customer.created v1",
+        "summary": "Cliente criado na aprovação do cadastro; liga o usuário ao cliente.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "customer.created"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/customer.created.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "customer-service",
+        "x-consumers": [
+          "risk-service",
+          "tax-service",
+          "notification-service",
+          "identity-service"
+        ]
+      },
       "example.pinged.v1": {
         "name": "example.pinged",
         "title": "example.pinged v1",
@@ -427,6 +1004,284 @@
         "x-producer": "example-service",
         "x-consumers": [
           "example-service"
+        ]
+      },
+      "identity.login_failed.v1": {
+        "name": "identity.login_failed",
+        "title": "identity.login_failed v1",
+        "summary": "Tentativa de login recusada (RN-AUTH-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.login_failed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.login_failed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "audit-service"
+        ]
+      },
+      "identity.login_succeeded.v1": {
+        "name": "identity.login_succeeded",
+        "title": "identity.login_succeeded v1",
+        "summary": "Login concluído: sessão criada (Autenticação §4).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.login_succeeded"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.login_succeeded.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "identity.mfa_enabled.v1": {
+        "name": "identity.mfa_enabled",
+        "title": "identity.mfa_enabled v1",
+        "summary": "Fator de MFA ativado (RN-AUTH-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.mfa_enabled"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.mfa_enabled.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "identity.new_device_detected.v1": {
+        "name": "identity.new_device_detected",
+        "title": "identity.new_device_detected v1",
+        "summary": "Login num dispositivo nunca visto: notificação SECURITY_NEW_DEVICE (RN-AUTH-013).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.new_device_detected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.new_device_detected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "notification-service"
+        ]
+      },
+      "identity.password_changed.v1": {
+        "name": "identity.password_changed",
+        "title": "identity.password_changed v1",
+        "summary": "Senha trocada (troca ou recuperação de acesso).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.password_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.password_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "identity.session_revoked.v1": {
+        "name": "identity.session_revoked",
+        "title": "identity.session_revoked v1",
+        "summary": "Sessão encerrada: os tokens dela deixam de valer (RN-AUTH-013).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.session_revoked"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.session_revoked.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "realtime-gateway",
+          "audit-service"
+        ]
+      },
+      "identity.trading_signature_changed.v1": {
+        "name": "identity.trading_signature_changed",
+        "title": "identity.trading_signature_changed v1",
+        "summary": "Assinatura eletrônica cadastrada ou redefinida (RN-SIG-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.trading_signature_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.trading_signature_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "notification-service",
+          "audit-service"
+        ]
+      },
+      "identity.user_registered.v1": {
+        "name": "identity.user_registered",
+        "title": "identity.user_registered v1",
+        "summary": "Credenciais criadas no realm (cadastro do cliente ou convite do backoffice).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "identity.user_registered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/identity.user_registered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "identity-service",
+        "x-consumers": [
+          "customer-service",
+          "audit-service"
         ]
       },
       "routine.completed.v1": {

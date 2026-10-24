@@ -1,0 +1,1760 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "identity-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/customers/register": {
+      "post": {
+        "operationId": "register",
+        "summary": "Cadastro self-service no realm customers (RN-AUTH-001). O backoffice não tem rota de cadastro.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "fullName",
+                  "taxId"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 254
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "fullName": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200
+                  },
+                  "taxId": {
+                    "type": "string",
+                    "minLength": 11,
+                    "maxLength": 14
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "userId"
+                  ],
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campo inválido (senha fora da política: TOO_SHORT, CONTAINS_TAX_ID...).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "EMAIL_ALREADY_REGISTERED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/oauth/authorize": {
+      "post": {
+        "operationId": "authorize",
+        "summary": "Authorization Code + PKCE (S256) em fluxo nativo: credenciais do usuário → código ou etapa de MFA (RN-AUTH-010/011).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id",
+                  "redirect_uri",
+                  "code_challenge",
+                  "code_challenge_method",
+                  "device_id",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "code_challenge": {
+                    "type": "string",
+                    "minLength": 43,
+                    "maxLength": 43
+                  },
+                  "code_challenge_method": {
+                    "type": "string",
+                    "const": "S256"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "maxLength": 512
+                  },
+                  "device_id": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "biometric": {
+                    "type": "boolean"
+                  },
+                  "email": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 254
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Código de autorização ou desafio de MFA.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "redirectUri"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "AUTHORIZED"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "redirectUri": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "mfaToken",
+                        "methods",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "MFA_REQUIRED"
+                        },
+                        "mfaToken": {
+                          "type": "string"
+                        },
+                        "methods": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "INVALID_CREDENTIALS (igual para e-mail inexistente, RN-AUTH-002).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "LOGIN_TEMPORARILY_LOCKED, com Retry-After.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/oauth/authorize/mfa": {
+      "post": {
+        "operationId": "authorizeMfa",
+        "summary": "Segunda etapa do login: TOTP ou WebAuthn.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "mfa_token"
+                    ],
+                    "properties": {
+                      "mfa_token": {
+                        "type": "string",
+                        "minLength": 16,
+                        "maxLength": 256
+                      }
+                    }
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "method",
+                          "code"
+                        ],
+                        "properties": {
+                          "method": {
+                            "type": "string",
+                            "const": "TOTP"
+                          },
+                          "code": {
+                            "type": "string",
+                            "pattern": "^\\d{6}$"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "method",
+                          "response"
+                        ],
+                        "properties": {
+                          "method": {
+                            "type": "string",
+                            "const": "WEBAUTHN"
+                          },
+                          "response": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Código de autorização.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "redirectUri"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "AUTHORIZED"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "redirectUri": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "mfaToken",
+                        "methods",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "MFA_REQUIRED"
+                        },
+                        "mfaToken": {
+                          "type": "string"
+                        },
+                        "methods": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "INVALID_MFA ou MFA_CHALLENGE_EXPIRED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/oauth/authorize/mfa/webauthn-options": {
+      "post": {
+        "operationId": "authorizeMfaWebauthnOptions",
+        "summary": "Desafio WebAuthn da etapa de MFA.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mfa_token"
+                ],
+                "properties": {
+                  "mfa_token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PublicKeyCredentialRequestOptions."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "token",
+        "summary": "Endpoint de token (form ou JSON): authorization_code (com code_verifier), refresh_token (rotação, reuso revoga a sessão) e client_credentials (Basic). Erros no formato OAuth.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "authorization_code"
+                      },
+                      {
+                        "type": "string",
+                        "const": "refresh_token"
+                      },
+                      {
+                        "type": "string",
+                        "const": "client_credentials"
+                      }
+                    ]
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "code_verifier": {
+                    "type": "string"
+                  },
+                  "redirect_uri": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "access_token",
+                    "token_type",
+                    "expires_in",
+                    "scope"
+                  ],
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "const": "Bearer"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "refresh_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "{ error: invalid_grant | invalid_request | invalid_scope }",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "{ error: invalid_client }",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "revoke",
+        "summary": "Logout: encerra a sessão do refresh token (sempre 200, RFC 7009).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Encerrada (ou já não existia)."
+          }
+        },
+        "security": []
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "operationId": "jwks",
+        "summary": "Chaves públicas ES256 (a ativa e as aposentadas recentes).",
+        "responses": {
+          "200": {
+            "description": "JWKS."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/recovery": {
+      "post": {
+        "operationId": "recoveryRequest",
+        "summary": "Pede o link de recuperação (15 min). Sempre 202 (RN-AUTH-004).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "realm": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "customers"
+                      },
+                      {
+                        "type": "string",
+                        "const": "backoffice"
+                      }
+                    ]
+                  },
+                  "email": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 254
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Se o e-mail existir, o link foi enviado."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/recovery/methods": {
+      "post": {
+        "operationId": "recoveryMethods",
+        "summary": "Segundos fatores disponíveis para concluir a recuperação.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Métodos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "methods"
+                  ],
+                  "properties": {
+                    "methods": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_LINK.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/recovery/sms": {
+      "post": {
+        "operationId": "recoverySms",
+        "summary": "Envia o OTP de recuperação por SMS (simulado).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/recovery/complete": {
+      "post": {
+        "operationId": "recoveryComplete",
+        "summary": "Nova senha + segundo fator. Revoga todas as sessões e bloqueia a assinatura por 24 h.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "newPassword",
+                  "method",
+                  "code"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "method": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "TOTP"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SMS"
+                      }
+                    ]
+                  },
+                  "code": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/backoffice/invitations/start": {
+      "post": {
+        "operationId": "invitationStart",
+        "summary": "Convite do backoffice: segredo TOTP a cadastrar no autenticador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Segredo e URI otpauth.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "secret",
+                    "uri"
+                  ],
+                  "properties": {
+                    "secret": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/backoffice/invitations/complete": {
+      "post": {
+        "operationId": "invitationComplete",
+        "summary": "Conclui o convite: senha + código TOTP (MFA forte obrigatório, RN-BO-002).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "password",
+                  "totpCode"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 256
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "totpCode": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/me/sessions": {
+      "get": {
+        "operationId": "sessions",
+        "summary": "Sessões ativas do usuário (RN-AUTH-013).",
+        "responses": {
+          "200": {
+            "description": "Sessões."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/sessions/{sessionId}": {
+      "delete": {
+        "operationId": "revokeSession",
+        "summary": "Revoga uma sessão do próprio usuário; os tokens dela deixam de valer.",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "404": {
+            "description": "Sessão inexistente ou de outro usuário.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/devices": {
+      "get": {
+        "operationId": "devices",
+        "summary": "Dispositivos já usados pelo usuário.",
+        "responses": {
+          "200": {
+            "description": "Dispositivos."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa": {
+      "get": {
+        "operationId": "factors",
+        "summary": "Fatores de MFA ativos.",
+        "responses": {
+          "200": {
+            "description": "Fatores."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/totp": {
+      "post": {
+        "operationId": "totpEnroll",
+        "summary": "Começa a ativação do TOTP.",
+        "responses": {
+          "201": {
+            "description": "Segredo e URI otpauth."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/totp/confirm": {
+      "post": {
+        "operationId": "totpConfirm",
+        "summary": "Confirma o TOTP com um código válido; publica identity.mfa_enabled.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ativo."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/webauthn/options": {
+      "post": {
+        "operationId": "webauthnOptions",
+        "summary": "Opções de cadastro de chave WebAuthn.",
+        "responses": {
+          "200": {
+            "description": "PublicKeyCredentialCreationOptions e factorId."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/webauthn": {
+      "post": {
+        "operationId": "webauthnRegister",
+        "summary": "Conclui o cadastro da chave WebAuthn.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "factorId",
+                  "response"
+                ],
+                "properties": {
+                  "factorId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "response": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^.*$": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ativa."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/sms": {
+      "post": {
+        "operationId": "smsEnroll",
+        "summary": "Telefone de recuperação (fator fraco, só para recuperação): envia um OTP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phone"
+                ],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 16
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "OTP enviado."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/sms/confirm": {
+      "post": {
+        "operationId": "smsConfirm",
+        "summary": "Confirma o telefone de recuperação.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ativo."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/{factorId}": {
+      "delete": {
+        "operationId": "removeFactor",
+        "summary": "Desativa um fator; exige MFA nos últimos 15 min (RN-AUTHZ-003).",
+        "parameters": [
+          {
+            "name": "factorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "403": {
+            "description": "STEP_UP_REQUIRED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/step-up": {
+      "post": {
+        "operationId": "stepUp",
+        "summary": "Prova um fator agora: novo access token com mfa_time atual (RN-AUTHZ-003).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "code"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "TOTP"
+                      },
+                      "code": {
+                        "type": "string",
+                        "pattern": "^\\d{6}$"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "response"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "WEBAUTHN"
+                      },
+                      "response": {
+                        "type": "object",
+                        "patternProperties": {
+                          "^.*$": {}
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "access_token",
+                    "token_type",
+                    "expires_in",
+                    "scope"
+                  ],
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "const": "Bearer"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "refresh_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/step-up/webauthn-options": {
+      "post": {
+        "operationId": "stepUpWebauthnOptions",
+        "summary": "Desafio WebAuthn do step-up.",
+        "responses": {
+          "200": {
+            "description": "PublicKeyCredentialRequestOptions."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/trading-signature": {
+      "put": {
+        "operationId": "setSignature",
+        "summary": "Cadastra ou redefine a assinatura eletrônica (6 a 8 dígitos); redefinir exige MFA recente (RN-SIG-001/004).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "secret"
+                ],
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "maxLength": 16
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "403": {
+            "description": "STEP_UP_REQUIRED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/trading-signature/verify": {
+      "post": {
+        "operationId": "verifySignature",
+        "summary": "VerifyTradingSignature: token de assinatura do escopo, vinculado à sessão (5 min, ou até 8 h para ordens com rememberInSession).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "secret",
+                  "scope"
+                ],
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "maxLength": 16
+                  },
+                  "scope": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "ORDERS"
+                      },
+                      {
+                        "type": "string",
+                        "const": "WITHDRAWALS"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SETTINGS"
+                      }
+                    ]
+                  },
+                  "rememberInSession": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token de assinatura (header X-Trading-Signature nos comandos).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "signatureToken",
+                    "scope",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "signatureToken": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ORDERS"
+                        },
+                        {
+                          "type": "string",
+                          "const": "WITHDRAWALS"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SETTINGS"
+                        }
+                      ]
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "INVALID_SIGNATURE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "SIGNATURE_LOCKED, SIGNATURE_RESET_REQUIRED ou SIGNATURE_BLOCKED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/settings/desktop-idle": {
+      "put": {
+        "operationId": "desktopIdle",
+        "summary": "Inatividade do desktop, de 120 a 480 minutos (RN-AUTH-012).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "minutes"
+                ],
+                "properties": {
+                  "minutes": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/backoffice/users": {
+      "post": {
+        "operationId": "inviteBackofficeUser",
+        "summary": "Convida um usuário do backoffice com papéis (BO_ADMIN; segregação RN-BO-001).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "fullName",
+                  "roles"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 254
+                  },
+                  "fullName": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 7
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Convidado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "userId"
+                  ],
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "SEGREGATION_OF_DUTIES.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/backoffice/users/{userId}/roles": {
+      "put": {
+        "operationId": "setRoles",
+        "summary": "Troca os papéis (BO_ADMIN); BO_AUDITOR não acumula outro papel.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roles"
+                ],
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 7
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Feito."
+          },
+          "422": {
+            "description": "SEGREGATION_OF_DUTIES.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/clients": {
+      "post": {
+        "operationId": "registerClient",
+        "summary": "Cliente OAuth de serviço (client credentials) com escopos mínimos (BO_ADMIN).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "clientId",
+                  "scopes"
+                ],
+                "properties": {
+                  "clientId": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{2,63}$"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$"
+                    },
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O segredo aparece só nesta resposta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "clientId",
+                    "clientSecret"
+                  ],
+                  "properties": {
+                    "clientId": {
+                      "type": "string"
+                    },
+                    "clientSecret": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/signing-keys/rotate": {
+      "post": {
+        "operationId": "rotateKeys",
+        "summary": "Rotaciona a chave de assinatura dos tokens (BO_ADMIN).",
+        "responses": {
+          "200": {
+            "description": "kid da nova chave.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "kid"
+                  ],
+                  "properties": {
+                    "kid": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

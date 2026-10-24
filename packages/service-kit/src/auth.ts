@@ -1,7 +1,9 @@
 import type { Clock } from '@broker/clock';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } from 'jose';
 import type { Actor } from '@broker/messaging';
+import type { Instant } from '@broker/domain-kernel';
 import { forbidden, notFound, unauthenticated } from './errors.js';
+import type { RevocationList } from './revocation.js';
 
 /** Claims do access token (Autenticação §4). */
 export interface AccessClaims extends JWTPayload {
@@ -11,6 +13,8 @@ export interface AccessClaims extends JWTPayload {
   scope?: string;
   session_id?: string;
   amr?: string[];
+  /** Instante (s) do último MFA da sessão, para o step-up (RN-AUTHZ-003). */
+  mfa_time?: number;
   client_id?: string;
 }
 
@@ -30,6 +34,8 @@ export interface AuthenticatorOptions {
   clock: Clock;
   /** Padrão ES256 (D10). */
   algorithms?: string[];
+  /** Lista de revogação: o token de uma sessão revogada é recusado antes de expirar (RN-AUTH-013). */
+  revocation?: Pick<RevocationList, 'isSessionRevoked'>;
 }
 
 /** Valida tokens JWT pela JWKS e monta o principal (usuário, operador ou serviço). */
@@ -54,6 +60,11 @@ export class Authenticator {
       }));
     } catch {
       throw unauthenticated('Token inválido ou expirado.');
+    }
+    // O token de assinatura também é um JWT do identity, mas não serve como access token.
+    if (claims['sig_scope'] !== undefined) throw unauthenticated('Token inválido ou expirado.');
+    if (claims.session_id && (await this.options.revocation?.isSessionRevoked(claims.session_id))) {
+      throw unauthenticated('Sessão encerrada.');
     }
     const scopes = new Set((claims.scope ?? '').split(' ').filter(Boolean));
     const roles = new Set(claims.roles ?? []);
@@ -164,5 +175,75 @@ export class ServiceTokenProvider {
       expiresAt: this.options.clock.now().epochMillis + body.expires_in * 1000,
     };
     return body.access_token;
+  }
+}
+
+/** Escopos do token de assinatura eletrônica (RN-SIG-003). */
+export type SignatureScope = 'ORDERS' | 'WITHDRAWALS' | 'SETTINGS';
+
+export interface SignatureVerifierOptions {
+  /** A mesma JWKS do identity-service dos access tokens. */
+  jwks: URL | JWTVerifyGetKey;
+  issuer: string;
+  audience: string;
+  clock: Clock;
+  revocation?: Pick<RevocationList, 'isSignatureRevoked'>;
+}
+
+/** Comando sem assinatura válida para o escopo (RN-SIG-002, Autenticação §3). */
+export const signatureRequired = () =>
+  forbidden('TRADING_SIGNATURE_REQUIRED', 'Confirme com a assinatura eletrônica.');
+
+/**
+ * Confere o token de assinatura (header `X-Trading-Signature`): assinado pelo identity, do escopo
+ * exigido, da mesma sessão e do mesmo usuário do access token, e fora da lista de revogação.
+ * Qualquer falha responde `403 TRADING_SIGNATURE_REQUIRED` (RN-SIG-002/003).
+ */
+export class SignatureVerifier {
+  private readonly keys: JWTVerifyGetKey;
+
+  constructor(private readonly options: SignatureVerifierOptions) {
+    this.keys = options.jwks instanceof URL ? createRemoteJWKSet(options.jwks) : options.jwks;
+  }
+
+  async verify(
+    token: string | undefined,
+    expected: { scope: SignatureScope; userId: string; sessionId: string | undefined },
+  ): Promise<void> {
+    if (!token || !expected.sessionId) throw signatureRequired();
+    let claims: JWTPayload;
+    try {
+      ({ payload: claims } = await jwtVerify(token, this.keys, {
+        issuer: this.options.issuer,
+        audience: this.options.audience,
+        algorithms: ['ES256'],
+        typ: 'sig+jwt',
+        currentDate: new Date(this.options.clock.now().epochMillis),
+      }));
+    } catch {
+      throw signatureRequired();
+    }
+    if (
+      claims['sig_scope'] !== expected.scope ||
+      claims.sub !== expected.userId ||
+      claims['session_id'] !== expected.sessionId ||
+      typeof claims.jti !== 'string' ||
+      (await this.options.revocation?.isSignatureRevoked(claims.jti))
+    ) {
+      throw signatureRequired();
+    }
+  }
+}
+
+/** RN-AUTHZ-003: MFA nos últimos 15 minutos. */
+export const STEP_UP_WINDOW_MS = 15 * 60_000;
+
+/**
+ * Step-up (RN-AUTHZ-003): exige MFA recente na sessão. Para regras condicionais (ex.: saque acima
+ * de R$ 10 mil), o caso de uso chama direto; para rotas sempre sensíveis, use `stepUp: true`.
+ */
+export function requireStepUp(mfaAt: Instant | undefined, now: Instant): void {
+  if (!mfaAt || now.epochMillis - mfaAt.epochMillis > STEP_UP_WINDOW_MS) {
+    throw forbidden('STEP_UP_REQUIRED', 'Confirme com o segundo fator para continuar.');
   }
 }

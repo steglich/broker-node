@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:identity.login_succeeded:v1",
+  "title": "identity.login_succeeded v1",
+  "description": "Login concluído: sessão criada (Autenticação §4).",
+  "x-producer": "identity-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "userId",
+    "sessionId",
+    "deviceId",
+    "channel",
+    "newDevice"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sessionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "deviceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel": {
+      "type": "string"
+    },
+    "ipHash": {
+      "type": "string"
+    },
+    "newDevice": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:customer.created:v1",
+  "title": "customer.created v1",
+  "description": "Cliente criado na aprovação do cadastro; liga o usuário ao cliente.",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "customerId",
+    "userId",
+    "displayName",
+    "declaredNetWorth",
+    "pep"
+  ],
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "declaredNetWorth": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "pep": {
+      "type": "boolean"
+    }
+  }
+}

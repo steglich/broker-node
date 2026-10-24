@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:account.opened:v1",
+  "title": "account.opened v1",
+  "description": "Conta aberta; o identity passa a pôr o account_id no token do usuário.",
+  "x-producer": "customer-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "accountId",
+    "customerId",
+    "accountNumber",
+    "openedAt"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountNumber": {
+      "type": "string"
+    },
+    "openedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

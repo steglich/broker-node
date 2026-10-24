@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:identity.trading_signature_changed:v1",
+  "title": "identity.trading_signature_changed v1",
+  "description": "Assinatura eletrônica cadastrada ou redefinida (RN-SIG-001).",
+  "x-producer": "identity-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "userId",
+    "at"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

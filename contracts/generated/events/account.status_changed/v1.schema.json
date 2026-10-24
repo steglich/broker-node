@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:account.status_changed:v1",
+  "title": "account.status_changed v1",
+  "description": "Status da conta mudou; BLOCKED revoga as assinaturas do titular (RN-AUTH-014).",
+  "x-producer": "customer-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "accountId",
+    "from",
+    "to",
+    "reasonCode",
+    "actor"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "from": {
+      "type": "string",
+      "pattern": "^[A-Z_]+$"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^[A-Z_]+$"
+    },
+    "reasonCode": {
+      "type": "string"
+    },
+    "restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actor": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

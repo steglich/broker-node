@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:identity.new_device_detected:v1",
+  "title": "identity.new_device_detected v1",
+  "description": "Login num dispositivo nunca visto: notificação SECURITY_NEW_DEVICE (RN-AUTH-013).",
+  "x-producer": "identity-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "userId",
+    "deviceId",
+    "channel"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "deviceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel": {
+      "type": "string"
+    }
+  }
+}

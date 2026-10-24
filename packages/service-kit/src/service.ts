@@ -1,5 +1,6 @@
 import type { Server } from 'node:http';
 import type { Clock } from '@broker/clock';
+import { Instant } from '@broker/domain-kernel';
 import { uuidv7 } from '@broker/ids';
 import { trace } from '@opentelemetry/api';
 import express, {
@@ -10,7 +11,14 @@ import express, {
   type Response,
 } from 'express';
 import type { TSchema, Static } from 'typebox';
-import { authorize, type AccessPolicy, type Authenticator } from './auth.js';
+import {
+  authorize,
+  requireStepUp,
+  type AccessPolicy,
+  type Authenticator,
+  type SignatureScope,
+  type SignatureVerifier,
+} from './auth.js';
 import type { BaseConfig } from './config.js';
 import { ANONYMOUS, runWithContext, type Channel, type ExecutionContext } from './context.js';
 import { HttpError, toProblem, validationError } from './errors.js';
@@ -55,6 +63,10 @@ export interface RouteDefinition<SB, SQ, SP> {
   flag?: string;
   /** Resposta com dados de conta: `Cache-Control: no-store` (padrão true). */
   accountData?: boolean;
+  /** Exige token de assinatura do escopo no header `X-Trading-Signature` (RN-SIG-002). */
+  signature?: SignatureScope;
+  /** Exige MFA nos últimos 15 min (RN-AUTHZ-003). */
+  stepUp?: boolean;
   handler: (
     req: RouteRequest<Infer<SB>, Infer<SQ>, Infer<SP>>,
     ctx: ExecutionContext,
@@ -68,6 +80,8 @@ export interface ServiceOptions {
   /** Dependências críticas para o readiness (ex.: banco, broker). Cada uma lança se indisponível. */
   readiness?: Record<string, () => Promise<unknown>>;
   authenticator?: Authenticator;
+  /** Necessário para rotas com `signature`. */
+  signatureVerifier?: SignatureVerifier;
   idempotency?: IdempotencyStore;
   flags?: FeatureFlags;
   /** Limite do corpo (RN-API-042: 64 KB). */
@@ -152,6 +166,16 @@ export class Service {
     this.routes[def.method](def.path, async (req: Request, res: Response) => {
       const ctx = res.locals['ctx'] as ExecutionContext;
       await this.authenticate(req, def.auth, ctx);
+      if (def.stepUp) requireStepUp(ctx.mfaAt, this.options.clock.now());
+      if (def.signature) {
+        if (!this.options.signatureVerifier)
+          throw new Error('rota com assinatura sem SignatureVerifier configurado');
+        await this.options.signatureVerifier.verify(req.header('x-trading-signature'), {
+          scope: def.signature,
+          userId: ctx.actor.id,
+          sessionId: ctx.sessionId,
+        });
+      }
       if (
         def.flag &&
         this.options.flags &&
@@ -294,6 +318,9 @@ export class Service {
     if (principal.accountId) ctx.accountId = principal.accountId;
     ctx.scopes = principal.scopes;
     ctx.roles = principal.roles;
+    if (principal.claims.session_id) ctx.sessionId = principal.claims.session_id;
+    if (principal.claims.mfa_time !== undefined)
+      ctx.mfaAt = Instant.ofEpochMillis(principal.claims.mfa_time * 1000);
     if (principal.actor.type === 'SERVICE') ctx.channel = 'SERVICE';
   }
 

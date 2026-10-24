@@ -13,5 +13,6 @@ Os arquivos são gerados por `node infra/scripts/secrets.mjs`, que o `pnpm env:u
 | `grafana_admin_password` | usuário `admin` do Grafana                    |
 | `db/<svc>_app`           | usuário de aplicação (DML) do serviço `<svc>` |
 | `db/<svc>_migrator`      | usuário de migração (DDL) do serviço `<svc>`  |
+| `webhook/<simulador>`    | HMAC dos webhooks do simulador (RN-SIM-003)   |
 
 Para trocar todas as senhas, apague a pasta (menos este README) e destrua os volumes com `pnpm env:down --volumes`.

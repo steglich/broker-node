@@ -78,8 +78,8 @@
 
 ## 10. Fase 0 — Critério de pronto
 
-- [ ] 10.1 Criar um serviço de exemplo (`apps/sample-service`) que publica por outbox e consome com inbox, com trace de ponta a ponta; verificar com teste E2E e no Grafana
-- [ ] 10.2 Escrever `docs/primeiros-passos.md` (pré-requisitos, `mkcert`, `pnpm env:up`, URLs das UIs) e verificar seguindo o guia numa clone limpa
+- [x] 10.1 Criar um serviço de exemplo (`apps/example-service`, criado no grupo 6) que publica por outbox e consome com inbox, com trace de ponta a ponta; verificar com teste E2E e no Grafana
+- [x] 10.2 Escrever `docs/primeiros-passos.md` (pré-requisitos, `mkcert`, `pnpm env:up`, URLs das UIs) e verificar seguindo o guia numa clone limpa
 
 ## 11. Fase 1 — scheduler-service
 

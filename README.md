@@ -4,7 +4,9 @@ Implementação base, em **Node.js + TypeScript**, de um **Home Broker simulado*
 
 > **Simulação**: nenhum dinheiro real, nenhuma conexão com a B3 ou com bancos. Todo documento gerado pelo sistema leva a marca "SIMULADO — SEM VALOR LEGAL".
 
-> **Status**: em planejamento. O plano completo está em [`openspec/changes/implementation-roadmap`](openspec/changes/implementation-roadmap/). Ainda não há código.
+> **Status**: Fase 0 (fundações) concluída: monorepo, infraestrutura em Docker, bibliotecas de plataforma, mensageria, simuladores PIX/KYC/SMS e CI. O plano completo está em [`openspec/changes/implementation-roadmap`](openspec/changes/implementation-roadmap/).
+
+**Para rodar localmente, comece por [`docs/primeiros-passos.md`](docs/primeiros-passos.md).**
 
 ## O que será construído
 
@@ -55,7 +57,7 @@ Toda a infraestrutura roda em **Docker**. Detalhes e justificativas em [`design.
 
 Tarefas detalhadas em [`tasks.md`](openspec/changes/implementation-roadmap/tasks.md).
 
-## Estrutura planejada
+## Estrutura
 
 ```
 apps/        um diretório por microsserviço, simulador, gateway e BFF

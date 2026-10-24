@@ -1,5 +1,5 @@
 /**
- * Verificação de ponta a ponta da tarefa 6.5 contra o ambiente local (`pnpm env:up infra`):
+ * Verificação de ponta a ponta das tarefas 6.5 e 10.1 (critério de pronto da Fase 0) contra o ambiente local (`pnpm env:up infra`):
  * o example-service roda com a telemetria ligada; um POST gera um trace HTTP → outbox → relay →
  * RabbitMQ → consumidor que chega ao Tempo e é consultado pelo Grafana; as métricas RED chegam
  * ao Prometheus.
@@ -8,6 +8,7 @@ import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const root = fileURLToPath(new URL('../../../../', import.meta.url));
@@ -142,6 +143,31 @@ describe('trace de ponta a ponta no Grafana (RN-OBS §4)', () => {
       20_000,
       'consumidor processar',
     );
+
+    // Outbox e inbox (critério de pronto 10.1): o relay marcou o evento como publicado e o
+    // consumidor registrou o eventId em processed_event, na mesma transação do efeito.
+    const client = new pg.Client({
+      host: 'localhost',
+      database: 'example',
+      user: 'example_app',
+      password: secret('db/example_app'),
+    });
+    await client.connect();
+    try {
+      const outbox = await client.query<{ id: string; published_at: Date | null }>(
+        'SELECT id, published_at FROM outbox_event WHERE aggregate_id = $1',
+        [pingId],
+      );
+      expect(outbox.rows).toHaveLength(1);
+      expect(outbox.rows[0]!.published_at).not.toBeNull();
+      const inbox = await client.query<{ consumer: string }>(
+        'SELECT consumer FROM processed_event WHERE event_id = $1',
+        [outbox.rows[0]!.id],
+      );
+      expect(inbox.rows).toEqual([{ consumer: 'example.ping-processor' }]);
+    } finally {
+      await client.end();
+    }
 
     // O Grafana consulta o Tempo pelo datasource provisionado no otel-lgtm.
     const spans = await waitFor(

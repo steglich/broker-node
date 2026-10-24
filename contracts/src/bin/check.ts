@@ -12,6 +12,8 @@ import { loadRegistry } from '../registry.js';
 import { CONTRACTS_ROOT } from './paths.js';
 
 const { values } = parseArgs({
+  // `pnpm contracts:check --base x` chega como `-- --base x`: o separador do pnpm não é argumento.
+  args: process.argv.slice(2).filter((a) => a !== '--'),
   options: {
     base: { type: 'string', default: process.env['CONTRACTS_BASE_REF'] ?? 'main' },
     repo: { type: 'string' },

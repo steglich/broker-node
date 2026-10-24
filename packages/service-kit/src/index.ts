@@ -21,6 +21,7 @@ export {
   BaseConfigProperties,
   ConfigError,
   loadConfig,
+  packageVersion,
   loadConfigOrExit,
 } from './config.js';
 export {

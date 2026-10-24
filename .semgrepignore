@@ -1,0 +1,10 @@
+# Fora da análise estática (SAST): dependências, saída de build, documentação e os casos de teste
+# das regras próprias, que violam as regras de propósito.
+node_modules/
+dist/
+coverage/
+broker-docs/
+estudos/
+openspec/
+.claude/
+.semgrep/broker.ts

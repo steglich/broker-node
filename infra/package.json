@@ -2,12 +2,15 @@
   "name": "@broker/infra",
   "version": "0.0.0",
   "private": true,
-  "description": "Ambiente local em Docker e testes de verificação da infraestrutura.",
+  "description": "Ambiente local em Docker, ferramentas do pipeline (infra/ci) e testes de verificação da infraestrutura.",
   "type": "module",
   "devDependencies": {
     "@aws-sdk/client-s3": "3.1144.0",
     "@types/pg": "^8.23.1",
     "pg": "^8.23.1",
     "vitest": "^4.1.12"
+  },
+  "scripts": {
+    "test": "vitest run -c vitest.ci.config.ts"
   }
 }

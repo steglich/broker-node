@@ -29,7 +29,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "generate": "tsx --conditions=source src/bin/generate.ts",
-    "check": "tsx --conditions=source src/bin/check.ts"
+    "check": "tsx --conditions=source src/bin/check.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@broker/messaging": "workspace:*",

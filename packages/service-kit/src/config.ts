@@ -1,7 +1,24 @@
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import Type, { type Static, type TObject } from 'typebox';
+
+/**
+ * Versão do serviço que está rodando: a do `package.json` do diretório atual (`/app` na imagem,
+ * onde o `pnpm deploy` deixa o manifesto; a pasta do serviço em desenvolvimento). Ela é a fonte da
+ * verdade do semver por serviço (RN-CICD-020), mantida pelo `pnpm release`.
+ */
+export function packageVersion(dir = process.cwd()): string {
+  try {
+    const { version } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as {
+      version?: string;
+    };
+    return version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
 
 /**
  * Configuração comum a todo serviço. Cada serviço estende com `Type.Composite`/spread das
@@ -9,7 +26,9 @@ import Type, { type Static, type TObject } from 'typebox';
  */
 export const BaseConfigProperties = {
   SERVICE_NAME: Type.String({ minLength: 1, pattern: '^[a-z][a-z0-9-]*$' }),
-  SERVICE_VERSION: Type.String({ default: '0.0.0' }),
+  /** Padrão: a versão do `package.json` (RN-CICD-020). A variável sobrescreve. */
+  SERVICE_VERSION: Type.String({ default: packageVersion() }),
+  /** Commit do build: a imagem traz em `GIT_COMMIT` (build arg do Dockerfile). */
   GIT_COMMIT: Type.String({ default: 'unknown' }),
   ENVIRONMENT: Type.String({ minLength: 1, pattern: '^[a-z][a-z0-9-]*$' }),
   PORT: Type.Integer({ minimum: 1, maximum: 65535, default: 8080 }),

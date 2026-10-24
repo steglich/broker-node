@@ -72,9 +72,9 @@
 
 ## 9. Fase 0 — Pipeline de CI
 
-- [ ] 9.1 Criar o workflow do GitHub Actions com Turborepo (afetados): lint, typecheck, unitários com cobertura, integração (serviços Docker), contrato e compatibilidade de esquemas; verificar um PR de teste passando e outro reprovado por lint
-- [ ] 9.2 Adicionar Semgrep, `osv-scanner`, `gitleaks`, build de imagens com SBOM (`syft`) e assinatura (`cosign`); verificar que um segredo de teste commitado reprova o pipeline (RN-CICD §2)
-- [ ] 9.3 Adicionar a convenção de commits e o changelog por serviço, além do versionamento semver exposto no `/info`; verificar o `/info` do serviço de exemplo (RN-CICD-020/021)
+- [x] 9.1 Criar o workflow do GitHub Actions com Turborepo (afetados): lint, typecheck, unitários com cobertura, integração (serviços Docker), contrato e compatibilidade de esquemas; verificar um PR de teste passando e outro reprovado por lint
+- [x] 9.2 Adicionar Semgrep, `osv-scanner`, `gitleaks`, build de imagens com SBOM (`syft`) e assinatura (`cosign`); verificar que um segredo de teste commitado reprova o pipeline (RN-CICD §2)
+- [x] 9.3 Adicionar a convenção de commits e o changelog por serviço, além do versionamento semver exposto no `/info`; verificar o `/info` do serviço de exemplo (RN-CICD-020/021)
 
 ## 10. Fase 0 — Critério de pronto
 

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { request as httpRequest } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import request from 'supertest';
 import Type from 'typebox';
 import { describe, expect, it } from 'vitest';
-import { BaseConfigProperties, ConfigError, loadConfig } from '../src/index.js';
+import { BaseConfigProperties, ConfigError, loadConfig, packageVersion } from '../src/index.js';
 import { sleep, testService } from './helpers.js';
 
 const pkgDir = fileURLToPath(new URL('..', import.meta.url));
@@ -116,6 +116,23 @@ describe('health e info (RN-OBS §5)', () => {
       environment: 'prod',
     });
     expect(Date.parse(res.body.startedAt)).not.toBeNaN();
+  });
+
+  it('RN-CICD-020: a versão padrão é a do package.json do serviço; a variável sobrescreve', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'kit-version-'));
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: '@broker/x', version: '0.3.1' }),
+    );
+    expect(packageVersion(dir)).toBe('0.3.1');
+    expect(packageVersion(join(dir, 'nao-existe'))).toBe('0.0.0');
+    // Rodando a partir da pasta do pacote (como na imagem, em /app), o padrão é a versão dele.
+    const own = JSON.parse(readFileSync(join(pkgDir, 'package.json'), 'utf8')).version;
+    const schema = Type.Object(BaseConfigProperties);
+    const env = { SERVICE_NAME: 'x', ENVIRONMENT: 'prod' };
+    expect(loadConfig(schema, env).SERVICE_VERSION).toBe(packageVersion());
+    expect(packageVersion(pkgDir)).toBe(own);
+    expect(loadConfig(schema, { ...env, SERVICE_VERSION: '9.9.9' }).SERVICE_VERSION).toBe('9.9.9');
   });
 });
 

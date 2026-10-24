@@ -77,18 +77,19 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Testes, CI e ambiente
 
-| Conceito                | Tecnologia                                                                                          | Decisão |
-| ----------------------- | --------------------------------------------------------------------------------------------------- | ------- |
-| Unitários e componente  | Vitest (cobertura v8, ≥ 80% em `domain/`); `supertest` para HTTP                                    | D20     |
-| Testes de propriedade   | fast-check                                                                                          | D20     |
-| Integração              | Testcontainers (PostgreSQL, RabbitMQ, Valkey, MinIO, Mailpit)                                       | D20     |
-| Golden master           | YAML em `scenarios/<domínio>/<ID>.yaml` + runner com relógio virtual e semente (`pnpm scenarios`)   | D20     |
-| Carga e caos            | k6 em contêiner; Toxiproxy                                                                          | D20     |
-| CI                      | GitHub Actions + Turborepo; Semgrep, `osv-scanner`, `gitleaks`, `syft` (SBOM), `cosign`             | D21     |
-| Contêineres e ambientes | Dockerfile multi-stage (`node:24-slim`, não-root) e Docker Compose com perfis `infra`/`core`/`full` | D22     |
-| E-mail, SMS e push      | Mailpit (e-mail, relay só para `MAIL_RELAY_ALLOWLIST`) e `message-sink` (SMS/push)                  | D16     |
-| Simuladores externos    | `pix-simulator`, `kyc-simulator` e `message-sink` sobre `@broker/simulator-kit` (falhas e UI)       | D16     |
-| Webhooks assinados      | `@broker/webhooks`: HMAC-SHA256 `timestamp.corpo`, desvio ≤ 5 min, fila com backoff 1 s → 1 h       | D16     |
+| Conceito                | Tecnologia                                                                                                                                                   | Decisão |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| Unitários e componente  | Vitest (cobertura v8, ≥ 80% em `domain/`); `supertest` para HTTP                                                                                             | D20     |
+| Testes de propriedade   | fast-check                                                                                                                                                   | D20     |
+| Integração              | Testcontainers (PostgreSQL, RabbitMQ, Valkey, MinIO, Mailpit)                                                                                                | D20     |
+| Golden master           | YAML em `scenarios/<domínio>/<ID>.yaml` + runner com relógio virtual e semente (`pnpm scenarios`)                                                            | D20     |
+| Carga e caos            | k6 em contêiner; Toxiproxy                                                                                                                                   | D20     |
+| CI                      | GitHub Actions + Turborepo (`--affected`); Semgrep, `osv-scanner`, `gitleaks`, `syft` (SBOM), `cosign` keyless; mesmos comandos localmente (`pnpm ci:local`) | D21     |
+| Versões e changelog     | Conventional Commits (hook + CI), semver e `CHANGELOG.md` por pacote (`pnpm release`), versão e commit no `/info`                                            | D21     |
+| Contêineres e ambientes | Dockerfile multi-stage (`node:24-slim`, não-root) e Docker Compose com perfis `infra`/`core`/`full`                                                          | D22     |
+| E-mail, SMS e push      | Mailpit (e-mail, relay só para `MAIL_RELAY_ALLOWLIST`) e `message-sink` (SMS/push)                                                                           | D16     |
+| Simuladores externos    | `pix-simulator`, `kyc-simulator` e `message-sink` sobre `@broker/simulator-kit` (falhas e UI)                                                                | D16     |
+| Webhooks assinados      | `@broker/webhooks`: HMAC-SHA256 `timestamp.corpo`, desvio ≤ 5 min, fila com backoff 1 s → 1 h                                                                | D16     |
 
 ## Conflitos e simplificações
 

@@ -1,0 +1,42 @@
+# Regras próprias do broker-node (SAST, RN-CICD §2). Somam-se aos conjuntos p/typescript, p/nodejs,
+# p/expressjs e p/secrets. Teste: `semgrep --test .semgrep/` (casos em broker.ts).
+rules:
+  - id: kysely-sql-raw-dynamic
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      `sql.raw()` com valor dinâmico vira SQL sem parâmetro (injeção). Use a interpolação do
+      template `sql` (que parametriza) ou `sql.table()`/`sql.ref()` para identificadores.
+    patterns:
+      - pattern: sql.raw($X)
+      - pattern-not: sql.raw("...")
+  - id: pg-query-template-interpolation
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      SQL montado com template string e passado ao driver: use parâmetros (`$1`) ou o template `sql`
+      do Kysely.
+    pattern-either:
+      - pattern: $C.query(`...${$X}...`, ...)
+      - pattern: $C.query(`...${$X}...`)
+  - id: tls-verification-disabled
+    languages: [typescript]
+    severity: ERROR
+    message: Verificação de certificado TLS desligada; use a CA local (infra/certs/ca) em vez disso.
+    pattern-either:
+      - pattern: |
+          { ..., rejectUnauthorized: false, ... }
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+  - id: webhook-signature-non-constant-compare
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      Assinatura comparada com `===`: o tempo da comparação vaza quantos bytes conferem. Use
+      `verifyWebhook` de @broker/webhooks (timingSafeEqual).
+    patterns:
+      - pattern-either:
+          - pattern: $A === $B
+          - pattern: $A !== $B
+      - metavariable-regex:
+          metavariable: $A
+          regex: (?i).*signature.*

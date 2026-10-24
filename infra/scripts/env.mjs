@@ -20,6 +20,21 @@ function profileArgs(profile) {
   return ['--profile', 'core', '--profile', 'full'];
 }
 
+/** Commit que vai para as imagens e para o /info (RN-CICD-020); `-dirty` com alterações não commitadas. */
+function gitCommit() {
+  try {
+    const sha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+    const dirty = execFileSync('git', ['status', '--porcelain'], {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim();
+    return dirty ? `${sha}-dirty` : sha;
+  } catch {
+    return 'unknown';
+  }
+}
+process.env.GIT_COMMIT ??= gitCommit();
+
 const compose = (args, profile = 'full') =>
   run('docker', ['compose', '-f', composeFile, ...profileArgs(profile), ...args]);
 

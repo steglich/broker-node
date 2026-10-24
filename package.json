@@ -23,7 +23,12 @@
     "test:infra": "vitest run --project infra --project example-service-e2e",
     "contracts:generate": "pnpm --filter @broker/contracts generate",
     "contracts:check": "pnpm --filter @broker/contracts check --",
-    "scenarios": "pnpm --filter @broker/scenarios run run --"
+    "scenarios": "pnpm --filter @broker/scenarios run run --",
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "commitlint": "node infra/ci/commitlint.mjs",
+    "release": "node infra/ci/release.mjs",
+    "ci:security": "infra/ci/security.sh",
+    "ci:local": "infra/ci/local.sh"
   },
   "devDependencies": {
     "@broker/eslint-config": "workspace:*",

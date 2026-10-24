@@ -20,5 +20,8 @@
   "devDependencies": {
     "eslint": "^10.13.0",
     "vitest": "^4.1.12"
+  },
+  "scripts": {
+    "test": "vitest run"
   }
 }

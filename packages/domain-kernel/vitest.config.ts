@@ -1,7 +1,13 @@
-import { defineProject } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
+import { packageCoverage } from '../../vitest.shared.js';
 
-export default defineProject({
+export default defineConfig({
   // Usa o código-fonte dos pacotes @broker/* (condição `source` do exports), sem build prévio.
   ssr: { resolve: { conditions: ['source'] } },
-  test: { name: 'domain-kernel', include: ['test/**/*.test.ts'] },
+  test: {
+    // Cobertura quando o pacote roda sozinho (CI via Turborepo: `turbo run test -- --coverage`).
+    coverage: packageCoverage({ domain: true }),
+    name: 'domain-kernel',
+    include: ['test/**/*.test.ts'],
+  },
 });

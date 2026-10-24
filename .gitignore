@@ -155,3 +155,6 @@ broker-docs
 infra/secrets/*
 !infra/secrets/README.md
 infra/certs/
+
+# Worktrees de sessões paralelas do Claude Code
+.claude/worktrees/

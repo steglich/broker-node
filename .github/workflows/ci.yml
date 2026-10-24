@@ -1,0 +1,131 @@
+# Pipeline de integração (D21, RN-CICD §2). Cada etapa chama o mesmo comando que roda na máquina
+# (pnpm/infra/ci/*), então "passou localmente" e "passou no CI" significam a mesma coisa.
+# Turborepo roda só o que a mudança afeta (inclusive dependentes): TURBO_SCM_BASE é a base do PR,
+# ou o commit anterior no push para a main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+  TURBO_SCM_HEAD: ${{ github.sha }}
+  TURBO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  quality:
+    name: Formatação, lint, typecheck e commits
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm turbo run typecheck --affected
+      - name: Convenção de commits (RN-CICD-021)
+        if: github.event_name == 'pull_request'
+        run: pnpm commitlint --from "$TURBO_SCM_BASE" --to "$TURBO_SCM_HEAD"
+
+  test:
+    name: Unitários (cobertura), integração e componente
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      # Integração e componente usam Testcontainers: o Docker do runner sobe Postgres, RabbitMQ,
+      # Valkey, MinIO e Mailpit. A cobertura reprova abaixo de 80% no domínio (vitest.shared.ts).
+      - run: pnpm turbo run test --affected -- --coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: '**/coverage/coverage-summary.json'
+          if-no-files-found: ignore
+
+  contracts:
+    name: Contratos e compatibilidade de esquemas
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      # generated/ atualizado e esquemas de evento compatíveis com a base (RN-MSG-B-020..023).
+      - run: pnpm contracts:check --base "$TURBO_SCM_BASE"
+      - run: pnpm scenarios
+
+  security:
+    name: SAST, SCA e segredos
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: infra/ci/security.sh sast
+      - run: infra/ci/security.sh sca
+      - name: Segredos nos commits da mudança
+        run: infra/ci/security.sh secrets
+        env:
+          SECRETS_BASE: ${{ github.event_name == 'workflow_dispatch' && '' || env.TURBO_SCM_BASE }}
+
+  affected-apps:
+    name: Serviços afetados
+    runs-on: ubuntu-24.04
+    outputs:
+      apps: ${{ steps.detect.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - id: detect
+        run: echo "apps=$(node infra/ci/affected-apps.mjs)" >> "$GITHUB_OUTPUT"
+
+  image:
+    name: Imagem, SBOM e assinatura (${{ matrix.app }})
+    needs: [quality, test, contracts, security, affected-apps]
+    if: needs.affected-apps.outputs.apps != '[]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      # Token OIDC para a assinatura keyless do cosign (Sigstore).
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.affected-apps.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@v4
+      # PR de fork não tem permissão de escrita no GHCR nem token OIDC: só build e SBOM.
+      - name: Login no GHCR
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build, SBOM, push e assinatura
+        run: infra/ci/image.sh "${{ matrix.app }}"
+        env:
+          REGISTRY: ghcr.io/${{ github.repository }}
+          PUSH: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && '1' || '0' }}
+          SIGN: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'keyless' || 'none' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.app }}
+          path: out/sbom/${{ matrix.app }}.spdx.json

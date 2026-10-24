@@ -1,0 +1,3 @@
+#!/bin/sh
+# Convenção de commits (RN-CICD-021). Ativado por `pnpm install` (script prepare: core.hooksPath).
+exec node "$(git rev-parse --show-toplevel)/infra/ci/commitlint.mjs" --file "$1"

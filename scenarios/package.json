@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "run": "tsx --conditions=source src/bin/run.ts"
+    "run": "tsx --conditions=source src/bin/run.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@broker/calendar": "workspace:*",

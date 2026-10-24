@@ -24,34 +24,34 @@ O **frontend** (web, mobile, desktop e UI do backoffice) não faz parte deste re
 
 ## Stack
 
-| Camada | Tecnologia |
-|---|---|
-| Linguagem / runtime | TypeScript (strict) em Node.js 24 |
-| HTTP | Express 5 |
-| Banco | PostgreSQL 17 (um database e um usuário por serviço) |
-| Mensageria | RabbitMQ 4 (super streams para eventos, quorum queues para jobs e DLQ) |
-| Cache | Valkey |
-| Storage de objetos | MinIO |
-| E-mail de teste | Mailpit |
-| Observabilidade | OpenTelemetry + Grafana (Tempo, Loki, Prometheus) |
-| Borda TLS | Traefik |
-| Monorepo | pnpm workspaces + Turborepo |
-| Testes | Vitest, fast-check, Testcontainers, k6 |
+| Camada              | Tecnologia                                                             |
+| ------------------- | ---------------------------------------------------------------------- |
+| Linguagem / runtime | TypeScript (strict) em Node.js 24                                      |
+| HTTP                | Express 5                                                              |
+| Banco               | PostgreSQL 17 (um database e um usuário por serviço)                   |
+| Mensageria          | RabbitMQ 4 (super streams para eventos, quorum queues para jobs e DLQ) |
+| Cache               | Valkey                                                                 |
+| Storage de objetos  | MinIO                                                                  |
+| E-mail de teste     | Mailpit                                                                |
+| Observabilidade     | OpenTelemetry + Grafana (Tempo, Loki, Prometheus)                      |
+| Borda TLS           | Traefik                                                                |
+| Monorepo            | pnpm workspaces + Turborepo                                            |
+| Testes              | Vitest, fast-check, Testcontainers, k6                                 |
 
 Toda a infraestrutura roda em **Docker**. Detalhes e justificativas em [`design.md`](openspec/changes/implementation-roadmap/design.md).
 
 ## Roadmap
 
-| Fase | Entrega |
-|---|---|
-| 0 | Fundações: monorepo, Docker, bibliotecas compartilhadas, mensageria, simuladores PIX/KYC/e-mail, CI |
-| 1 | Conta, dinheiro e preços: identidade, onboarding, ledger, dados de referência, market data, agendador, notificações, gateway e BFF web |
-| 2 | Negociação básica: sessão, motor de matching, formador de mercado, risco à vista, OMS, tempo real |
-| 3 | Pós-negociação e carteira: clearing, custódia, alertas, relatórios, aprovações e BFF backoffice |
-| 4 | Ordens avançadas, proventos e IR |
-| 5 | Alavancagem, venda a descoberto e aluguel (BTC) |
-| 6 | Backend dos canais mobile e desktop |
-| 7 | Endurecimento: sandbox, replay, LGPD, carga, caos e segurança |
+| Fase | Entrega                                                                                                                                |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Fundações: monorepo, Docker, bibliotecas compartilhadas, mensageria, simuladores PIX/KYC/e-mail, CI                                    |
+| 1    | Conta, dinheiro e preços: identidade, onboarding, ledger, dados de referência, market data, agendador, notificações, gateway e BFF web |
+| 2    | Negociação básica: sessão, motor de matching, formador de mercado, risco à vista, OMS, tempo real                                      |
+| 3    | Pós-negociação e carteira: clearing, custódia, alertas, relatórios, aprovações e BFF backoffice                                        |
+| 4    | Ordens avançadas, proventos e IR                                                                                                       |
+| 5    | Alavancagem, venda a descoberto e aluguel (BTC)                                                                                        |
+| 6    | Backend dos canais mobile e desktop                                                                                                    |
+| 7    | Endurecimento: sandbox, replay, LGPD, carga, caos e segurança                                                                          |
 
 Tarefas detalhadas em [`tasks.md`](openspec/changes/implementation-roadmap/tasks.md).
 

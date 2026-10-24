@@ -10,7 +10,14 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/vitest.shared.ts",
+        "$TURBO_ROOT$/infra/postgres/**",
+        "$TURBO_ROOT$/infra/rabbitmq/**",
+        "$TURBO_ROOT$/infra/compose/compose.yml"
+      ]
     }
   }
 }

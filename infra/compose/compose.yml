@@ -16,7 +16,6 @@ x-limits: &small
 # Base dos simuladores externos (Sistemas simulados): mesma imagem única, latência e falhas
 # configuráveis por variável (RN-SIM-002), UI de inspeção em /ui (RN-SIM-005).
 x-simulator-env: &simulator-env
-  SERVICE_VERSION: 0.0.1
   ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
   PORT: '8080'
   DB_HOST: postgres
@@ -294,6 +293,8 @@ services:
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE: '@broker/pix-simulator'
+        # Commit no /info (RN-CICD-020); o `pnpm env:up` exporta o HEAD.
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
     command: ['node', 'dist/migrate.js']
     environment:
       DB_HOST: postgres
@@ -336,6 +337,8 @@ services:
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE: '@broker/kyc-simulator'
+        # Commit no /info (RN-CICD-020); o `pnpm env:up` exporta o HEAD.
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
     command: ['node', 'dist/migrate.js']
     environment:
       DB_HOST: postgres
@@ -379,6 +382,8 @@ services:
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE: '@broker/message-sink'
+        # Commit no /info (RN-CICD-020); o `pnpm env:up` exporta o HEAD.
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
     command: ['node', 'dist/migrate.js']
     environment:
       DB_HOST: postgres
@@ -427,6 +432,8 @@ services:
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE: '@broker/example-service'
+        # Commit no /info (RN-CICD-020); o `pnpm env:up` exporta o HEAD.
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
     command: ['node', 'dist/migrate.js']
     environment:
       DB_HOST: postgres
@@ -447,7 +454,6 @@ services:
     command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
     environment:
       SERVICE_NAME: example-service
-      SERVICE_VERSION: 0.0.1
       ENVIRONMENT: local
       PORT: '8080'
       DB_HOST: postgres

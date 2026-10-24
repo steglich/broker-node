@@ -1,0 +1,8 @@
+# Varredura de segredos (RN-CICD §2). Usa as regras padrão do gitleaks e libera só o que é gerado
+# localmente e nunca vai para o git (infra/secrets e infra/certs estão no .gitignore).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "artefatos locais e lockfile"
+paths = ['''^infra/secrets/''', '''^infra/certs/''', '''^pnpm-lock\.yaml$''']

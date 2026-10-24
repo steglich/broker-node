@@ -33,6 +33,15 @@ describe('geração de contratos (D8)', async () => {
     expect(doc.operations['example-service.send.example.pinged.v1'].action).toBe('send');
   });
 
+  it('AsyncAPI 3: contexto explícito do tópico e eventos publicados no tópico de cada produtor', () => {
+    const doc = json('asyncapi.json');
+    expect(doc.channels.scheduler.messages['routine.triggered.v1']).toBeDefined();
+    expect(doc.channels.scheduler.messages['clock.ticked.v1']).toBeDefined();
+    expect(doc.channels['owner-topics'].address).toBe('{environment}.{context}.events');
+    expect(doc.channels['owner-topics'].messages['routine.completed.v1']).toBeDefined();
+    expect(doc.channels.routine).toBeUndefined();
+  });
+
   it('OpenAPI 3.1: rotas, parâmetros de caminho e Problem Details nos erros', () => {
     const doc = json('openapi/example-service.json');
     expect(doc.openapi).toBe('3.1.0');

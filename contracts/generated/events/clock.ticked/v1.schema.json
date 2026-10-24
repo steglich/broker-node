@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:clock.ticked:v1",
+  "title": "clock.ticked v1",
+  "description": "Tempo do ambiente em ACCELERATED (a cada minuto virtual) e VIRTUAL (a cada advance_to).",
+  "x-producer": "scheduler-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "virtualNow",
+    "mode",
+    "speedFactor"
+  ],
+  "properties": {
+    "virtualNow": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "ACCELERATED"
+        },
+        {
+          "type": "string",
+          "const": "VIRTUAL"
+        }
+      ]
+    },
+    "speedFactor": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  }
+}

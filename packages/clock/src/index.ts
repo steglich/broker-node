@@ -2,6 +2,7 @@ export {
   AcceleratedClock,
   createClock,
   RealClock,
+  TickedClock,
   timestamps,
   VirtualClock,
   type AcceleratedClockOptions,

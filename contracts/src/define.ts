@@ -12,6 +12,12 @@ export interface EventContract<S extends TSchema = TSchema> {
   readonly summary: string;
   /** Consumidores declarados (RN-MSG-B-023); servem de documentação no AsyncAPI. */
   readonly consumers?: readonly string[];
+  /**
+   * Contexto do tópico `<ambiente>.<contexto>.events`, quando não é o primeiro segmento do
+   * `eventType` (ex.: `routine.triggered` sai em `scheduler.events`). `'*'`: cada produtor publica
+   * no próprio tópico (ex.: `routine.completed`, publicado pelo serviço dono da rotina).
+   */
+  readonly context?: string;
 }
 
 export function defineEventContract<S extends TSchema>(

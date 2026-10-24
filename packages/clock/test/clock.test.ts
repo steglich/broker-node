@@ -4,6 +4,7 @@ import {
   AcceleratedClock,
   createClock,
   RealClock,
+  TickedClock,
   timestamps,
   VirtualClock,
 } from '../src/index.js';
@@ -78,5 +79,21 @@ describe('relógio do sistema (RN-CLK-001..004)', () => {
       () => 0,
     );
     expect(acc.mode).toBe('ACCELERATED');
+  });
+});
+
+describe('TickedClock (RN-CLK-003)', () => {
+  it('spec "Serviço segue o tempo virtual": o tempo passa a ser o do clock.ticked', () => {
+    const clock = new TickedClock('VIRTUAL', Instant.parse('2026-10-16T12:00:00Z'));
+    expect(clock.apply({ virtualNow: '2026-10-16T13:00:00Z' })).toBe(true);
+    expect(clock.now().toString()).toBe('2026-10-16T13:00:00.000Z');
+    expect(clock.businessDate().toString()).toBe('2026-10-16');
+  });
+
+  it('tick repetido ou atrasado (entrega pelo menos uma vez) não faz o tempo voltar', () => {
+    const clock = new TickedClock('ACCELERATED', Instant.parse('2026-10-16T13:00:00Z'));
+    expect(clock.apply({ virtualNow: '2026-10-16T13:00:00Z' })).toBe(false);
+    expect(clock.apply({ virtualNow: '2026-10-16T12:59:00Z' })).toBe(false);
+    expect(clock.now().toString()).toBe('2026-10-16T13:00:00.000Z');
   });
 });

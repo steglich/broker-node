@@ -7,6 +7,22 @@
   },
   "defaultContentType": "application/json",
   "channels": {
+    "scheduler": {
+      "address": "{environment}.scheduler.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "clock.ticked.v1": {
+          "$ref": "#/components/messages/clock.ticked.v1"
+        },
+        "routine.triggered.v1": {
+          "$ref": "#/components/messages/routine.triggered.v1"
+        }
+      }
+    },
     "example": {
       "address": "{environment}.example.events",
       "parameters": {
@@ -19,9 +35,40 @@
           "$ref": "#/components/messages/example.pinged.v1"
         }
       }
+    },
+    "owner-topics": {
+      "address": "{environment}.{context}.events",
+      "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        },
+        "context": {
+          "description": "Contexto do serviço que publica."
+        }
+      },
+      "messages": {
+        "routine.completed.v1": {
+          "$ref": "#/components/messages/routine.completed.v1"
+        },
+        "routine.failed.v1": {
+          "$ref": "#/components/messages/routine.failed.v1"
+        }
+      }
     }
   },
   "operations": {
+    "scheduler-service.send.clock.ticked.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/scheduler"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/scheduler/messages/clock.ticked.v1"
+        }
+      ]
+    },
     "example-service.send.example.pinged.v1": {
       "action": "send",
       "channel": {
@@ -30,6 +77,39 @@
       "messages": [
         {
           "$ref": "#/channels/example/messages/example.pinged.v1"
+        }
+      ]
+    },
+    "routine-owner.send.routine.completed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/owner-topics"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/owner-topics/messages/routine.completed.v1"
+        }
+      ]
+    },
+    "routine-owner.send.routine.failed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/owner-topics"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/owner-topics/messages/routine.failed.v1"
+        }
+      ]
+    },
+    "scheduler-service.send.routine.triggered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/scheduler"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/scheduler/messages/routine.triggered.v1"
         }
       ]
     }
@@ -139,6 +219,36 @@
           }
         }
       },
+      "clock.ticked.v1": {
+        "type": "object",
+        "required": [
+          "virtualNow",
+          "mode",
+          "speedFactor"
+        ],
+        "properties": {
+          "virtualNow": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ACCELERATED"
+              },
+              {
+                "type": "string",
+                "const": "VIRTUAL"
+              }
+            ]
+          },
+          "speedFactor": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      },
       "example.pinged.v1": {
         "type": "object",
         "required": [
@@ -150,9 +260,141 @@
             "format": "uuid"
           }
         }
+      },
+      "routine.completed.v1": {
+        "type": "object",
+        "required": [
+          "routineName",
+          "businessDate",
+          "executionId"
+        ],
+        "properties": {
+          "routineName": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "executionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stats": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {}
+            }
+          }
+        }
+      },
+      "routine.failed.v1": {
+        "type": "object",
+        "required": [
+          "routineName",
+          "businessDate",
+          "executionId",
+          "reason"
+        ],
+        "properties": {
+          "routineName": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "executionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "stats": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {}
+            }
+          }
+        }
+      },
+      "routine.triggered.v1": {
+        "type": "object",
+        "required": [
+          "routineName",
+          "businessDate",
+          "executionId",
+          "attempt",
+          "scheduledFor",
+          "catchUp"
+        ],
+        "properties": {
+          "routineName": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "executionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scheduledFor": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "catchUp": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "messages": {
+      "clock.ticked.v1": {
+        "name": "clock.ticked",
+        "title": "clock.ticked v1",
+        "summary": "Tempo do ambiente em ACCELERATED (a cada minuto virtual) e VIRTUAL (a cada advance_to).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "clock.ticked"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/clock.ticked.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "scheduler-service",
+        "x-consumers": [
+          "all-services"
+        ]
+      },
       "example.pinged.v1": {
         "name": "example.pinged",
         "title": "example.pinged v1",
@@ -185,6 +427,108 @@
         "x-producer": "example-service",
         "x-consumers": [
           "example-service"
+        ]
+      },
+      "routine.completed.v1": {
+        "name": "routine.completed",
+        "title": "routine.completed v1",
+        "summary": "A rotina terminou na data; libera as rotinas que dependem dela (RN-ROT-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "routine.completed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/routine.completed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "routine-owner",
+        "x-consumers": [
+          "scheduler-service"
+        ]
+      },
+      "routine.failed.v1": {
+        "name": "routine.failed",
+        "title": "routine.failed v1",
+        "summary": "A rotina falhou na data; as dependentes continuam esperando até um novo disparo dar certo.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "routine.failed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/routine.failed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "routine-owner",
+        "x-consumers": [
+          "scheduler-service"
+        ]
+      },
+      "routine.triggered.v1": {
+        "name": "routine.triggered",
+        "title": "routine.triggered v1",
+        "summary": "Hora de executar a rotina na data. O dono executa uma vez por (routineName, businessDate) e responde com routine.completed ou routine.failed.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "routine.triggered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/routine.triggered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "scheduler-service",
+        "x-consumers": [
+          "routine-owner"
         ]
       }
     }

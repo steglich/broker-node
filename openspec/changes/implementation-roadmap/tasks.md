@@ -83,9 +83,9 @@
 
 ## 11. Fase 1 — scheduler-service
 
-- [ ] 11.1 Implementar `routine_definition`/`routine_execution`, o disparo de `routine.triggered` pela tabela de rotinas e pelo calendário, e a idempotência por `(routine_name, business_date)`; verificar que o feriado não dispara e que o disparo duplicado não duplica (RN-ROT-001)
-- [ ] 11.2 Implementar as dependências por `routine.completed` e o catch-up em ordem de datas; verificar com o relógio virtual um dia perdido (RN-ROT-002/003)
-- [ ] 11.3 Implementar a publicação de `clock.ticked` nos modos `ACCELERATED`/`VIRTUAL`, o comando `advance_to` (só em VIRTUAL/sandbox) e a liderança por lease; verificar o failover sem disparo duplicado (RN-CLK-003)
+- [x] 11.1 Implementar `routine_definition`/`routine_execution`, o disparo de `routine.triggered` pela tabela de rotinas e pelo calendário, e a idempotência por `(routine_name, business_date)`; verificar que o feriado não dispara e que o disparo duplicado não duplica (RN-ROT-001)
+- [x] 11.2 Implementar as dependências por `routine.completed` e o catch-up em ordem de datas; verificar com o relógio virtual um dia perdido (RN-ROT-002/003)
+- [x] 11.3 Implementar a publicação de `clock.ticked` nos modos `ACCELERATED`/`VIRTUAL`, o comando `advance_to` (só em VIRTUAL/sandbox) e a liderança por lease; verificar o failover sem disparo duplicado (RN-CLK-003)
 
 ## 12. Fase 1 — audit-service
 

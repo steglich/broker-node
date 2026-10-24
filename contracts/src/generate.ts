@@ -48,7 +48,8 @@ export function asyncApiDocument(events: readonly EventContract[]): JsonSchema {
   for (const contract of events) {
     const { eventType, eventVersion, auditable } = contract.definition;
     const key = eventKey(contract);
-    const context = contextOf(eventType);
+    const context = contract.context ?? contextOf(eventType);
+    const channelId = context === '*' ? 'owner-topics' : context;
     schemas[key] = toJsonSchema(contract.definition.payload);
     messages[key] = {
       name: eventType,
@@ -72,16 +73,27 @@ export function asyncApiDocument(events: readonly EventContract[]): JsonSchema {
       'x-producer': contract.producer,
       'x-consumers': [...(contract.consumers ?? [])],
     };
-    const channel = (channels[context] ??= {
-      address: `{environment}.${context}.events`,
-      parameters: { environment: { description: 'Ambiente isolado (RN-PAD-080).' } },
-      messages: {},
-    });
+    const channel = (channels[channelId] ??=
+      context === '*'
+        ? {
+            address: '{environment}.{context}.events',
+            description: 'Tópico do próprio serviço produtor (cada serviço publica no seu).',
+            parameters: {
+              environment: { description: 'Ambiente isolado (RN-PAD-080).' },
+              context: { description: 'Contexto do serviço que publica.' },
+            },
+            messages: {},
+          }
+        : {
+            address: `{environment}.${context}.events`,
+            parameters: { environment: { description: 'Ambiente isolado (RN-PAD-080).' } },
+            messages: {},
+          });
     (channel['messages'] as JsonSchema)[key] = { $ref: `#/components/messages/${key}` };
     operations[`${contract.producer}.send.${key}`] = {
       action: 'send',
-      channel: { $ref: `#/channels/${context}` },
-      messages: [{ $ref: `#/channels/${context}/messages/${key}` }],
+      channel: { $ref: `#/channels/${channelId}` },
+      messages: [{ $ref: `#/channels/${channelId}/messages/${key}` }],
     };
   }
 

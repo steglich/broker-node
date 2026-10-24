@@ -62,6 +62,10 @@ secrets:
     file: ../secrets/db/example_app
   db_example_migrator:
     file: ../secrets/db/example_migrator
+  db_scheduler_app:
+    file: ../secrets/db/scheduler_app
+  db_scheduler_migrator:
+    file: ../secrets/db/scheduler_migrator
   db_pix_simulator_app:
     file: ../secrets/db/pix_simulator_app
   db_pix_simulator_migrator:
@@ -417,6 +421,68 @@ services:
       traefik.http.routers.sms.rule: Host(`sms.broker.localhost`)
       traefik.http.routers.sms.entrypoints: websecure
       traefik.http.services.sms.loadbalancer.server.port: '8080'
+
+  # ---------------------------------------------------------------- núcleo (perfil core)
+
+  scheduler-migrate:
+    profiles: [core]
+    image: broker/scheduler-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/scheduler-service'
+        # Commit no /info (RN-CICD-020); o `pnpm env:up` exporta o HEAD.
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: scheduler
+      DB_USER: scheduler_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_scheduler_migrator
+    secrets: [db_scheduler_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Rotinas do dia e relógio do ambiente (líder único, RN-ENV-021). O sandbox usa
+  # CLOCK_MODE=ACCELERATED; os testes de replay, VIRTUAL com advance_to.
+  scheduler-service:
+    profiles: [core]
+    image: broker/scheduler-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: scheduler-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: scheduler
+      DB_USER: scheduler_app
+      DB_PASSWORD_FILE: /run/secrets/db_scheduler_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      CLOCK_SPEED_FACTOR: ${CLOCK_SPEED_FACTOR:-1}
+      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-}
+      ADMIN_API_ENABLED: 'true'
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets: [db_scheduler_app, rabbitmq_password]
+    networks: [broker]
+    depends_on:
+      scheduler-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.scheduler.rule: Host(`scheduler.broker.localhost`)
+      traefik.http.routers.scheduler.entrypoints: websecure
+      traefik.http.services.scheduler.loadbalancer.server.port: '8080'
 
   # ---------------------------------------------------------------- serviços
   # Padrão de um serviço: imagem do Dockerfile único (SERVICE=<pacote>), um one-shot de

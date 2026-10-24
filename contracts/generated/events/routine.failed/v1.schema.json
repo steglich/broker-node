@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:routine.failed:v1",
+  "title": "routine.failed v1",
+  "description": "A rotina falhou na data; as dependentes continuam esperando até um novo disparo dar certo.",
+  "x-producer": "routine-owner",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "routineName",
+    "businessDate",
+    "executionId",
+    "reason"
+  ],
+  "properties": {
+    "routineName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "businessDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "executionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "stats": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {}
+      }
+    }
+  }
+}

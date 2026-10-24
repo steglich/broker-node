@@ -110,6 +110,35 @@ export class VirtualClock extends BaseClock {
   }
 }
 
+/**
+ * Relógio de um serviço num ambiente ACCELERATED/VIRTUAL (RN-CLK-003, D15): o tempo é o do último
+ * `clock.ticked` publicado pelo scheduler-service, o dono do tempo do ambiente. Ticks repetidos ou
+ * fora de ordem (entrega pelo menos uma vez) não fazem o tempo voltar.
+ */
+export class TickedClock extends BaseClock {
+  private current: Instant;
+
+  constructor(
+    readonly mode: 'ACCELERATED' | 'VIRTUAL',
+    start: Instant,
+  ) {
+    super();
+    this.current = start;
+  }
+
+  now(): Instant {
+    return this.current;
+  }
+
+  /** Aplica um `clock.ticked`; devolve `false` se ele era antigo (ignorado). */
+  apply(tick: { virtualNow: string }): boolean {
+    const at = Instant.parse(tick.virtualNow);
+    if (!at.isAfter(this.current)) return false;
+    this.current = at;
+    return true;
+  }
+}
+
 export type ClockConfig =
   | { mode: 'REAL' }
   | { mode: 'ACCELERATED'; start: string; speedFactor: number }

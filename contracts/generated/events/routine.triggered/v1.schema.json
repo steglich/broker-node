@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:routine.triggered:v1",
+  "title": "routine.triggered v1",
+  "description": "Hora de executar a rotina na data. O dono executa uma vez por (routineName, businessDate) e responde com routine.completed ou routine.failed.",
+  "x-producer": "scheduler-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "routineName",
+    "businessDate",
+    "executionId",
+    "attempt",
+    "scheduledFor",
+    "catchUp"
+  ],
+  "properties": {
+    "routineName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "businessDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "executionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scheduledFor": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "catchUp": {
+      "type": "boolean"
+    }
+  }
+}

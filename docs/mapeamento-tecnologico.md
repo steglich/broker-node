@@ -6,20 +6,21 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 ## Plataforma e código
 
-| Conceito                                 | Tecnologia                                                                                                                                                    | Decisão |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)                                                                                | D1      |
-| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento                                                                        | D2      |
-| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                                                                                                   | D2      |
-| Framework HTTP                           | Express 5 via `@broker/service-kit` (`createService` + `service.route`): contexto, correlação, Problem Details, health/info e encerramento gracioso           | D2      |
-| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint                                                                           | D3      |
-| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random`                                                                       | D3, D15 |
-| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`                                                                                | D5      |
-| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`                                                                                   | D1      |
-| Geradores de teste                       | `@broker/testing`: builders (`defineBuilder`), relógio virtual (`testClock`), PRNG com semente, CPF por penúltimo dígito, Testcontainers e utilitários de E2E | D20     |
-| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `@broker/clock`, com `clock.ticked` publicado pelo `scheduler-service`                                                                                        | D15     |
-| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`                                                                            | D15     |
-| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier                                                                                | D3      |
+| Conceito                                 | Tecnologia                                                                                                                                                                                                           | Decisão  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Repositório e build                      | Monorepo com pnpm workspaces + Turborepo (build e teste só do que foi afetado)                                                                                                                                       | D1       |
+| Runtime e linguagem                      | Node.js 24 LTS, TypeScript `strict` com ESM, `tsc` no build e `tsx` no desenvolvimento                                                                                                                               | D2       |
+| Esquemas e validação em runtime          | TypeBox (fonte única) + Ajv                                                                                                                                                                                          | D2       |
+| Framework HTTP                           | Express 5 via `@broker/service-kit` (`createService` + `service.route`): contexto, correlação, Problem Details, health/info e encerramento gracioso                                                                  | D2       |
+| Arquitetura do serviço                   | Hexagonal (`domain/`, `application/`, `adapters/`, `config/`), garantida por ESLint                                                                                                                                  | D3       |
+| Determinismo do domínio                  | Porta `Clock` (`@broker/clock`); ESLint proíbe `Date.now`, `new Date()` e `Math.random`                                                                                                                              | D3, D15  |
+| Decimal e objetos de valor               | `decimal.js` (34 dígitos, arredondamento explícito) em `@broker/domain-kernel`                                                                                                                                       | D5       |
+| Identificadores                          | UUID v7 próprio (RFC 9562, monotônico) e formatos legíveis em `@broker/ids`                                                                                                                                          | D1       |
+| Geradores de teste                       | `@broker/testing`: builders (`defineBuilder`), relógio virtual (`testClock`), PRNG com semente, CPF por penúltimo dígito, Testcontainers e utilitários de E2E                                                        | D20      |
+| Relógio do ambiente (REAL/ACCEL/VIRTUAL) | `scheduler-service` é o dono: grava o tempo (`clock_state`), publica `clock.ticked` e aceita `advance_to` (só VIRTUAL); os serviços seguem com `TickedClock` (`@broker/clock`)                                       | D15      |
+| Rotinas do dia de negócio                | `scheduler-service`: `routine_definition` (Pregão §8, fases pela grade do calendário), `routine_execution` com PK `(routine_name, business_date)`, dependências por `routine.completed` e catch-up em ordem de datas | D14, D15 |
+| Calendário de pregão                     | `@broker/calendar` (funções puras) + cópia local alimentada por `calendar.updated`                                                                                                                                   | D15      |
+| Lint e formatação                        | ESLint (flat config, `typescript-eslint`, `eslint-plugin-import-x`) + Prettier                                                                                                                                       | D3       |
 
 ## Barramento e mensageria
 
@@ -107,6 +108,7 @@ Cada serviço novo acrescenta aqui as tecnologias específicas que usar.
 
 - **Tabelas append-only**: duas barreiras independentes. O usuário `<svc>_app` perde UPDATE/DELETE/TRUNCATE, e o gatilho `forbid_mutation()` recusa essas operações até para o dono da tabela (`makeAppendOnly`).
 - **Limite da eleição de líder**: entre a queda real da conexão e o próximo heartbeat, o antigo líder ainda pode se achar líder. Quem escreve sob liderança deve escrever no mesmo banco (a queda da sessão derruba a transação) ou usar um _fencing token_.
+- **Disparo duplo no failover**: o agendador trava a linha `scheduler_state` a cada passo e grava `routine_execution` com `ON CONFLICT DO NOTHING`, na mesma transação da outbox. Dois "líderes" ao mesmo tempo (o limite acima) ainda geram um único `routine.triggered` por rotina e data.
 - **Datas técnicas no relógio do banco**: `created_at`, `processed_at` e afins das tabelas técnicas usam `now()` do PostgreSQL. Instantes de negócio (`occurred_at`) vêm sempre do relógio do ambiente (RN-CLK-004).
 
 - **Ordem com retentativa atrasada (design D6)**: o design bloqueava a chave só na DLQ, o que deixaria mensagens seguintes passarem na frente durante até ~1h11 de retentativas. Decisão do grupo 5: nos consumidores ordenados, a chave é bloqueada já na primeira retentativa atrasada (`blocked_key.reason = 'RETRYING'`).

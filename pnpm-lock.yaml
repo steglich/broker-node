@@ -427,6 +427,64 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  apps/scheduler-service:
+    dependencies:
+      '@broker/calendar':
+        specifier: workspace:*
+        version: link:../../packages/calendar
+      '@broker/clock':
+        specifier: workspace:*
+        version: link:../../packages/clock
+      '@broker/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@broker/domain-kernel':
+        specifier: workspace:*
+        version: link:../../packages/domain-kernel
+      '@broker/ids':
+        specifier: workspace:*
+        version: link:../../packages/ids
+      '@broker/messaging':
+        specifier: workspace:*
+        version: link:../../packages/messaging
+      '@broker/persistence':
+        specifier: workspace:*
+        version: link:../../packages/persistence
+      '@broker/service-kit':
+        specifier: workspace:*
+        version: link:../../packages/service-kit
+      kysely:
+        specifier: 0.29.6
+        version: 0.29.6
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+      typebox:
+        specifier: 1.3.34
+        version: 1.3.34
+    devDependencies:
+      '@broker/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
+      '@broker/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      '@types/supertest':
+        specifier: 7.2.1
+        version: 7.2.1
+      supertest:
+        specifier: 7.3.1
+        version: 7.3.1(supports-color@7.2.0)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+
   contracts:
     dependencies:
       '@broker/messaging':
@@ -605,7 +663,7 @@ importers:
         version: 8.20.0
       ajv-formats:
         specifier: 3.0.1
-        version: 3.0.1(ajv@8.20.0)
+        version: 3.0.1
       amqplib:
         specifier: 2.2.0
         version: 2.2.0
@@ -742,7 +800,7 @@ importers:
         version: 8.20.0
       ajv-formats:
         specifier: 3.0.1
-        version: 3.0.1(ajv@8.20.0)
+        version: 3.0.1
       express:
         specifier: 5.2.1
         version: 5.2.1(supports-color@7.2.0)
@@ -2092,11 +2150,6 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
-    peerDependencies:
-      ajv: ^8.0.0
-    peerDependenciesMeta:
-      ajv:
-        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -4858,9 +4911,7 @@ snapshots:
 
   acorn@8.19.0: {}
 
-  ajv-formats@3.0.1(ajv@8.20.0):
-    optionalDependencies:
-      ajv: 8.20.0
+  ajv-formats@3.0.1: {}
 
   ajv@6.15.0:
     dependencies:

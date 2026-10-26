@@ -1,0 +1,1813 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ledger-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/me/balances": {
+      "get": {
+        "operationId": "balances",
+        "summary": "Saldos liquidado, projetado D0/D1/D2 e total, holds e sacável, com asOf (§4).",
+        "responses": {
+          "200": {
+            "description": "Saldos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "accountId",
+                    "currency",
+                    "settled",
+                    "projected",
+                    "projectedTotal",
+                    "holds",
+                    "withdrawable",
+                    "lastSequence",
+                    "asOf"
+                  ],
+                  "properties": {
+                    "accountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "settled": {
+                      "type": "string",
+                      "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "projected": {
+                      "type": "object",
+                      "required": [
+                        "d0",
+                        "d1",
+                        "d2"
+                      ],
+                      "properties": {
+                        "d0": {
+                          "type": "string",
+                          "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                        },
+                        "d1": {
+                          "type": "string",
+                          "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                        },
+                        "d2": {
+                          "type": "string",
+                          "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                        }
+                      }
+                    },
+                    "projectedTotal": {
+                      "type": "string",
+                      "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "holds": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "withdrawable": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "lastSequence": {
+                      "type": "integer"
+                    },
+                    "asOf": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/statement": {
+      "get": {
+        "operationId": "statement",
+        "summary": "Extrato da CUST_CASH, do mais recente, com saldo após cada lançamento (RN-EXT-001/002).",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página do extrato.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "sequence",
+                          "bookingDate",
+                          "valueDate",
+                          "description",
+                          "category",
+                          "reference",
+                          "amount",
+                          "status",
+                          "balanceAfter"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "sequence": {
+                            "type": "integer"
+                          },
+                          "bookingDate": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "valueDate": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "reference": {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "id"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PENDING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "SETTLED"
+                              }
+                            ]
+                          },
+                          "balanceAfter": {
+                            "type": "string",
+                            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/statement/future": {
+      "get": {
+        "operationId": "futureEntries",
+        "summary": "Lançamentos futuros (PENDING) agrupados por data-valor (RN-EXT-004).",
+        "responses": {
+          "200": {
+            "description": "Grupos por data-valor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "groups"
+                  ],
+                  "properties": {
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "valueDate",
+                          "total",
+                          "items"
+                        ],
+                        "properties": {
+                          "valueDate": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "total": {
+                            "type": "string",
+                            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                          },
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "id",
+                                "sequence",
+                                "bookingDate",
+                                "valueDate",
+                                "description",
+                                "category",
+                                "reference",
+                                "amount",
+                                "status",
+                                "balanceAfter"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "sequence": {
+                                  "type": "integer"
+                                },
+                                "bookingDate": {
+                                  "type": "string",
+                                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                },
+                                "valueDate": {
+                                  "type": "string",
+                                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "category": {
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "object",
+                                  "required": [
+                                    "type",
+                                    "id"
+                                  ],
+                                  "properties": {
+                                    "type": {
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                                },
+                                "status": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "const": "PENDING"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "SETTLED"
+                                    }
+                                  ]
+                                },
+                                "balanceAfter": {
+                                  "type": "string",
+                                  "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits": {
+      "post": {
+        "operationId": "createDeposit",
+        "summary": "Cria a cobrança PIX do depósito; expira em 30 min (RN-DEP-001/002).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cobrança criada (PENDING).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "pixCopyPaste",
+                    "expiresAt",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PAID"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CREDITED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REFUNDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "pixCopyPaste": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "refundReason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "DEPOSIT_AMOUNT_OUT_OF_RANGE, ACCOUNT_NOT_ACTIVE, ACCOUNT_NOT_OPENED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "PIX_UNAVAILABLE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listDeposits",
+        "summary": "Depósitos da conta, do mais recente.",
+        "responses": {
+          "200": {
+            "description": "Depósitos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "status",
+                          "amount",
+                          "pixCopyPaste",
+                          "expiresAt",
+                          "createdAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PENDING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PAID"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CREDITED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REFUNDED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "EXPIRED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CANCELED"
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                          },
+                          "pixCopyPaste": {
+                            "type": "string"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "refundReason": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits/{id}": {
+      "get": {
+        "operationId": "getDeposit",
+        "summary": "Estado do depósito.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Depósito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "pixCopyPaste",
+                    "expiresAt",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PAID"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CREDITED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REFUNDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "pixCopyPaste": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "refundReason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits/{id}/cancel": {
+      "post": {
+        "operationId": "cancelDeposit",
+        "summary": "Cancela a cobrança ainda PENDING; um pagamento depois disso é devolvido.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "pixCopyPaste",
+                    "expiresAt",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PAID"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CREDITED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REFUNDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "pixCopyPaste": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "refundReason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "DEPOSIT_NOT_CANCELABLE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals": {
+      "post": {
+        "operationId": "requestWithdrawal",
+        "summary": "Solicita saque (assinatura WITHDRAWALS): hold no Risco, revisão acima do limite e envio PIX (§7).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "bankAccountId"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                  },
+                  "bankAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Aceito (PROCESSING ou PENDING_REVIEW).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "bankAccountId",
+                    "requestedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "REQUESTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PENDING_REVIEW"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "bankAccountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "failureReason": {
+                      "type": "string"
+                    },
+                    "endToEndId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "INSUFFICIENT_WITHDRAWABLE_BALANCE, WITHDRAWAL_LIMIT_EXCEEDED, BANK_ACCOUNT_NOT_ALLOWED, WITHDRAWAL_AMOUNT_TOO_LOW, ACCOUNT_NOT_ACTIVE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CUSTOMER_UNAVAILABLE ou RISK_UNAVAILABLE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listWithdrawals",
+        "summary": "Saques da conta, do mais recente.",
+        "responses": {
+          "200": {
+            "description": "Saques.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "status",
+                          "amount",
+                          "bankAccountId",
+                          "requestedAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "REQUESTED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PENDING_REVIEW"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PROCESSING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "COMPLETED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "FAILED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REJECTED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CANCELED"
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                          },
+                          "bankAccountId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "requestedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "completedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "failureReason": {
+                            "type": "string"
+                          },
+                          "endToEndId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals/{id}": {
+      "get": {
+        "operationId": "getWithdrawal",
+        "summary": "Estado do saque.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saque.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "bankAccountId",
+                    "requestedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "REQUESTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PENDING_REVIEW"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "bankAccountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "failureReason": {
+                      "type": "string"
+                    },
+                    "endToEndId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals/{id}/cancel": {
+      "post": {
+        "operationId": "cancelWithdrawal",
+        "summary": "Cancela o saque antes de PROCESSING; o hold é liberado (RN-SAQ-006).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "bankAccountId",
+                    "requestedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "REQUESTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PENDING_REVIEW"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "bankAccountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "failureReason": {
+                      "type": "string"
+                    },
+                    "endToEndId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "WITHDRAWAL_NOT_CANCELABLE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/webhooks/pix-simulator": {
+      "post": {
+        "operationId": "pixWebhook",
+        "summary": "Webhook `pix.recebido` do Banco Simulado, assinado (RN-DEP-005, RN-DEP-008).",
+        "responses": {
+          "204": {
+            "description": "Processado (ou repetido)."
+          },
+          "401": {
+            "description": "INVALID_WEBHOOK_SIGNATURE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Titularidade indisponível: o simulador reenvia.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/bo/withdrawals": {
+      "get": {
+        "operationId": "reviewQueue",
+        "summary": "Saques em PENDING_REVIEW (BO_FINANCE, BO_ADMIN).",
+        "responses": {
+          "200": {
+            "description": "Fila.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "status",
+                          "amount",
+                          "bankAccountId",
+                          "requestedAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "REQUESTED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PENDING_REVIEW"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PROCESSING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "COMPLETED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "FAILED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REJECTED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CANCELED"
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                          },
+                          "bankAccountId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "requestedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "completedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "failureReason": {
+                            "type": "string"
+                          },
+                          "endToEndId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/withdrawals/{id}/approve": {
+      "post": {
+        "operationId": "approveWithdrawal",
+        "summary": "Aprova o saque em revisão: segue para o envio (RN-SAQ-005).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PROCESSING.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "bankAccountId",
+                    "requestedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "REQUESTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PENDING_REVIEW"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "bankAccountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "failureReason": {
+                      "type": "string"
+                    },
+                    "endToEndId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/withdrawals/{id}/reject": {
+      "post": {
+        "operationId": "rejectWithdrawal",
+        "summary": "Reprova o saque em revisão; o hold é liberado.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "REJECTED.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "amount",
+                    "bankAccountId",
+                    "requestedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "REQUESTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PENDING_REVIEW"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PROCESSING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COMPLETED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "FAILED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        }
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^\\d{1,16}(\\.\\d{1,2})?$"
+                    },
+                    "bankAccountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "requestedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "failureReason": {
+                      "type": "string"
+                    },
+                    "endToEndId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/reconciliations/pix/{date}": {
+      "get": {
+        "operationId": "reconciliation",
+        "summary": "Resultado da reconciliação PIX da data (RN-PIXS-002).",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reconciliação."
+          },
+          "404": {
+            "description": "Não executada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/internal/accounts/{id}/closure-pendencies": {
+      "get": {
+        "operationId": "closurePendencies",
+        "summary": "Pendências do ledger para o encerramento da conta (RN-ACC-012), escopo closure:read.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pendências (vazio = pode encerrar).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "pendencies"
+                  ],
+                  "properties": {
+                    "pendencies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "code",
+                          "message"
+                        ],
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

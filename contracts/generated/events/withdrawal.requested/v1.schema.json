@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:withdrawal.requested:v1",
+  "title": "withdrawal.requested v1",
+  "description": "Saque pedido; o hold no Risco vem a seguir (RN-LED-032).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "withdrawalId",
+    "accountId",
+    "amount"
+  ],
+  "properties": {
+    "withdrawalId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

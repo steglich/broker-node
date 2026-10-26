@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:withdrawal.rejected:v1",
+  "title": "withdrawal.rejected v1",
+  "description": "Saque recusado (saldo sacável insuficiente ou reprovado na revisão).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "withdrawalId",
+    "accountId",
+    "amount"
+  ],
+  "properties": {
+    "withdrawalId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

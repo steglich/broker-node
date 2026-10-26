@@ -115,12 +115,12 @@
 
 ## 15. Fase 1 — ledger-service
 
-- [ ] 15.1 Implementar `ledger_account`, `journal` e `ledger_entry` append-only, a validação de soma zero, a idempotência por `idempotency_key`, a sequência por conta e a convenção de sinal num único módulo; verificar com testes de propriedade que Σ = 0 sempre (RN-LED-001..007, INV-01)
-- [ ] 15.2 Criar as contas da casa por migração e as contas do cliente ao consumir `account.opened`; verificar a idempotência da criação (RN-LED-010/011)
-- [ ] 15.3 Implementar os saldos (`settled`, `projected(Dn)`, `total`, `withdrawable`) com `as_of` e os eventos `ledger.journal_posted`/`balance_changed`; verificar o cenário LED-001
-- [ ] 15.4 Implementar o depósito (intenção, cobrança no simulador, webhook assinado, validações de titularidade, valor e expiração, devolução, crédito `SETTLED`, estados); verificar o depósito de terceiro, o pagamento após expiração e o webhook duplicado (RN-DEP-*)
-- [ ] 15.5 Implementar a saga de saque com a porta `RiskHoldPort` (na Fase 1, um adaptador provisório local que calcula o sacável no próprio ledger), limites diário e noturno, revisão acima de R$ 50 mil, retentativas e estados; verificar o limite noturno e a falha definitiva liberando o hold (RN-SAQ-*)
-- [ ] 15.6 Implementar o extrato (filtros, cursor, saldo após cada lançamento, futuros agrupados) e a reconciliação PIX diária; verificar com dados de exemplo (RN-EXT-001/002/004, RN-PIXS-002)
+- [x] 15.1 Implementar `ledger_account`, `journal` e `ledger_entry` append-only, a validação de soma zero, a idempotência por `idempotency_key`, a sequência por conta e a convenção de sinal num único módulo; verificar com testes de propriedade que Σ = 0 sempre (RN-LED-001..007, INV-01)
+- [x] 15.2 Criar as contas da casa por migração e as contas do cliente ao consumir `account.opened`; verificar a idempotência da criação (RN-LED-010/011)
+- [x] 15.3 Implementar os saldos (`settled`, `projected(Dn)`, `total`, `withdrawable`) com `as_of` e os eventos `ledger.journal_posted`/`balance_changed`; verificar o cenário LED-001
+- [x] 15.4 Implementar o depósito (intenção, cobrança no simulador, webhook assinado, validações de titularidade, valor e expiração, devolução, crédito `SETTLED`, estados); verificar o depósito de terceiro, o pagamento após expiração e o webhook duplicado (RN-DEP-*)
+- [x] 15.5 Implementar a saga de saque com a porta `RiskHoldPort` (na Fase 1, um adaptador provisório local que calcula o sacável no próprio ledger), limites diário e noturno, revisão acima de R$ 50 mil, retentativas e estados; verificar o limite noturno e a falha definitiva liberando o hold (RN-SAQ-*)
+- [x] 15.6 Implementar o extrato (filtros, cursor, saldo após cada lançamento, futuros agrupados) e a reconciliação PIX diária; verificar com dados de exemplo (RN-EXT-001/002/004, RN-PIXS-002)
 
 ## 16. Fase 1 — reference-data-service
 

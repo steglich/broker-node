@@ -82,6 +82,12 @@ secrets:
     file: ../secrets/crypto/customer_field_master_key
   customer_blind_index_key:
     file: ../secrets/crypto/customer_blind_index_key
+  db_ledger_app:
+    file: ../secrets/db/ledger_app
+  db_ledger_migrator:
+    file: ../secrets/db/ledger_migrator
+  ledger_blind_index_key:
+    file: ../secrets/crypto/ledger_blind_index_key
   db_audit_app:
     file: ../secrets/db/audit_app
   db_audit_migrator:
@@ -667,6 +673,79 @@ services:
       traefik.http.routers.customer.rule: Host(`customer.broker.localhost`)
       traefik.http.routers.customer.entrypoints: websecure
       traefik.http.services.customer.loadbalancer.server.port: '8080'
+
+  ledger-migrate:
+    profiles: [core]
+    image: broker/ledger-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/ledger-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: ledger
+      DB_USER: ledger_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_ledger_migrator
+    secrets: [db_ledger_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Ledger de partidas dobradas, saldos, depósito e saque PIX (webhook do Banco Simulado), extrato
+  # e reconciliação PIX. Holds de saque no próprio ledger até o risk-service (Fase 2).
+  ledger-service:
+    profiles: [core]
+    image: broker/ledger-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: ledger-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: ledger
+      DB_USER: ledger_app
+      DB_PASSWORD_FILE: /run/secrets/db_ledger_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      BLIND_INDEX_KEY_FILE: /run/secrets/ledger_blind_index_key
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      PIX_URL: http://pix-simulator:8080
+      PIX_WEBHOOK_SECRET_FILE: /run/secrets/webhook_pix_simulator
+      CUSTOMER_URL: http://customer-service:8080
+      # Cliente OAuth `ledger-service` (client credentials) cadastrado no identity pelo backoffice.
+      SERVICE_CLIENT_SECRET: ${LEDGER_SERVICE_CLIENT_SECRET:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_ledger_app
+      - rabbitmq_password
+      - valkey_password
+      - webhook_pix_simulator
+      - ledger_blind_index_key
+    networks: [broker]
+    depends_on:
+      ledger-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.ledger.rule: Host(`ledger.broker.localhost`)
+      traefik.http.routers.ledger.entrypoints: websecure
+      traefik.http.services.ledger.loadbalancer.server.port: '8080'
 
   audit-migrate:
     profiles: [core]

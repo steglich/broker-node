@@ -83,4 +83,14 @@ export const migrations: Record<string, Migration> = {
         ON CONFLICT (name) DO NOTHING`.execute(db);
     },
   },
+  '0005_pix_reconciliation': {
+    // Rotina do ledger-service (grupo 15): reconciliação PIX diária.
+    async up(db: Kysely<unknown>) {
+      const r = DEFAULT_ROUTINES.find((d) => d.name === 'pix_reconciliation')!;
+      await sql`
+        INSERT INTO routine_definition (name, owner, schedule, days, depends_on, enabled)
+        VALUES (${r.name}, ${r.owner}, ${JSON.stringify(r.schedule)}, ${r.days}, ${[...r.dependsOn]}, ${r.enabled})
+        ON CONFLICT (name) DO NOTHING`.execute(db);
+    },
+  },
 };

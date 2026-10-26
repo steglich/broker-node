@@ -42,6 +42,7 @@ export function generateSecrets() {
   add('crypto/identity_blind_index_key', randomBytes(32).toString('hex'));
   add('crypto/customer_field_master_key', randomBytes(32).toString('hex'));
   add('crypto/customer_blind_index_key', randomBytes(32).toString('hex'));
+  add('crypto/ledger_blind_index_key', randomBytes(32).toString('hex'));
   for (const svc of serviceCatalog()) {
     add(`db/${svc}_app`);
     add(`db/${svc}_migrator`);

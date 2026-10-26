@@ -326,6 +326,44 @@ export class Accounts {
     return { id, availableFrom: now.plusMillis(WITHDRAWAL_ACCOUNT_GRACE_MS).toString() };
   }
 
+  // ---------------------------------------------------------------- consultas internas (ledger)
+
+  /**
+   * RN-DEP-003: o CPF do pagador é o do titular? A comparação é pelo HMAC de busca, então o
+   * ledger pergunta sem guardar CPF e a resposta não devolve nenhum.
+   */
+  async holderMatches(accountId: string, taxId: string): Promise<{ matches: boolean }> {
+    return this.d.store.transaction(async (tx) => {
+      const account = await tx.account(accountId);
+      if (!account) throw notFound('Conta inexistente.');
+      const customer = (await tx.customer(account.customerId))!;
+      const digits = taxId.replace(/\D/g, '');
+      return { matches: this.d.fields.hash(digits, HASH.taxId) === customer.taxIdHash };
+    });
+  }
+
+  /**
+   * Destino de um saque (RN-SAQ-002), para o ledger: a chave em claro e o CPF do titular (o envio
+   * confere a titularidade de novo no banco). Só por token de serviço; conta de outro titular → 404.
+   */
+  async withdrawalDestination(accountId: string, id: string) {
+    return this.d.store.transaction(async (tx) => {
+      const w = await tx.withdrawalAccount(id);
+      if (!w || w.accountId !== accountId) throw notFound('Conta de saque inexistente.');
+      const account = (await tx.account(accountId))!;
+      const customer = (await tx.customer(account.customerId))!;
+      return {
+        id: w.id,
+        status: w.status,
+        pixKey: this.d.fields.open(w.pixKeyEnc, CTX.pixKey),
+        pixKeyType: w.pixKeyType,
+        availableFrom: w.availableFrom.toString(),
+        available: !this.d.clock.now().isBefore(w.availableFrom),
+        holderTaxId: this.d.fields.open(customer.taxIdEnc, CTX.taxId),
+      };
+    });
+  }
+
   async removeWithdrawalAccount(caller: Caller, id: string): Promise<void> {
     await this.d.store.transaction(async (tx) => {
       const account = await this.callerAccount(caller, tx);

@@ -22,7 +22,7 @@ describe('cenários de referência (golden master)', () => {
   const scenarios = loadScenarios(root);
 
   it('carrega os cenários do repositório (e não as fixtures de teste)', () => {
-    expect(scenarios.map((s) => s.id)).toEqual(['CAL-001', 'FEE-010']);
+    expect(scenarios.map((s) => s.id)).toEqual(['CAL-001', 'FEE-010', 'LED-001']);
   });
 
   it.each(scenarios.map((s) => [s.title, s] as const))('%s', (_title, scenario) => {

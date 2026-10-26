@@ -1,0 +1,16 @@
+cenario: LED-001 saldo sacável com compra e venda a liquidar em D2
+regras: [RN-LED-020, RN-LED-021]
+relogio: '2026-01-05T13:00:00Z'
+entradas:
+  calendario: b3-2026-2027
+  liquidado: '10000.00'
+  holds: '0.00'
+  # Lançamentos PENDING de hoje; a data-valor é D0 + n dias úteis (RN-LIQ-001).
+  pendentes:
+    - { descricao: compra, valor: '-6000.00', dias_uteis: 2 }
+    - { descricao: venda, valor: '3000.00', dias_uteis: 2 }
+saidas_esperadas:
+  liquidado: '10000.00'
+  projetado: { d0: '10000.00', d1: '10000.00', d2: '7000.00' }
+  projetado_total: '7000.00'
+  sacavel: '7000.00'

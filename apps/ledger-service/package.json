@@ -1,0 +1,45 @@
+{
+  "name": "@broker/ledger-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Ledger de partidas dobradas, saldos, depósito e saque PIX (simulado), extrato e reconciliação PIX (Financeiro, RN-LED/DEP/SAQ/EXT, RN-PIXS-002).",
+  "type": "module",
+  "exports": {
+    "./domain/*": {
+      "source": "./src/domain/*.ts",
+      "types": "./dist/domain/*.d.ts",
+      "default": "./dist/domain/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@broker/calendar": "workspace:*",
+    "@broker/clock": "workspace:*",
+    "@broker/contracts": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/ids": "workspace:*",
+    "@broker/messaging": "workspace:*",
+    "@broker/persistence": "workspace:*",
+    "@broker/service-kit": "workspace:*",
+    "@broker/webhooks": "workspace:*",
+    "iovalkey": "0.4.0",
+    "kysely": "0.29.6",
+    "pg": "^8.23.1",
+    "typebox": "1.3.34"
+  },
+  "devDependencies": {
+    "@broker/testing": "workspace:*",
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/supertest": "7.2.1",
+    "fast-check": "4.10.2",
+    "jose": "6.2.12",
+    "supertest": "7.3.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

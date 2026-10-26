@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:deposit.credited:v1",
+  "title": "deposit.credited v1",
+  "description": "Depósito creditado em CUST_CASH, liquidado (RN-DEP-003..006).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "depositId",
+    "accountId",
+    "amount"
+  ],
+  "properties": {
+    "depositId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

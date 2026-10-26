@@ -449,4 +449,23 @@ export function registerHttp(service: Service, d: HttpDeps): void {
         body: await d.accounts.eligibility(q.params.id, q.query.operation as Operation),
       })),
   });
+  // Consultas do ledger (grupo 15): titularidade do depósito e destino do saque.
+  route({
+    method: 'post',
+    path: '/v1/internal/accounts/:id/holder-match',
+    auth: { principal: 'service', scopes: ['customer:holder'] },
+    validate: { params: r.holderMatch.params, body: r.holderMatch.body },
+    handler: (q) =>
+      run(async () => ({ body: await d.accounts.holderMatches(q.params.id, q.body.taxId) })),
+  });
+  route({
+    method: 'get',
+    path: '/v1/internal/accounts/:id/withdrawal-accounts/:withdrawalAccountId',
+    auth: { principal: 'service', scopes: ['customer:withdrawal-accounts'] },
+    validate: { params: r.withdrawalDestination.params },
+    handler: (q) =>
+      run(async () => ({
+        body: await d.accounts.withdrawalDestination(q.params.id, q.params.withdrawalAccountId),
+      })),
+  });
 }

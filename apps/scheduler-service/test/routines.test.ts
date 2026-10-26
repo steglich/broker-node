@@ -158,6 +158,7 @@ describe('decisão de disparo (RN-ROT-001..003)', () => {
       'securities_lending_renewal',
       'leveraged_day_trade_close',
       'customer_daily',
+      'pix_reconciliation',
       'audit_chain_verify',
     ]);
     expect(r.nextCursor.toString()).toBe('2026-03-03');

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:ledger.balance_changed:v1",
+  "title": "ledger.balance_changed v1",
+  "description": "Saldos da conta recalculados depois de um lançamento (Financeiro §4, RN-LED-031).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "accountId",
+    "settled",
+    "projected",
+    "projectedTotal",
+    "withdrawable",
+    "lastSequence",
+    "asOf"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "settled": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    },
+    "projected": {
+      "type": "object",
+      "required": [
+        "d0",
+        "d1",
+        "d2"
+      ],
+      "properties": {
+        "d0": {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+        },
+        "d1": {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+        },
+        "d2": {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+        }
+      }
+    },
+    "projectedTotal": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    },
+    "withdrawable": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+    },
+    "lastSequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "asOf": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -321,6 +321,56 @@ describe('14.7 contas de saque (RN-ACC-020/021)', () => {
       pixKey: expect.stringMatching(/^\*+\.com$/) as unknown as string,
     });
   });
+
+  it('consultas internas do ledger: titularidade pelo HMAC e destino do saque só para a própria conta', async () => {
+    const c = await customer();
+    const other = await customer();
+    a.bank.keys.set('destino@exemplo.com', { type: 'EMAIL', cpf: c.taxId, name: 'Maria Souza' });
+    const added = await a.http
+      .post('/v1/me/withdrawal-accounts')
+      .set(bearer(await customerToken(a.clock, c.userId, { mfaAgoSec: 60 })))
+      .set('X-Trading-Signature', await signatureToken(a.clock, c.userId, 'SETTINGS'))
+      .set('Idempotency-Key', uuidv7())
+      .send({ pixKey: 'destino@exemplo.com' })
+      .expect(201);
+
+    const holder = await serviceToken(a.clock, ['customer:holder']);
+    const match = (accountId: string, taxId: string) =>
+      a.http
+        .post(`/v1/internal/accounts/${accountId}/holder-match`)
+        .set(bearer(holder))
+        .send({ taxId });
+    expect((await match(c.accountId, c.taxId).expect(200)).body).toEqual({ matches: true });
+    expect((await match(c.accountId, other.taxId).expect(200)).body).toEqual({ matches: false });
+    // Sem o escopo, nada (o escopo de elegibilidade não serve).
+    expect(
+      (
+        await a.http
+          .post(`/v1/internal/accounts/${c.accountId}/holder-match`)
+          .set(bearer(await serviceToken(a.clock, ['customer:eligibility'])))
+          .send({ taxId: c.taxId })
+      ).status,
+    ).toBe(403);
+
+    const dest = await serviceToken(a.clock, ['customer:withdrawal-accounts']);
+    const destination = (
+      await a.http
+        .get(`/v1/internal/accounts/${c.accountId}/withdrawal-accounts/${added.body.id}`)
+        .set(bearer(dest))
+        .expect(200)
+    ).body;
+    expect(destination).toMatchObject({
+      id: added.body.id,
+      status: 'ACTIVE',
+      pixKey: 'destino@exemplo.com',
+      available: false,
+      holderTaxId: c.taxId,
+    });
+    await a.http
+      .get(`/v1/internal/accounts/${other.accountId}/withdrawal-accounts/${added.body.id}`)
+      .set(bearer(dest))
+      .expect(404);
+  });
 });
 
 describe('14.7 manutenção cadastral (RN-CAD-001..004)', () => {

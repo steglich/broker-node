@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:deposit.refunded:v1",
+  "title": "deposit.refunded v1",
+  "description": "Pagamento devolvido integralmente; reason diz o motivo (RN-DEP-002..004, RN-DEP-007).",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "depositId",
+    "accountId",
+    "amount"
+  ],
+  "properties": {
+    "depositId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

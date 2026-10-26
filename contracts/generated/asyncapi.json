@@ -75,6 +75,52 @@
         }
       }
     },
+    "ledger": {
+      "address": "{environment}.ledger.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "deposit.credited.v1": {
+          "$ref": "#/components/messages/deposit.credited.v1"
+        },
+        "deposit.expired.v1": {
+          "$ref": "#/components/messages/deposit.expired.v1"
+        },
+        "deposit.refunded.v1": {
+          "$ref": "#/components/messages/deposit.refunded.v1"
+        },
+        "deposit.requested.v1": {
+          "$ref": "#/components/messages/deposit.requested.v1"
+        },
+        "ledger.balance_changed.v1": {
+          "$ref": "#/components/messages/ledger.balance_changed.v1"
+        },
+        "ledger.journal_posted.v1": {
+          "$ref": "#/components/messages/ledger.journal_posted.v1"
+        },
+        "ledger.negative_balance_cleared.v1": {
+          "$ref": "#/components/messages/ledger.negative_balance_cleared.v1"
+        },
+        "ledger.negative_balance_detected.v1": {
+          "$ref": "#/components/messages/ledger.negative_balance_detected.v1"
+        },
+        "withdrawal.completed.v1": {
+          "$ref": "#/components/messages/withdrawal.completed.v1"
+        },
+        "withdrawal.failed.v1": {
+          "$ref": "#/components/messages/withdrawal.failed.v1"
+        },
+        "withdrawal.rejected.v1": {
+          "$ref": "#/components/messages/withdrawal.rejected.v1"
+        },
+        "withdrawal.requested.v1": {
+          "$ref": "#/components/messages/withdrawal.requested.v1"
+        }
+      }
+    },
     "example": {
       "address": "{environment}.example.events",
       "parameters": {
@@ -119,22 +165,6 @@
         },
         "identity.user_registered.v1": {
           "$ref": "#/components/messages/identity.user_registered.v1"
-        }
-      }
-    },
-    "ledger": {
-      "address": "{environment}.ledger.events",
-      "parameters": {
-        "environment": {
-          "description": "Ambiente isolado (RN-PAD-080)."
-        }
-      },
-      "messages": {
-        "ledger.negative_balance_cleared.v1": {
-          "$ref": "#/components/messages/ledger.negative_balance_cleared.v1"
-        },
-        "ledger.negative_balance_detected.v1": {
-          "$ref": "#/components/messages/ledger.negative_balance_detected.v1"
         }
       }
     },
@@ -212,6 +242,50 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/customer.updated.v1"
+        }
+      ]
+    },
+    "ledger-service.send.deposit.credited.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/deposit.credited.v1"
+        }
+      ]
+    },
+    "ledger-service.send.deposit.expired.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/deposit.expired.v1"
+        }
+      ]
+    },
+    "ledger-service.send.deposit.refunded.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/deposit.refunded.v1"
+        }
+      ]
+    },
+    "ledger-service.send.deposit.requested.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/deposit.requested.v1"
         }
       ]
     },
@@ -311,6 +385,28 @@
       "messages": [
         {
           "$ref": "#/channels/identity/messages/identity.user_registered.v1"
+        }
+      ]
+    },
+    "ledger-service.send.ledger.balance_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/ledger.balance_changed.v1"
+        }
+      ]
+    },
+    "ledger-service.send.ledger.journal_posted.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/ledger.journal_posted.v1"
         }
       ]
     },
@@ -476,6 +572,50 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/terms.accepted.v1"
+        }
+      ]
+    },
+    "ledger-service.send.withdrawal.completed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/withdrawal.completed.v1"
+        }
+      ]
+    },
+    "ledger-service.send.withdrawal.failed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/withdrawal.failed.v1"
+        }
+      ]
+    },
+    "ledger-service.send.withdrawal.rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/withdrawal.rejected.v1"
+        }
+      ]
+    },
+    "ledger-service.send.withdrawal.requested.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/ledger"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/ledger/messages/withdrawal.requested.v1"
         }
       ]
     }
@@ -742,6 +882,106 @@
           }
         }
       },
+      "deposit.credited.v1": {
+        "type": "object",
+        "required": [
+          "depositId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "depositId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "deposit.expired.v1": {
+        "type": "object",
+        "required": [
+          "depositId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "depositId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "deposit.refunded.v1": {
+        "type": "object",
+        "required": [
+          "depositId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "depositId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "deposit.requested.v1": {
+        "type": "object",
+        "required": [
+          "depositId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "depositId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
       "example.pinged.v1": {
         "type": "object",
         "required": [
@@ -936,6 +1176,151 @@
           "registeredAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "ledger.balance_changed.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "settled",
+          "projected",
+          "projectedTotal",
+          "withdrawable",
+          "lastSequence",
+          "asOf"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "settled": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          },
+          "projected": {
+            "type": "object",
+            "required": [
+              "d0",
+              "d1",
+              "d2"
+            ],
+            "properties": {
+              "d0": {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+              },
+              "d1": {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+              },
+              "d2": {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+              }
+            }
+          },
+          "projectedTotal": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          },
+          "withdrawable": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          },
+          "lastSequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ledger.journal_posted.v1": {
+        "type": "object",
+        "required": [
+          "journalId",
+          "type",
+          "referenceType",
+          "referenceId",
+          "bookingDate",
+          "entries"
+        ],
+        "properties": {
+          "journalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "referenceType": {
+            "type": "string"
+          },
+          "referenceId": {
+            "type": "string"
+          },
+          "bookingDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "accountCode",
+                "ownerId",
+                "amount",
+                "valueDate",
+                "status",
+                "sequence"
+              ],
+              "properties": {
+                "accountCode": {
+                  "type": "string"
+                },
+                "ownerId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+                },
+                "valueDate": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "status": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "PENDING"
+                    },
+                    {
+                      "type": "string",
+                      "const": "SETTLED"
+                    }
+                  ]
+                },
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "minItems": 2
           }
         }
       },
@@ -1315,6 +1700,106 @@
             "format": "date-time"
           }
         }
+      },
+      "withdrawal.completed.v1": {
+        "type": "object",
+        "required": [
+          "withdrawalId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "withdrawalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "withdrawal.failed.v1": {
+        "type": "object",
+        "required": [
+          "withdrawalId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "withdrawalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "withdrawal.rejected.v1": {
+        "type": "object",
+        "required": [
+          "withdrawalId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "withdrawalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "withdrawal.requested.v1": {
+        "type": "object",
+        "required": [
+          "withdrawalId",
+          "accountId",
+          "amount"
+        ],
+        "properties": {
+          "withdrawalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
       }
     },
     "messages": {
@@ -1498,6 +1983,146 @@
         "x-producer": "customer-service",
         "x-consumers": [
           "risk-service"
+        ]
+      },
+      "deposit.credited.v1": {
+        "name": "deposit.credited",
+        "title": "deposit.credited v1",
+        "summary": "Depósito creditado em CUST_CASH, liquidado (RN-DEP-003..006).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "deposit.credited"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/deposit.credited.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "deposit.expired.v1": {
+        "name": "deposit.expired",
+        "title": "deposit.expired v1",
+        "summary": "Cobrança vencida sem pagamento válido (RN-DEP-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "deposit.expired"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/deposit.expired.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "deposit.refunded.v1": {
+        "name": "deposit.refunded",
+        "title": "deposit.refunded v1",
+        "summary": "Pagamento devolvido integralmente; reason diz o motivo (RN-DEP-002..004, RN-DEP-007).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "deposit.refunded"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/deposit.refunded.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "deposit.requested.v1": {
+        "name": "deposit.requested",
+        "title": "deposit.requested v1",
+        "summary": "Cobrança PIX criada para o depósito (RN-DEP-001/002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "deposit.requested"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/deposit.requested.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
         ]
       },
       "example.pinged.v1": {
@@ -1809,6 +2434,80 @@
         "x-producer": "identity-service",
         "x-consumers": [
           "customer-service",
+          "audit-service"
+        ]
+      },
+      "ledger.balance_changed.v1": {
+        "name": "ledger.balance_changed",
+        "title": "ledger.balance_changed v1",
+        "summary": "Saldos da conta recalculados depois de um lançamento (Financeiro §4, RN-LED-031).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "ledger.balance_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/ledger.balance_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "risk-service",
+          "realtime-gateway",
+          "bff-web",
+          "bff-mobile",
+          "bff-desktop"
+        ]
+      },
+      "ledger.journal_posted.v1": {
+        "name": "ledger.journal_posted",
+        "title": "ledger.journal_posted v1",
+        "summary": "Lançamento contábil gravado, com as entradas e as sequências por conta (RN-LED-031).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "ledger.journal_posted"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/ledger.journal_posted.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "risk-service",
+          "reporting-service",
           "audit-service"
         ]
       },
@@ -2331,6 +3030,146 @@
         "x-consumers": [
           "risk-service",
           "audit-service"
+        ]
+      },
+      "withdrawal.completed.v1": {
+        "name": "withdrawal.completed",
+        "title": "withdrawal.completed v1",
+        "summary": "PIX de saque confirmado e lançado; hold consumido.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "withdrawal.completed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/withdrawal.completed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "withdrawal.failed.v1": {
+        "name": "withdrawal.failed",
+        "title": "withdrawal.failed v1",
+        "summary": "Saque não realizado (recusa do PIX ou tentativas esgotadas); hold liberado (RN-SAQ-007).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "withdrawal.failed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/withdrawal.failed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "withdrawal.rejected.v1": {
+        "name": "withdrawal.rejected",
+        "title": "withdrawal.rejected v1",
+        "summary": "Saque recusado (saldo sacável insuficiente ou reprovado na revisão).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "withdrawal.rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/withdrawal.rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
+        ]
+      },
+      "withdrawal.requested.v1": {
+        "name": "withdrawal.requested",
+        "title": "withdrawal.requested v1",
+        "summary": "Saque pedido; o hold no Risco vem a seguir (RN-LED-032).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "withdrawal.requested"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/withdrawal.requested.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "ledger-service",
+        "x-consumers": [
+          "notification-service",
+          "reporting-service"
         ]
       }
     }

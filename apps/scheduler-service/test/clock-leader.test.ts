@@ -140,7 +140,7 @@ describe('advance_to no modo VIRTUAL (RN-CLK-002)', () => {
       ).status,
     ).toBe(404);
     expect((await request(readOnly.service.app).get('/v1/routines')).body.routines).toHaveLength(
-      21,
+      22,
     );
   });
 });

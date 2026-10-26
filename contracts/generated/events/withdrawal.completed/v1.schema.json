@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:withdrawal.completed:v1",
+  "title": "withdrawal.completed v1",
+  "description": "PIX de saque confirmado e lançado; hold consumido.",
+  "x-producer": "ledger-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "withdrawalId",
+    "accountId",
+    "amount"
+  ],
+  "properties": {
+    "withdrawalId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

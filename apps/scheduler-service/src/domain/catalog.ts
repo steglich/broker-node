@@ -43,6 +43,9 @@ export const DEFAULT_ROUTINES: readonly RoutineDefinition[] = [
   // Expirações do onboarding (30 dias), do suitability (24 meses) e do cadastro (RN-ONB-002,
   // RN-SUI-012, RN-CAD-003), depois do pregão.
   trading('customer_daily', 'customer-service', { at: '22:00' }),
+  // Reconciliação PIX do ledger com o Banco Simulado (RN-PIXS-002). Sem dependências: o PIX roda
+  // 24/7 e a janela de cada execução começa onde a anterior parou.
+  trading('pix_reconciliation', 'ledger-service', { at: '23:15' }),
   {
     name: 'custody_fee',
     owner: 'ledger-service',

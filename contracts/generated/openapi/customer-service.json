@@ -1540,6 +1540,173 @@
           }
         ]
       }
+    },
+    "/v1/internal/accounts/{id}/holder-match": {
+      "post": {
+        "operationId": "holderMatch",
+        "summary": "O CPF é o do titular da conta? Para o depósito do ledger (RN-DEP-003); token de serviço com customer:holder.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "taxId"
+                ],
+                "properties": {
+                  "taxId": {
+                    "type": "string",
+                    "maxLength": 14
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "matches"
+                  ],
+                  "properties": {
+                    "matches": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conta inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    },
+    "/v1/internal/accounts/{id}/withdrawal-accounts/{withdrawalAccountId}": {
+      "get": {
+        "operationId": "withdrawalDestination",
+        "summary": "Destino do saque com a chave em claro e o CPF do titular (RN-SAQ-002); token de serviço com customer:withdrawal-accounts.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "withdrawalAccountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conta de saque.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "status",
+                    "pixKey",
+                    "pixKeyType",
+                    "availableFrom",
+                    "available",
+                    "holderTaxId"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REMOVED"
+                        }
+                      ]
+                    },
+                    "pixKey": {
+                      "type": "string"
+                    },
+                    "pixKeyType": {
+                      "type": "string"
+                    },
+                    "availableFrom": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "holderTaxId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente ou de outra conta.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
     }
   },
   "components": {

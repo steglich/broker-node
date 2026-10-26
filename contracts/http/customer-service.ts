@@ -393,6 +393,42 @@ export const customerServiceHttp = defineHttpContract({
       }),
       responses: { 200: { description: '{ allowed, code?, status, restrictions }' } },
     },
+    holderMatch: {
+      method: 'post',
+      path: '/v1/internal/accounts/:id/holder-match',
+      summary:
+        'O CPF é o do titular da conta? Para o depósito do ledger (RN-DEP-003); token de serviço com customer:holder.',
+      auth: 'service',
+      params: Type.Object({ id: Uuid }),
+      body: Type.Object({ taxId: Type.String({ maxLength: 14 }) }),
+      responses: {
+        200: { description: 'Resultado.', body: Type.Object({ matches: Type.Boolean() }) },
+        404: { description: 'Conta inexistente.' },
+      },
+    },
+    withdrawalDestination: {
+      method: 'get',
+      path: '/v1/internal/accounts/:id/withdrawal-accounts/:withdrawalAccountId',
+      summary:
+        'Destino do saque com a chave em claro e o CPF do titular (RN-SAQ-002); token de serviço com customer:withdrawal-accounts.',
+      auth: 'service',
+      params: Type.Object({ id: Uuid, withdrawalAccountId: Uuid }),
+      responses: {
+        200: {
+          description: 'Conta de saque.',
+          body: Type.Object({
+            id: Uuid,
+            status: Type.Union([Type.Literal('ACTIVE'), Type.Literal('REMOVED')]),
+            pixKey: Type.String(),
+            pixKeyType: Type.String(),
+            availableFrom: Type.String({ format: 'date-time' }),
+            available: Type.Boolean(),
+            holderTaxId: Type.String(),
+          }),
+        },
+        404: { description: 'Inexistente ou de outra conta.' },
+      },
+    },
   },
 });
 

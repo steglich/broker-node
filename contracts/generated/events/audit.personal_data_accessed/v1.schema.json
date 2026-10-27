@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:audit.personal_data_accessed:v1",
+  "title": "audit.personal_data_accessed v1",
+  "description": "Consulta a dados pessoais por um canal (Segurança de aplicação §3, RN-AUD-BO-001).",
+  "x-producer": "bff",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "resourceType",
+    "resourceId",
+    "route",
+    "channel"
+  ],
+  "properties": {
+    "resourceType": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "resourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "route": {
+      "type": "string"
+    },
+    "channel": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "WEB"
+        },
+        {
+          "type": "string",
+          "const": "MOBILE"
+        },
+        {
+          "type": "string",
+          "const": "DESKTOP"
+        },
+        {
+          "type": "string",
+          "const": "BACKOFFICE"
+        }
+      ]
+    },
+    "actorRoles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "justification": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "ip": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    }
+  }
+}

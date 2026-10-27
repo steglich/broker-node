@@ -302,4 +302,28 @@ describe('consulta sob demanda (P3, RN-BRP-042/043, RN-BRP-081)', () => {
       .expect(404);
     expect(missing.body.code).toBe('QUOTE_NOT_FOUND');
   });
+
+  it('lote para os BFFs: na ordem pedida, sem repetidos, com o erro de cada ticker no item', async () => {
+    const a = await app(env);
+    a.fetch.set(
+      '/v2/stocks/quote?symbols=VALE3',
+      quoteFixture('VALE3', 61.2, at('2026-10-27T13:37:00Z')),
+    );
+    const res = await a.http
+      .get('/v1/market-data/external-quotes?symbols=vale3,ZZZZ3,VALE3')
+      .set(bearer(a.tokens.customer))
+      .expect(200);
+    expect(res.body.items).toHaveLength(2);
+    expect(res.body.items[0]).toMatchObject({ symbol: 'VALE3', servedFrom: 'PROVIDER' });
+    expect(res.body.items[1]).toEqual({
+      symbol: 'ZZZZ3',
+      error: { code: 'QUOTE_NOT_FOUND', message: expect.any(String) as unknown as string },
+    });
+    await a.http
+      .get(
+        `/v1/market-data/external-quotes?symbols=${Array.from({ length: 51 }, (_, i) => `AB${i}`).join(',')}`,
+      )
+      .set(bearer(a.tokens.customer))
+      .expect(400);
+  });
 });

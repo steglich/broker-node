@@ -46,6 +46,9 @@ export function generateSecrets() {
   // Token de push cifrado e HMAC para achar o mesmo aparelho (notification-service).
   add('crypto/notification_field_master_key', randomBytes(32).toString('hex'));
   add('crypto/notification_blind_index_key', randomBytes(32).toString('hex'));
+  // bff-web: HMAC do anti-CSRF e chave AES do cookie de login com MFA pendente.
+  add('crypto/bff_web_csrf_secret', randomBytes(32).toString('hex'));
+  add('crypto/bff_web_login_key', randomBytes(32).toString('hex'));
   // Tokens da brapi (RN-BRP-090/094): vazios por padrão, o local usa fixtures (RN-BRP-095). Para a
   // brapi real, escreva o token em brapi/token (e o próximo, na rotação, em brapi/token_next).
   add('brapi/token', '');

@@ -65,6 +65,16 @@ export function registerHttp(service: Service, d: HttpDeps): void {
 
   route({
     method: 'get',
+    path: '/v1/market-data/external-quotes',
+    auth: ANY,
+    validate: { query: r.externalQuotes.query },
+    handler: (q) =>
+      run(async () => ({
+        body: { items: await d.onDemand.getMany(q.query.symbols.toUpperCase().split(',')) },
+      })),
+  });
+  route({
+    method: 'get',
     path: '/v1/market-data/external-quotes/:symbol',
     auth: ANY,
     validate: { params: r.externalQuote.params },

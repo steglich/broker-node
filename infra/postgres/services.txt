@@ -20,6 +20,8 @@ custody
 engagement
 reporting
 approval
+# BFFs: só a outbox dos eventos audit.* (sem estado de negócio).
+bff_web
 corporate_actions
 tax
 securities_lending

@@ -59,6 +59,29 @@
         }
       }
     },
+    "owner-topics": {
+      "address": "{environment}.{context}.events",
+      "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        },
+        "context": {
+          "description": "Contexto do serviço que publica."
+        }
+      },
+      "messages": {
+        "audit.personal_data_accessed.v1": {
+          "$ref": "#/components/messages/audit.personal_data_accessed.v1"
+        },
+        "routine.completed.v1": {
+          "$ref": "#/components/messages/routine.completed.v1"
+        },
+        "routine.failed.v1": {
+          "$ref": "#/components/messages/routine.failed.v1"
+        }
+      }
+    },
     "reference": {
       "address": "{environment}.reference.events",
       "parameters": {
@@ -251,26 +274,6 @@
           "$ref": "#/components/messages/notification.read.v1"
         }
       }
-    },
-    "owner-topics": {
-      "address": "{environment}.{context}.events",
-      "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
-      "parameters": {
-        "environment": {
-          "description": "Ambiente isolado (RN-PAD-080)."
-        },
-        "context": {
-          "description": "Contexto do serviço que publica."
-        }
-      },
-      "messages": {
-        "routine.completed.v1": {
-          "$ref": "#/components/messages/routine.completed.v1"
-        },
-        "routine.failed.v1": {
-          "$ref": "#/components/messages/routine.failed.v1"
-        }
-      }
     }
   },
   "operations": {
@@ -293,6 +296,17 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/account.status_changed.v1"
+        }
+      ]
+    },
+    "bff.send.audit.personal_data_accessed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/owner-topics"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/owner-topics/messages/audit.personal_data_accessed.v1"
         }
       ]
     },
@@ -1078,6 +1092,64 @@
                 "type": "string"
               }
             }
+          }
+        }
+      },
+      "audit.personal_data_accessed.v1": {
+        "type": "object",
+        "required": [
+          "resourceType",
+          "resourceId",
+          "route",
+          "channel"
+        ],
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "resourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route": {
+            "type": "string"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "WEB"
+              },
+              {
+                "type": "string",
+                "const": "MOBILE"
+              },
+              {
+                "type": "string",
+                "const": "DESKTOP"
+              },
+              {
+                "type": "string",
+                "const": "BACKOFFICE"
+              }
+            ]
+          },
+          "actorRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "justification": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "ip": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
           }
         }
       },
@@ -3847,6 +3919,40 @@
           "risk-service",
           "ledger-service",
           "notification-service"
+        ]
+      },
+      "audit.personal_data_accessed.v1": {
+        "name": "audit.personal_data_accessed",
+        "title": "audit.personal_data_accessed v1",
+        "summary": "Consulta a dados pessoais por um canal (Segurança de aplicação §3, RN-AUD-BO-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "audit.personal_data_accessed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/audit.personal_data_accessed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "bff",
+        "x-consumers": [
+          "audit-service"
         ]
       },
       "calendar.updated.v1": {

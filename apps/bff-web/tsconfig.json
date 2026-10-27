@@ -1,0 +1,3 @@
+{
+  "extends": "@broker/tsconfig/library.json"
+}

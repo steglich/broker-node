@@ -88,6 +88,42 @@ export const marketDataServiceHttp = defineHttpContract({
         503: { description: 'QUOTE_UNAVAILABLE: sem cotação gravada e a fonte indisponível.' },
       },
     },
+    externalQuotes: {
+      method: 'get',
+      path: '/v1/market-data/external-quotes',
+      summary:
+        'Cotações externas em lote (até 50 tickers, para os BFFs sem N+1): cada item é a cotação ou o erro daquele ticker.',
+      auth: 'user',
+      query: Type.Object({
+        symbols: Type.String({
+          pattern: '^\\^?[A-Za-z0-9.]{2,12}(,\\^?[A-Za-z0-9.]{2,12}){0,49}$',
+        }),
+      }),
+      responses: {
+        200: {
+          description: 'Na ordem pedida, sem repetidos.',
+          body: Type.Object({
+            items: Type.Array(
+              Type.Union([
+                Type.Object({
+                  symbol: Type.String(),
+                  quote: ExternalQuote,
+                  servedFrom: Type.Union(
+                    ['PROVIDER', 'CACHE', 'STORED'].map((s) => Type.Literal(s)),
+                  ),
+                  attribution: Type.String(),
+                  warning: Type.Optional(Type.String()),
+                }),
+                Type.Object({
+                  symbol: Type.String(),
+                  error: Type.Object({ code: Type.String(), message: Type.String() }),
+                }),
+              ]),
+            ),
+          }),
+        },
+      },
+    },
     dailyHistory: {
       method: 'get',
       path: '/v1/market-data/history/:symbol',

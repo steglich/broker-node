@@ -78,6 +78,20 @@ export class OnDemandQuotes {
     );
   }
 
+  /** Lote (BFFs): cada ticker pela mesma regra; o erro de um não derruba os outros. */
+  async getMany(symbols: string[]) {
+    return Promise.all(
+      [...new Set(symbols)].map(async (symbol) => {
+        try {
+          return { symbol, ...(await this.get(symbol)) };
+        } catch (err) {
+          if (!(err instanceof MarketDataError)) throw err;
+          return { symbol, error: { code: err.code, message: err.message } };
+        }
+      }),
+    );
+  }
+
   private stored(symbol: string): Promise<StoredQuote | null> {
     return this.d.store.transaction((tx) => tx.quote(symbol));
   }

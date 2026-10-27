@@ -1,0 +1,1624 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "BFF web",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Login (Authorization Code + PKCE conduzido pelo BFF): tokens em cookies HttpOnly/Secure/SameSite=Strict (RN-AUTH-010).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 254
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticado ou desafio de MFA; nenhum token no corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "expiresIn",
+                        "csrfToken"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "AUTHENTICATED"
+                        },
+                        "expiresIn": {
+                          "type": "integer"
+                        },
+                        "csrfToken": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "methods",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "MFA_REQUIRED"
+                        },
+                        "methods": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "INVALID_CREDENTIALS.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "LOGIN_TEMPORARILY_LOCKED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/mfa/verify": {
+      "post": {
+        "operationId": "mfaVerify",
+        "summary": "Segunda etapa do login (o desafio fica no cookie cifrado do BFF).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "code"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "TOTP"
+                      },
+                      "code": {
+                        "type": "string",
+                        "pattern": "^\\d{6}$"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "response"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "WEBAUTHN"
+                      },
+                      "response": {
+                        "type": "object",
+                        "patternProperties": {
+                          "^.*$": {}
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "expiresIn",
+                        "csrfToken"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "AUTHENTICATED"
+                        },
+                        "expiresIn": {
+                          "type": "integer"
+                        },
+                        "csrfToken": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "methods",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "MFA_REQUIRED"
+                        },
+                        "methods": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "INVALID_MFA, MFA_CHALLENGE_EXPIRED ou LOGIN_EXPIRED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/mfa/webauthn-options": {
+      "post": {
+        "operationId": "mfaWebauthnOptions",
+        "summary": "Desafio WebAuthn da etapa de MFA.",
+        "responses": {
+          "200": {
+            "description": "PublicKeyCredentialRequestOptions."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/token/refresh": {
+      "post": {
+        "operationId": "refresh",
+        "summary": "Renova os cookies com o refresh token (rotação; reuso encerra a sessão).",
+        "responses": {
+          "200": {
+            "description": "Renovado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "expiresIn",
+                        "csrfToken"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "AUTHENTICATED"
+                        },
+                        "expiresIn": {
+                          "type": "integer"
+                        },
+                        "csrfToken": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "methods",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "const": "MFA_REQUIRED"
+                        },
+                        "methods": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão encerrada: cookies limpos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "Revoga a sessão no identity e limpa os cookies.",
+        "responses": {
+          "204": {
+            "description": "Encerrada."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/session": {
+      "get": {
+        "operationId": "session",
+        "summary": "Quem está logado e o token anti-CSRF (para o app recarregado).",
+        "responses": {
+          "200": {
+            "description": "Sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "userId",
+                    "accountId",
+                    "csrfToken",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "userId": {
+                      "type": "string"
+                    },
+                    "accountId": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "csrfToken": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/step-up": {
+      "post": {
+        "operationId": "stepUp",
+        "summary": "Step-up (RN-AUTHZ-003): o access token novo vai para o cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "code"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "TOTP"
+                      },
+                      "code": {
+                        "type": "string",
+                        "pattern": "^\\d{6}$"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "method",
+                      "response"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "WEBAUTHN"
+                      },
+                      "response": {
+                        "type": "object",
+                        "patternProperties": {
+                          "^.*$": {}
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "expiresIn"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "STEPPED_UP"
+                    },
+                    "expiresIn": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/trading-signature/verify": {
+      "post": {
+        "operationId": "verifySignature",
+        "summary": "Assinatura eletrônica: o token de curta duração fica num cookie HttpOnly do escopo e é anexado aos comandos (RN-SIG-003).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "secret",
+                  "scope"
+                ],
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "maxLength": 16
+                  },
+                  "scope": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "ORDERS"
+                      },
+                      {
+                        "type": "string",
+                        "const": "WITHDRAWALS"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SETTINGS"
+                      }
+                    ]
+                  },
+                  "rememberInSession": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validade do token (que não aparece no corpo).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "scope",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "scope": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "me",
+        "summary": "Painel inicial: perfil, saldos (com asOf) e notificações não lidas em chamadas paralelas, uma por dono (sem N+1).",
+        "responses": {
+          "200": {
+            "description": "Agregado; seção indisponível vem null e em `unavailable`."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/register": {
+      "post": {
+        "operationId": "register",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/password-reset": {
+      "post": {
+        "operationId": "passwordReset",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/password-reset/methods": {
+      "post": {
+        "operationId": "passwordResetMethods",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/password-reset/sms": {
+      "post": {
+        "operationId": "passwordResetSms",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/password-reset/complete": {
+      "post": {
+        "operationId": "passwordResetComplete",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/me/sessions": {
+      "get": {
+        "operationId": "sessions",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/sessions/{sessionId}": {
+      "delete": {
+        "operationId": "revokeSession",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/devices": {
+      "get": {
+        "operationId": "devices",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa": {
+      "get": {
+        "operationId": "mfa",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/totp": {
+      "post": {
+        "operationId": "mfaTotp",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/totp/confirm": {
+      "post": {
+        "operationId": "mfaTotpConfirm",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/webauthn/options": {
+      "post": {
+        "operationId": "mfaWebauthnOptionsMe",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/webauthn": {
+      "post": {
+        "operationId": "mfaWebauthn",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/sms": {
+      "post": {
+        "operationId": "mfaSms",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/sms/confirm": {
+      "post": {
+        "operationId": "mfaSmsConfirm",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/mfa/{factorId}": {
+      "delete": {
+        "operationId": "mfaDelete",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/step-up/webauthn-options": {
+      "post": {
+        "operationId": "stepUpWebauthnOptions",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/trading-signature": {
+      "put": {
+        "operationId": "setSignature",
+        "summary": "Repassada ao identity-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding": {
+      "get": {
+        "operationId": "onboarding",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/contact": {
+      "put": {
+        "operationId": "onboardingContact",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/contact/verify": {
+      "post": {
+        "operationId": "onboardingContactVerify",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/personal-data": {
+      "put": {
+        "operationId": "onboardingPersonal",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/address": {
+      "put": {
+        "operationId": "onboardingAddress",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/financial-profile": {
+      "put": {
+        "operationId": "onboardingFinancial",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/documents/upload-url": {
+      "post": {
+        "operationId": "onboardingUploadUrl",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/documents": {
+      "post": {
+        "operationId": "onboardingDocuments",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/onboarding/submit": {
+      "post": {
+        "operationId": "onboardingSubmit",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/suitability/questionnaire": {
+      "get": {
+        "operationId": "questionnaire",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/suitability/assessments": {
+      "post": {
+        "operationId": "assessments",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/terms/pending": {
+      "get": {
+        "operationId": "termsPending",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/terms/{termsId}/accept": {
+      "post": {
+        "operationId": "termsAccept",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile": {
+      "get": {
+        "operationId": "profile",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/contact-changes": {
+      "post": {
+        "operationId": "contactChanges",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/contact-changes/{changeId}/confirm": {
+      "post": {
+        "operationId": "contactChangeConfirm",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/reviewed-changes": {
+      "post": {
+        "operationId": "reviewedChanges",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/confirm": {
+      "post": {
+        "operationId": "profileConfirm",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/profile/history": {
+      "get": {
+        "operationId": "profileHistory",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawal-accounts": {
+      "get": {
+        "operationId": "withdrawalAccounts",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "addWithdrawalAccount",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawal-accounts/{id}": {
+      "delete": {
+        "operationId": "removeWithdrawalAccount",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/account/close": {
+      "post": {
+        "operationId": "closeAccount",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/account/close/cancel": {
+      "post": {
+        "operationId": "cancelClose",
+        "summary": "Repassada ao customer-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/balances": {
+      "get": {
+        "operationId": "balances",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/statement": {
+      "get": {
+        "operationId": "statement",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/statement/future": {
+      "get": {
+        "operationId": "statementFuture",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits": {
+      "post": {
+        "operationId": "createDeposit",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "deposits",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits/{id}": {
+      "get": {
+        "operationId": "deposit",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/deposits/{id}/cancel": {
+      "post": {
+        "operationId": "cancelDeposit",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals": {
+      "post": {
+        "operationId": "createWithdrawal",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "withdrawals",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals/{id}": {
+      "get": {
+        "operationId": "withdrawal",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/withdrawals/{id}/cancel": {
+      "post": {
+        "operationId": "cancelWithdrawal",
+        "summary": "Repassada ao ledger-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments": {
+      "get": {
+        "operationId": "instruments",
+        "summary": "Repassada ao reference-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{symbol}": {
+      "get": {
+        "operationId": "instrument",
+        "summary": "Repassada ao reference-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/quotes": {
+      "get": {
+        "operationId": "quotes",
+        "summary": "Repassada ao market-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/indexes": {
+      "get": {
+        "operationId": "indexes",
+        "summary": "Repassada ao market-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/history/{symbol}": {
+      "get": {
+        "operationId": "history",
+        "summary": "Repassada ao market-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/calendar": {
+      "get": {
+        "operationId": "calendar",
+        "summary": "Repassada ao reference-data-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/notifications": {
+      "get": {
+        "operationId": "notifications",
+        "summary": "Repassada ao notification-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/notifications/read": {
+      "post": {
+        "operationId": "notificationsRead",
+        "summary": "Repassada ao notification-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/notification-preferences": {
+      "get": {
+        "operationId": "preferences",
+        "summary": "Repassada ao notification-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "putPreferences",
+        "summary": "Repassada ao notification-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/me/push-devices": {
+      "post": {
+        "operationId": "pushDevices",
+        "summary": "Repassada ao notification-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

@@ -147,9 +147,9 @@
 
 ## 19. Fase 1 — api-gateway e bff-web
 
-- [ ] 19.1 Implementar o `api-gateway` (JWKS, revogação, rate limit no Valkey, CORS, limite de corpo, headers de segurança, correlação, `426`, roteamento para BFFs); verificar o `429` no 11º login e o `401` com token revogado (RN-API §3, §6, §7)
-- [ ] 19.2 Implementar o `bff-web` como token handler (PKCE, cookies `HttpOnly`/`SameSite=Strict`, anti-CSRF), as rotas `/v1/me` com conta do token, read-your-writes e `asOf`; verificar o `403` sem token anti-CSRF (RN-AUTH-010, RN-API-043, RN-PAD-010/011)
-- [ ] 19.3 Expor no `bff-web` as rotas da Fase 1 (auth, onboarding, perfil, suitability, saldos, extrato, depósitos, saques, contas de saque, instrumentos, cotação externa, notificações) seguindo `Contratos §1–§4` e emitir eventos de auditoria; verificar com testes de contrato
+- [x] 19.1 Implementar o `api-gateway` (JWKS, revogação, rate limit no Valkey, CORS, limite de corpo, headers de segurança, correlação, `426`, roteamento para BFFs); verificar o `429` no 11º login e o `401` com token revogado (RN-API §3, §6, §7)
+- [x] 19.2 Implementar o `bff-web` como token handler (PKCE, cookies `HttpOnly`/`SameSite=Strict`, anti-CSRF), as rotas `/v1/me` com conta do token, read-your-writes e `asOf`; verificar o `403` sem token anti-CSRF (RN-AUTH-010, RN-API-043, RN-PAD-010/011)
+- [x] 19.3 Expor no `bff-web` as rotas da Fase 1 (auth, onboarding, perfil, suitability, saldos, extrato, depósitos, saques, contas de saque, instrumentos, cotação externa, notificações) seguindo `Contratos §1–§4` e emitir eventos de auditoria; verificar com testes de contrato
 
 ## 20. Fase 1 — Critério de pronto
 

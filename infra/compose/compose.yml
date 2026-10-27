@@ -104,6 +104,14 @@ secrets:
     file: ../secrets/crypto/notification_field_master_key
   notification_blind_index_key:
     file: ../secrets/crypto/notification_blind_index_key
+  db_bff_web_app:
+    file: ../secrets/db/bff_web_app
+  db_bff_web_migrator:
+    file: ../secrets/db/bff_web_migrator
+  bff_web_csrf_secret:
+    file: ../secrets/crypto/bff_web_csrf_secret
+  bff_web_login_key:
+    file: ../secrets/crypto/bff_web_login_key
   # Tokens da brapi (RN-BRP-090/094); vazios no local, que usa as fixtures (RN-BRP-095).
   brapi_token:
     file: ../secrets/brapi/token
@@ -995,6 +1003,110 @@ services:
       traefik.http.routers.notification.rule: Host(`notification.broker.localhost`)
       traefik.http.routers.notification.entrypoints: websecure
       traefik.http.services.notification.loadbalancer.server.port: '8080'
+
+  # Borda (D9): o Traefik termina o TLS e manda api.* para o gateway, que valida o token, aplica
+  # rate limit, CORS, limites e headers e roteia pelo X-Client-Channel para o BFF do canal.
+  api-gateway:
+    profiles: [core]
+    image: broker/api-gateway:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/api-gateway'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: api-gateway
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      BFF_URLS: WEB=http://bff-web:8080
+      MIN_CLIENT_VERSIONS: ${MIN_CLIENT_VERSIONS:-WEB=1.0.0,MOBILE=1.0.0,DESKTOP=1.0.0,BACKOFFICE=1.0.0}
+      CORS_ORIGINS: https://app.broker.localhost,https://backoffice.broker.localhost
+      # Só o Traefik fica na frente: o IP do cliente é o que ele anotou no X-Forwarded-For.
+      TRUSTED_PROXY_HOPS: '1'
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets: [valkey_password]
+    networks: [broker]
+    depends_on:
+      valkey:
+        condition: service_healthy
+      bff-web:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.api.rule: Host(`api.broker.localhost`)
+      traefik.http.routers.api.entrypoints: websecure
+      traefik.http.services.api.loadbalancer.server.port: '8080'
+
+  bff-web-migrate:
+    profiles: [core]
+    image: broker/bff-web:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/bff-web'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: bff_web
+      DB_USER: bff_web_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_bff_web_migrator
+    secrets: [db_bff_web_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # BFF web: token handler (PKCE com o identity, cookies HttpOnly, anti-CSRF) e as rotas da Fase 1.
+  # Só o gateway fala com ele (sem rota no Traefik).
+  bff-web:
+    profiles: [core]
+    image: broker/bff-web:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: bff-web
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: bff_web
+      DB_USER: bff_web_app
+      DB_PASSWORD_FILE: /run/secrets/db_bff_web_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      CSRF_SECRET_FILE: /run/secrets/bff_web_csrf_secret
+      LOGIN_COOKIE_KEY_FILE: /run/secrets/bff_web_login_key
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_bff_web_app
+      - rabbitmq_password
+      - valkey_password
+      - bff_web_csrf_secret
+      - bff_web_login_key
+    networks: [broker]
+    depends_on:
+      bff-web-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    <<: [*ready-check, *small]
 
   audit-migrate:
     profiles: [core]

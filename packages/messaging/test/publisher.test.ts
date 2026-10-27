@@ -158,6 +158,16 @@ describe('parseEnvelope no consumo', () => {
     expect(env.payload).toMatchObject({ accountId: 'acc-1', outro: true });
   });
 
+  it('aceita contexto com _ no eventType (Catálogo de eventos: market_data.*, session_schedule.*)', () => {
+    for (const eventType of ['market_data.catalog_synced', 'session_schedule.updated'])
+      expect(parseEnvelope(JSON.stringify({ ...valid, eventType }), 'prod').eventType).toBe(
+        eventType,
+      );
+    expect(() =>
+      parseEnvelope(JSON.stringify({ ...valid, eventType: 'Market.x' }), 'prod'),
+    ).toThrow(/eventType/);
+  });
+
   it('mensagem sem eventId, que não é JSON ou de outro ambiente é erro permanente', () => {
     const { eventId: _omit, ...withoutId } = valid;
     expect(() => parseEnvelope(JSON.stringify(withoutId), 'prod')).toThrow(/eventId/);

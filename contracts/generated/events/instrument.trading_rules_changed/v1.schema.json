@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:instrument.trading_rules_changed:v1",
+  "title": "instrument.trading_rules_changed v1",
+  "description": "Nova vigência de parâmetros de negociação, global ou por instrumento (Ativos §7).",
+  "x-producer": "reference-data-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "ruleId",
+    "instrumentId",
+    "rules",
+    "validFrom",
+    "approvalRequestId"
+  ],
+  "properties": {
+    "ruleId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "instrumentId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rules": {
+      "type": "object",
+      "properties": {
+        "rejectionBandPct": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        "staticAuctionBandPct": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        "dynamicAuctionBandPct": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        "volatilityAuctionDurationS": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "volatilityAuctionExtensionS": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "auctionRandomEndMaxS": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxOrderQuantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxOrderNotional": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,2})?$"
+        },
+        "marketProtectionPct": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        "smmSpreadBps": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approvalRequestId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

@@ -59,6 +59,40 @@
         }
       }
     },
+    "reference": {
+      "address": "{environment}.reference.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "calendar.updated.v1": {
+          "$ref": "#/components/messages/calendar.updated.v1"
+        },
+        "instrument.created.v1": {
+          "$ref": "#/components/messages/instrument.created.v1"
+        },
+        "instrument.status_changed.v1": {
+          "$ref": "#/components/messages/instrument.status_changed.v1"
+        },
+        "instrument.symbol_changed.v1": {
+          "$ref": "#/components/messages/instrument.symbol_changed.v1"
+        },
+        "instrument.tradability_changed.v1": {
+          "$ref": "#/components/messages/instrument.tradability_changed.v1"
+        },
+        "instrument.trading_rules_changed.v1": {
+          "$ref": "#/components/messages/instrument.trading_rules_changed.v1"
+        },
+        "instrument.updated.v1": {
+          "$ref": "#/components/messages/instrument.updated.v1"
+        },
+        "session_schedule.updated.v1": {
+          "$ref": "#/components/messages/session_schedule.updated.v1"
+        }
+      }
+    },
     "scheduler": {
       "address": "{environment}.scheduler.events",
       "parameters": {
@@ -168,6 +202,25 @@
         }
       }
     },
+    "market-data": {
+      "address": "{environment}.market-data.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "market_data.catalog_synced.v1": {
+          "$ref": "#/components/messages/market_data.catalog_synced.v1"
+        },
+        "market_data.instrument_stale.v1": {
+          "$ref": "#/components/messages/market_data.instrument_stale.v1"
+        },
+        "market_data.symbol_rename_detected.v1": {
+          "$ref": "#/components/messages/market_data.symbol_rename_detected.v1"
+        }
+      }
+    },
     "owner-topics": {
       "address": "{environment}.{context}.events",
       "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
@@ -209,6 +262,17 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/account.status_changed.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.calendar.updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/calendar.updated.v1"
         }
       ]
     },
@@ -388,6 +452,72 @@
         }
       ]
     },
+    "reference-data-service.send.instrument.created.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.created.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.instrument.status_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.status_changed.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.instrument.symbol_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.symbol_changed.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.instrument.tradability_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.tradability_changed.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.instrument.trading_rules_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.trading_rules_changed.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.instrument.updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/instrument.updated.v1"
+        }
+      ]
+    },
     "ledger-service.send.ledger.balance_changed.v1": {
       "action": "send",
       "channel": {
@@ -429,6 +559,39 @@
       "messages": [
         {
           "$ref": "#/channels/ledger/messages/ledger.negative_balance_detected.v1"
+        }
+      ]
+    },
+    "market-data-service.send.market_data.catalog_synced.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.catalog_synced.v1"
+        }
+      ]
+    },
+    "market-data-service.send.market_data.instrument_stale.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.instrument_stale.v1"
+        }
+      ]
+    },
+    "market-data-service.send.market_data.symbol_rename_detected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.symbol_rename_detected.v1"
         }
       ]
     },
@@ -528,6 +691,17 @@
       "messages": [
         {
           "$ref": "#/channels/scheduler/messages/routine.triggered.v1"
+        }
+      ]
+    },
+    "reference-data-service.send.session_schedule.updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reference"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/reference/messages/session_schedule.updated.v1"
         }
       ]
     },
@@ -644,7 +818,7 @@
           },
           "eventType": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9_]*)+$"
+            "pattern": "^[a-z][a-z0-9_-]*(\\.[a-z][a-z0-9_]*)+$"
           },
           "eventVersion": {
             "type": "integer",
@@ -794,6 +968,175 @@
               },
               "id": {
                 "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "calendar.updated.v1": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "calendar"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "calendar": {
+            "type": "object",
+            "required": [
+              "coverage",
+              "days",
+              "schedules"
+            ],
+            "properties": {
+              "coverage": {
+                "type": "object",
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "days": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "date",
+                    "type",
+                    "description"
+                  ],
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "HOLIDAY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NO_TRADING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "LATE_OPEN"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "schedules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "validFrom",
+                    "validTo",
+                    "dayType",
+                    "phases"
+                  ],
+                  "properties": {
+                    "validFrom": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validTo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "dayType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BUSINESS_DAY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "LATE_OPEN"
+                        }
+                      ]
+                    },
+                    "phases": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "phase",
+                          "start"
+                        ],
+                        "properties": {
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PRE_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_OPENING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CONTINUOUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSING_CALL"
+                              },
+                              {
+                                "type": "string",
+                                "const": "POST_CLOSE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSED"
+                              }
+                            ]
+                          },
+                          "start": {
+                            "type": "string",
+                            "pattern": "^\\d{2}:\\d{2}$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "allDaysBusiness": {
+                "type": "boolean"
               }
             }
           }
@@ -1179,6 +1522,674 @@
           }
         }
       },
+      "instrument.created.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "oddLotSymbol",
+          "isin",
+          "shortName",
+          "longName",
+          "assetType",
+          "shareClass",
+          "sector",
+          "subsector",
+          "currency",
+          "lotSize",
+          "tickSize",
+          "oddLotEnabled",
+          "shortSaleEnabled",
+          "dayTradeEnabled",
+          "collateralEligible",
+          "haircut",
+          "taxCategory",
+          "status",
+          "tradable",
+          "logoUrl",
+          "source",
+          "updatedAt"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+          },
+          "oddLotSymbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shortName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "longName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assetType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "STOCK"
+              },
+              {
+                "type": "string",
+                "const": "UNIT"
+              },
+              {
+                "type": "string",
+                "const": "REIT"
+              },
+              {
+                "type": "string",
+                "const": "ETF"
+              },
+              {
+                "type": "string",
+                "const": "BDR"
+              }
+            ]
+          },
+          "shareClass": {
+            "type": "string"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subsector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "lotSize": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tickSize": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "oddLotEnabled": {
+            "type": "boolean"
+          },
+          "shortSaleEnabled": {
+            "type": "boolean"
+          },
+          "dayTradeEnabled": {
+            "type": "boolean"
+          },
+          "collateralEligible": {
+            "type": "boolean"
+          },
+          "haircut": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxCategory": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "STOCK"
+              },
+              {
+                "type": "string",
+                "const": "REIT"
+              },
+              {
+                "type": "string",
+                "const": "ETF_EQUITY"
+              },
+              {
+                "type": "string",
+                "const": "BDR"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PENDING"
+              },
+              {
+                "type": "string",
+                "const": "ACTIVE"
+              },
+              {
+                "type": "string",
+                "const": "SUSPENDED"
+              },
+              {
+                "type": "string",
+                "const": "DELISTED"
+              }
+            ]
+          },
+          "tradable": {
+            "type": "boolean"
+          },
+          "logoUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BRAPI"
+              },
+              {
+                "type": "string",
+                "const": "MANUAL"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "instrument.status_changed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "from",
+          "to",
+          "reason"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PENDING"
+              },
+              {
+                "type": "string",
+                "const": "ACTIVE"
+              },
+              {
+                "type": "string",
+                "const": "SUSPENDED"
+              },
+              {
+                "type": "string",
+                "const": "DELISTED"
+              }
+            ]
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PENDING"
+              },
+              {
+                "type": "string",
+                "const": "ACTIVE"
+              },
+              {
+                "type": "string",
+                "const": "SUSPENDED"
+              },
+              {
+                "type": "string",
+                "const": "DELISTED"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "instrument.symbol_changed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "oldSymbol",
+          "newSymbol",
+          "effectiveDate"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "oldSymbol": {
+            "type": "string"
+          },
+          "newSymbol": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "instrument.tradability_changed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "oddLotSymbol",
+          "lotSize",
+          "tradable",
+          "approvalRequestId"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "oddLotSymbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lotSize": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tradable": {
+            "type": "boolean"
+          },
+          "approvalRequestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "instrument.trading_rules_changed.v1": {
+        "type": "object",
+        "required": [
+          "ruleId",
+          "instrumentId",
+          "rules",
+          "validFrom",
+          "approvalRequestId"
+        ],
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instrumentId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rules": {
+            "type": "object",
+            "properties": {
+              "rejectionBandPct": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              "staticAuctionBandPct": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              "dynamicAuctionBandPct": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              "volatilityAuctionDurationS": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "volatilityAuctionExtensionS": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "auctionRandomEndMaxS": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxOrderQuantity": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "maxOrderNotional": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,2})?$"
+              },
+              "marketProtectionPct": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              "smmSpreadBps": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvalRequestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "instrument.updated.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "oddLotSymbol",
+          "isin",
+          "shortName",
+          "longName",
+          "assetType",
+          "shareClass",
+          "sector",
+          "subsector",
+          "currency",
+          "lotSize",
+          "tickSize",
+          "oddLotEnabled",
+          "shortSaleEnabled",
+          "dayTradeEnabled",
+          "collateralEligible",
+          "haircut",
+          "taxCategory",
+          "status",
+          "tradable",
+          "logoUrl",
+          "source",
+          "updatedAt"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+          },
+          "oddLotSymbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shortName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "longName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assetType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "STOCK"
+              },
+              {
+                "type": "string",
+                "const": "UNIT"
+              },
+              {
+                "type": "string",
+                "const": "REIT"
+              },
+              {
+                "type": "string",
+                "const": "ETF"
+              },
+              {
+                "type": "string",
+                "const": "BDR"
+              }
+            ]
+          },
+          "shareClass": {
+            "type": "string"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subsector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "lotSize": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tickSize": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "oddLotEnabled": {
+            "type": "boolean"
+          },
+          "shortSaleEnabled": {
+            "type": "boolean"
+          },
+          "dayTradeEnabled": {
+            "type": "boolean"
+          },
+          "collateralEligible": {
+            "type": "boolean"
+          },
+          "haircut": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxCategory": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "STOCK"
+              },
+              {
+                "type": "string",
+                "const": "REIT"
+              },
+              {
+                "type": "string",
+                "const": "ETF_EQUITY"
+              },
+              {
+                "type": "string",
+                "const": "BDR"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PENDING"
+              },
+              {
+                "type": "string",
+                "const": "ACTIVE"
+              },
+              {
+                "type": "string",
+                "const": "SUSPENDED"
+              },
+              {
+                "type": "string",
+                "const": "DELISTED"
+              }
+            ]
+          },
+          "tradable": {
+            "type": "boolean"
+          },
+          "logoUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BRAPI"
+              },
+              {
+                "type": "string",
+                "const": "MANUAL"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ledger.balance_changed.v1": {
         "type": "object",
         "required": [
@@ -1355,6 +2366,146 @@
           "settledBalance": {
             "type": "string",
             "pattern": "^-?\\d+(\\.\\d{1,2})?$"
+          }
+        }
+      },
+      "market_data.catalog_synced.v1": {
+        "type": "object",
+        "required": [
+          "newSymbols",
+          "inactiveSymbols",
+          "syncedAt"
+        ],
+        "properties": {
+          "newSymbols": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "symbol"
+              ],
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                },
+                "shortName": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "longName": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "assetType": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "STOCK"
+                    },
+                    {
+                      "type": "string",
+                      "const": "UNIT"
+                    },
+                    {
+                      "type": "string",
+                      "const": "REIT"
+                    },
+                    {
+                      "type": "string",
+                      "const": "ETF"
+                    },
+                    {
+                      "type": "string",
+                      "const": "BDR"
+                    }
+                  ]
+                },
+                "sector": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "logoUrl": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "inactiveSymbols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "syncedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "market_data.instrument_stale.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "staleSince"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staleSince": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "market_data.symbol_rename_detected.v1": {
+        "type": "object",
+        "required": [
+          "oldSymbol",
+          "newSymbol",
+          "effectiveDate"
+        ],
+        "properties": {
+          "oldSymbol": {
+            "type": "string"
+          },
+          "newSymbol": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "conversionRatio": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
           }
         }
       },
@@ -1590,6 +2741,182 @@
           },
           "catchUp": {
             "type": "boolean"
+          }
+        }
+      },
+      "session_schedule.updated.v1": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "calendar"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "calendar": {
+            "type": "object",
+            "required": [
+              "coverage",
+              "days",
+              "schedules"
+            ],
+            "properties": {
+              "coverage": {
+                "type": "object",
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "days": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "date",
+                    "type",
+                    "description"
+                  ],
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "HOLIDAY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "NO_TRADING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "LATE_OPEN"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "schedules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "validFrom",
+                    "validTo",
+                    "dayType",
+                    "phases"
+                  ],
+                  "properties": {
+                    "validFrom": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "validTo": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "dayType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BUSINESS_DAY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "LATE_OPEN"
+                        }
+                      ]
+                    },
+                    "phases": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "phase",
+                          "start"
+                        ],
+                        "properties": {
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PRE_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_OPENING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CONTINUOUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSING_CALL"
+                              },
+                              {
+                                "type": "string",
+                                "const": "POST_CLOSE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSED"
+                              }
+                            ]
+                          },
+                          "start": {
+                            "type": "string",
+                            "pattern": "^\\d{2}:\\d{2}$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "allDaysBusiness": {
+                "type": "boolean"
+              }
+            }
           }
         }
       },
@@ -1878,6 +3205,43 @@
           "risk-service",
           "ledger-service",
           "notification-service"
+        ]
+      },
+      "calendar.updated.v1": {
+        "name": "calendar.updated",
+        "title": "calendar.updated v1",
+        "summary": "Dias do calendário ou período carregado mudaram (RN-CAL-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "calendar.updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/calendar.updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "scheduler-service",
+          "trading-session-service",
+          "ledger-service",
+          "clearing-service"
         ]
       },
       "clock.ticked.v1": {
@@ -2437,6 +3801,229 @@
           "audit-service"
         ]
       },
+      "instrument.created.v1": {
+        "name": "instrument.created",
+        "title": "instrument.created v1",
+        "summary": "Instrumento cadastrado (brapi ou manual), com o estado completo (Ativos §2).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.created"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.created.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "market-data-service",
+          "oms-service",
+          "risk-service",
+          "custody-service",
+          "engagement-service"
+        ]
+      },
+      "instrument.status_changed.v1": {
+        "name": "instrument.status_changed",
+        "title": "instrument.status_changed v1",
+        "summary": "Status do instrumento mudou (Ativos §5, RN-INS-020).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.status_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.status_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "oms-service",
+          "trading-session-service",
+          "market-maker-service",
+          "risk-service"
+        ]
+      },
+      "instrument.symbol_changed.v1": {
+        "name": "instrument.symbol_changed",
+        "title": "instrument.symbol_changed v1",
+        "summary": "Ticker renomeado; o instrument_id não muda (RN-INS-030).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.symbol_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.symbol_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "market-data-service",
+          "oms-service",
+          "custody-service",
+          "engagement-service"
+        ]
+      },
+      "instrument.tradability_changed.v1": {
+        "name": "instrument.tradability_changed",
+        "title": "instrument.tradability_changed v1",
+        "summary": "Entrada ou saída do universo negociável: dispara histórico, primeira cotação, livros e FMS (RN-INS-014).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.tradability_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.tradability_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "market-data-service",
+          "market-maker-service",
+          "trading-session-service",
+          "oms-service"
+        ]
+      },
+      "instrument.trading_rules_changed.v1": {
+        "name": "instrument.trading_rules_changed",
+        "title": "instrument.trading_rules_changed v1",
+        "summary": "Nova vigência de parâmetros de negociação, global ou por instrumento (Ativos §7).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.trading_rules_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.trading_rules_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "oms-service",
+          "trading-session-service",
+          "market-maker-service"
+        ]
+      },
+      "instrument.updated.v1": {
+        "name": "instrument.updated",
+        "title": "instrument.updated v1",
+        "summary": "Instrumento alterado; traz o estado completo para a cópia local dos consumidores.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "instrument.updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/instrument.updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "market-data-service",
+          "oms-service",
+          "risk-service",
+          "custody-service",
+          "engagement-service"
+        ]
+      },
       "ledger.balance_changed.v1": {
         "name": "ledger.balance_changed",
         "title": "ledger.balance_changed v1",
@@ -2581,6 +4168,110 @@
           "customer-service",
           "risk-service",
           "notification-service"
+        ]
+      },
+      "market_data.catalog_synced.v1": {
+        "name": "market_data.catalog_synced",
+        "title": "market_data.catalog_synced v1",
+        "summary": "Catálogo diário de tickers da brapi sincronizado (RN-INS-010).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.catalog_synced"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.catalog_synced.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "reference-data-service"
+        ]
+      },
+      "market_data.instrument_stale.v1": {
+        "name": "market_data.instrument_stale",
+        "title": "market_data.instrument_stale v1",
+        "summary": "Sem cotação válida além de max_quote_staleness (RN-INS-020, RN-BRP-07x).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.instrument_stale"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.instrument_stale.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "reference-data-service",
+          "market-maker-service"
+        ]
+      },
+      "market_data.symbol_rename_detected.v1": {
+        "name": "market_data.symbol_rename_detected",
+        "title": "market_data.symbol_rename_detected v1",
+        "summary": "A brapi informou troca de ticker (renames/resolve, RN-INS-030..033).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.symbol_rename_detected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.symbol_rename_detected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "reference-data-service",
+          "corporate-actions-service"
         ]
       },
       "onboarding.approved.v1": {
@@ -2890,6 +4581,42 @@
         "x-producer": "scheduler-service",
         "x-consumers": [
           "routine-owner"
+        ]
+      },
+      "session_schedule.updated.v1": {
+        "name": "session_schedule.updated",
+        "title": "session_schedule.updated v1",
+        "summary": "Nova grade horária com vigência (RN-CAL-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session_schedule.updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session_schedule.updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "reference-data-service",
+        "x-consumers": [
+          "scheduler-service",
+          "trading-session-service",
+          "ledger-service"
         ]
       },
       "suitability.assessed.v1": {

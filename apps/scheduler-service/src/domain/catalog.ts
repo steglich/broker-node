@@ -46,6 +46,9 @@ export const DEFAULT_ROUTINES: readonly RoutineDefinition[] = [
   // Reconciliação PIX do ledger com o Banco Simulado (RN-PIXS-002). Sem dependências: o PIX roda
   // 24/7 e a janela de cada execução começa onde a anterior parou.
   trading('pix_reconciliation', 'ledger-service', { at: '23:15' }),
+  // Alerta do calendário acabando (RN-CAL-001) e suspensão por cotação defasada (RN-INS-020),
+  // depois do pregão e antes da abertura seguinte.
+  trading('reference_daily', 'reference-data-service', { at: '22:30' }),
   {
     name: 'custody_fee',
     owner: 'ledger-service',

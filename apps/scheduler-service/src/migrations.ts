@@ -93,4 +93,14 @@ export const migrations: Record<string, Migration> = {
         ON CONFLICT (name) DO NOTHING`.execute(db);
     },
   },
+  '0006_reference_daily': {
+    // Rotina do reference-data-service (grupo 16): calendário e defasagem de cotação.
+    async up(db: Kysely<unknown>) {
+      const r = DEFAULT_ROUTINES.find((d) => d.name === 'reference_daily')!;
+      await sql`
+        INSERT INTO routine_definition (name, owner, schedule, days, depends_on, enabled)
+        VALUES (${r.name}, ${r.owner}, ${JSON.stringify(r.schedule)}, ${r.days}, ${[...r.dependsOn]}, ${r.enabled})
+        ON CONFLICT (name) DO NOTHING`.execute(db);
+    },
+  },
 };

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:market_data.catalog_synced:v1",
+  "title": "market_data.catalog_synced v1",
+  "description": "Catálogo diário de tickers da brapi sincronizado (RN-INS-010).",
+  "x-producer": "market-data-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "newSymbols",
+    "inactiveSymbols",
+    "syncedAt"
+  ],
+  "properties": {
+    "newSymbols": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "symbol"
+        ],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+          },
+          "shortName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "longName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assetType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "STOCK"
+              },
+              {
+                "type": "string",
+                "const": "UNIT"
+              },
+              {
+                "type": "string",
+                "const": "REIT"
+              },
+              {
+                "type": "string",
+                "const": "ETF"
+              },
+              {
+                "type": "string",
+                "const": "BDR"
+              }
+            ]
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "logoUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "inactiveSymbols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "syncedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

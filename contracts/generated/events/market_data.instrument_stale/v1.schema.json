@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:market_data.instrument_stale:v1",
+  "title": "market_data.instrument_stale v1",
+  "description": "Sem cotação válida além de max_quote_staleness (RN-INS-020, RN-BRP-07x).",
+  "x-producer": "market-data-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "staleSince"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staleSince": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

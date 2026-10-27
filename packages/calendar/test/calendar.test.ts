@@ -206,3 +206,21 @@ describe('session_schedule com vigência (RN-CAL-003)', () => {
     ).toThrow(/fim de semana/);
   });
 });
+
+describe('sandbox sempre útil (RN-SBX-002)', () => {
+  const sandbox = new TradingCalendar({ ...b3Calendar2026To2027, allDaysBusiness: true });
+
+  it('RN-SBX-002: sábado, feriado e NO_TRADING são úteis, com a grade BUSINESS_DAY', () => {
+    for (const day of ['2026-01-03', '2026-02-16', '2026-12-31']) {
+      expect(sandbox.isBusinessDay(d(day))).toBe(true);
+      expect(sandbox.dayType(d(day))).toBe('BUSINESS_DAY');
+      expect(sandbox.sessionSchedule(d(day))?.phases[2]?.phase).toBe('CONTINUOUS');
+    }
+    expect(sandbox.nextBusinessDay(d('2026-01-02'), 1).toString()).toBe('2026-01-03');
+    expect(sandbox.businessDaysBetween(d('2026-01-01'), d('2026-01-08'))).toBe(7);
+  });
+
+  it('RN-SBX-002: continua recusando fora do período carregado', () => {
+    expect(() => sandbox.isBusinessDay(d('2028-01-01'))).toThrow(CalendarNotLoadedError);
+  });
+});

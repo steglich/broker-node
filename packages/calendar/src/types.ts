@@ -30,4 +30,9 @@ export interface CalendarData {
   coverage: { from: string; to: string };
   days: readonly CalendarDayData[];
   schedules: readonly SessionScheduleData[];
+  /**
+   * Sandbox (RN-SBX-002): todo dia do período carregado é útil, com a grade `BUSINESS_DAY`,
+   * para o mercado estar sempre disponível. Ausente = calendário normal.
+   */
+  allDaysBusiness?: boolean;
 }

@@ -1,0 +1,5944 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "reference-data-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/instruments/search": {
+      "get": {
+        "operationId": "searchInstruments",
+        "summary": "Busca por ticker (principal, fracionário ou antigo, com aviso) e nome (RN-INS-010, RN-INS-032).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrument",
+                          "board",
+                          "tradingSymbol"
+                        ],
+                        "properties": {
+                          "instrument": {
+                            "type": "object",
+                            "required": [
+                              "instrumentId",
+                              "symbol",
+                              "oddLotSymbol",
+                              "isin",
+                              "shortName",
+                              "longName",
+                              "assetType",
+                              "shareClass",
+                              "sector",
+                              "subsector",
+                              "currency",
+                              "lotSize",
+                              "tickSize",
+                              "oddLotEnabled",
+                              "shortSaleEnabled",
+                              "dayTradeEnabled",
+                              "collateralEligible",
+                              "haircut",
+                              "taxCategory",
+                              "status",
+                              "tradable",
+                              "logoUrl",
+                              "source",
+                              "updatedAt",
+                              "statusReason",
+                              "createdAt"
+                            ],
+                            "properties": {
+                              "instrumentId": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                              },
+                              "oddLotSymbol": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "isin": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "shortName": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "longName": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "assetType": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "const": "STOCK"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "UNIT"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "REIT"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "ETF"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "BDR"
+                                  }
+                                ]
+                              },
+                              "shareClass": {
+                                "type": "string"
+                              },
+                              "sector": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "subsector": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "currency": {
+                                "type": "string",
+                                "const": "BRL"
+                              },
+                              "lotSize": {
+                                "type": "integer",
+                                "minimum": 1
+                              },
+                              "tickSize": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,8})?$"
+                              },
+                              "oddLotEnabled": {
+                                "type": "boolean"
+                              },
+                              "shortSaleEnabled": {
+                                "type": "boolean"
+                              },
+                              "dayTradeEnabled": {
+                                "type": "boolean"
+                              },
+                              "collateralEligible": {
+                                "type": "boolean"
+                              },
+                              "haircut": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,8})?$"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "taxCategory": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "const": "STOCK"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "REIT"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "ETF_EQUITY"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "BDR"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "const": "PENDING"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "ACTIVE"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "SUSPENDED"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "DELISTED"
+                                  }
+                                ]
+                              },
+                              "tradable": {
+                                "type": "boolean"
+                              },
+                              "logoUrl": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "source": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "const": "BRAPI"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "MANUAL"
+                                  }
+                                ]
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "statusReason": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          },
+                          "board": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "MAIN"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ODD_LOT"
+                              }
+                            ]
+                          },
+                          "tradingSymbol": {
+                            "type": "string"
+                          },
+                          "notice": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/by-symbol/{symbol}": {
+      "get": {
+        "operationId": "resolveSymbol",
+        "summary": "Resolve um ticker exato: PETR4F → PETR4 no ODD_LOT; ticker antigo com aviso.",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]{2,12}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instrumento e livro.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrument",
+                    "board",
+                    "tradingSymbol"
+                  ],
+                  "properties": {
+                    "instrument": {
+                      "type": "object",
+                      "required": [
+                        "instrumentId",
+                        "symbol",
+                        "oddLotSymbol",
+                        "isin",
+                        "shortName",
+                        "longName",
+                        "assetType",
+                        "shareClass",
+                        "sector",
+                        "subsector",
+                        "currency",
+                        "lotSize",
+                        "tickSize",
+                        "oddLotEnabled",
+                        "shortSaleEnabled",
+                        "dayTradeEnabled",
+                        "collateralEligible",
+                        "haircut",
+                        "taxCategory",
+                        "status",
+                        "tradable",
+                        "logoUrl",
+                        "source",
+                        "updatedAt",
+                        "statusReason",
+                        "createdAt"
+                      ],
+                      "properties": {
+                        "instrumentId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "symbol": {
+                          "type": "string",
+                          "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                        },
+                        "oddLotSymbol": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "isin": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "shortName": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "longName": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "assetType": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "STOCK"
+                            },
+                            {
+                              "type": "string",
+                              "const": "UNIT"
+                            },
+                            {
+                              "type": "string",
+                              "const": "REIT"
+                            },
+                            {
+                              "type": "string",
+                              "const": "ETF"
+                            },
+                            {
+                              "type": "string",
+                              "const": "BDR"
+                            }
+                          ]
+                        },
+                        "shareClass": {
+                          "type": "string"
+                        },
+                        "sector": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "subsector": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "currency": {
+                          "type": "string",
+                          "const": "BRL"
+                        },
+                        "lotSize": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "tickSize": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        "oddLotEnabled": {
+                          "type": "boolean"
+                        },
+                        "shortSaleEnabled": {
+                          "type": "boolean"
+                        },
+                        "dayTradeEnabled": {
+                          "type": "boolean"
+                        },
+                        "collateralEligible": {
+                          "type": "boolean"
+                        },
+                        "haircut": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,8})?$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "taxCategory": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "STOCK"
+                            },
+                            {
+                              "type": "string",
+                              "const": "REIT"
+                            },
+                            {
+                              "type": "string",
+                              "const": "ETF_EQUITY"
+                            },
+                            {
+                              "type": "string",
+                              "const": "BDR"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "PENDING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "ACTIVE"
+                            },
+                            {
+                              "type": "string",
+                              "const": "SUSPENDED"
+                            },
+                            {
+                              "type": "string",
+                              "const": "DELISTED"
+                            }
+                          ]
+                        },
+                        "tradable": {
+                          "type": "boolean"
+                        },
+                        "logoUrl": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "source": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "BRAPI"
+                            },
+                            {
+                              "type": "string",
+                              "const": "MANUAL"
+                            }
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "statusReason": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "board": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MAIN"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ODD_LOT"
+                        }
+                      ]
+                    },
+                    "tradingSymbol": {
+                      "type": "string"
+                    },
+                    "notice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "INSTRUMENT_NOT_FOUND.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments": {
+      "get": {
+        "operationId": "listInstruments",
+        "summary": "Catálogo por ticker, com cursor (cópia inicial dos consumidores).",
+        "parameters": [
+          {
+            "name": "tradable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "true"
+                },
+                {
+                  "type": "string",
+                  "const": "false"
+                }
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrumentId",
+                          "symbol",
+                          "oddLotSymbol",
+                          "isin",
+                          "shortName",
+                          "longName",
+                          "assetType",
+                          "shareClass",
+                          "sector",
+                          "subsector",
+                          "currency",
+                          "lotSize",
+                          "tickSize",
+                          "oddLotEnabled",
+                          "shortSaleEnabled",
+                          "dayTradeEnabled",
+                          "collateralEligible",
+                          "haircut",
+                          "taxCategory",
+                          "status",
+                          "tradable",
+                          "logoUrl",
+                          "source",
+                          "updatedAt",
+                          "statusReason",
+                          "createdAt"
+                        ],
+                        "properties": {
+                          "instrumentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                          },
+                          "oddLotSymbol": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isin": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "shortName": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "longName": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "assetType": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "UNIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          },
+                          "shareClass": {
+                            "type": "string"
+                          },
+                          "sector": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "subsector": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "BRL"
+                          },
+                          "lotSize": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "tickSize": {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,8})?$"
+                          },
+                          "oddLotEnabled": {
+                            "type": "boolean"
+                          },
+                          "shortSaleEnabled": {
+                            "type": "boolean"
+                          },
+                          "dayTradeEnabled": {
+                            "type": "boolean"
+                          },
+                          "collateralEligible": {
+                            "type": "boolean"
+                          },
+                          "haircut": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,8})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "taxCategory": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF_EQUITY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PENDING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ACTIVE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "SUSPENDED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DELISTED"
+                              }
+                            ]
+                          },
+                          "tradable": {
+                            "type": "boolean"
+                          },
+                          "logoUrl": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "source": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "BRAPI"
+                              },
+                              {
+                                "type": "string",
+                                "const": "MANUAL"
+                              }
+                            ]
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "statusReason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/universe": {
+      "get": {
+        "operationId": "universe",
+        "summary": "Universo negociável: \"x de max\" e os instrumentos (RN-INS-011).",
+        "responses": {
+          "200": {
+            "description": "Universo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "max",
+                    "count",
+                    "items"
+                  ],
+                  "properties": {
+                    "max": {
+                      "type": "integer"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrumentId",
+                          "symbol",
+                          "oddLotSymbol",
+                          "isin",
+                          "shortName",
+                          "longName",
+                          "assetType",
+                          "shareClass",
+                          "sector",
+                          "subsector",
+                          "currency",
+                          "lotSize",
+                          "tickSize",
+                          "oddLotEnabled",
+                          "shortSaleEnabled",
+                          "dayTradeEnabled",
+                          "collateralEligible",
+                          "haircut",
+                          "taxCategory",
+                          "status",
+                          "tradable",
+                          "logoUrl",
+                          "source",
+                          "updatedAt",
+                          "statusReason",
+                          "createdAt"
+                        ],
+                        "properties": {
+                          "instrumentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                          },
+                          "oddLotSymbol": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isin": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "shortName": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "longName": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "assetType": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "UNIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          },
+                          "shareClass": {
+                            "type": "string"
+                          },
+                          "sector": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "subsector": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "BRL"
+                          },
+                          "lotSize": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "tickSize": {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,8})?$"
+                          },
+                          "oddLotEnabled": {
+                            "type": "boolean"
+                          },
+                          "shortSaleEnabled": {
+                            "type": "boolean"
+                          },
+                          "dayTradeEnabled": {
+                            "type": "boolean"
+                          },
+                          "collateralEligible": {
+                            "type": "boolean"
+                          },
+                          "haircut": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,8})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "taxCategory": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF_EQUITY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PENDING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ACTIVE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "SUSPENDED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DELISTED"
+                              }
+                            ]
+                          },
+                          "tradable": {
+                            "type": "boolean"
+                          },
+                          "logoUrl": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "source": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "BRAPI"
+                              },
+                              {
+                                "type": "string",
+                                "const": "MANUAL"
+                              }
+                            ]
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "statusReason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{id}": {
+      "get": {
+        "operationId": "getInstrument",
+        "summary": "Detalhe do instrumento.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instrumento.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "oddLotSymbol",
+                    "isin",
+                    "shortName",
+                    "longName",
+                    "assetType",
+                    "shareClass",
+                    "sector",
+                    "subsector",
+                    "currency",
+                    "lotSize",
+                    "tickSize",
+                    "oddLotEnabled",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory",
+                    "status",
+                    "tradable",
+                    "logoUrl",
+                    "source",
+                    "updatedAt",
+                    "statusReason",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                    },
+                    "oddLotSymbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isin": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "shortName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "longName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "shareClass": {
+                      "type": "string"
+                    },
+                    "sector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subsector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "BRL"
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "oddLotEnabled": {
+                      "type": "boolean"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SUSPENDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DELISTED"
+                        }
+                      ]
+                    },
+                    "tradable": {
+                      "type": "boolean"
+                    },
+                    "logoUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BRAPI"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MANUAL"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "statusReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{id}/symbol-history": {
+      "get": {
+        "operationId": "symbolHistory",
+        "summary": "Tickers antigos com vigência (RN-INS-030).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/trading-rules/effective": {
+      "get": {
+        "operationId": "effectiveRules",
+        "summary": "Regras vigentes no instante: global + sobrescrita do instrumento (Ativos §7).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Regras vigentes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "at",
+                    "values",
+                    "globalRuleId",
+                    "overrideRuleId",
+                    "overridden"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "values": {
+                      "type": "object",
+                      "required": [
+                        "rejectionBandPct",
+                        "staticAuctionBandPct",
+                        "dynamicAuctionBandPct",
+                        "volatilityAuctionDurationS",
+                        "volatilityAuctionExtensionS",
+                        "auctionRandomEndMaxS",
+                        "maxOrderQuantity",
+                        "maxOrderNotional",
+                        "marketProtectionPct",
+                        "smmSpreadBps"
+                      ],
+                      "properties": {
+                        "rejectionBandPct": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        "staticAuctionBandPct": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        "dynamicAuctionBandPct": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        "volatilityAuctionDurationS": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "volatilityAuctionExtensionS": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "auctionRandomEndMaxS": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "maxOrderQuantity": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "maxOrderNotional": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,2})?$"
+                        },
+                        "marketProtectionPct": {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        "smmSpreadBps": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    },
+                    "globalRuleId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "overrideRuleId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "overridden": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar": {
+      "get": {
+        "operationId": "calendar",
+        "summary": "Calendário completo (dados do @broker/calendar) para a cópia local (D15).",
+        "responses": {
+          "200": {
+            "description": "Calendário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "coverage",
+                    "days",
+                    "schedules"
+                  ],
+                  "properties": {
+                    "coverage": {
+                      "type": "object",
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "properties": {
+                        "from": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "to": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "date",
+                          "type",
+                          "description"
+                        ],
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "HOLIDAY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "NO_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "LATE_OPEN"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "schedules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "validFrom",
+                          "validTo",
+                          "dayType",
+                          "phases"
+                        ],
+                        "properties": {
+                          "validFrom": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "validTo": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "dayType": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "BUSINESS_DAY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "LATE_OPEN"
+                              }
+                            ]
+                          },
+                          "phases": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "phase",
+                                "start"
+                              ],
+                              "properties": {
+                                "phase": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "const": "PRE_TRADING"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "PRE_OPENING"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "CONTINUOUS"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "CLOSING_CALL"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "POST_CLOSE"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "const": "CLOSED"
+                                    }
+                                  ]
+                                },
+                                "start": {
+                                  "type": "string",
+                                  "pattern": "^\\d{2}:\\d{2}$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "allDaysBusiness": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/days/{date}": {
+      "get": {
+        "operationId": "calendarDay",
+        "summary": "is_business_day, tipo do dia, D+1/D-1 e session_schedule da data.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dia."
+          },
+          "422": {
+            "description": "CALENDAR_NOT_LOADED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/days/{date}/next": {
+      "get": {
+        "operationId": "nextBusinessDay",
+        "summary": "next_business_day(d, n) / previous com n negativo.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^-?\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/calendar/business-days-between": {
+      "get": {
+        "operationId": "businessDaysBetween",
+        "summary": "business_days_between(a, b): dias úteis em (a, b].",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contagem."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instruments": {
+      "post": {
+        "operationId": "createInstrument",
+        "summary": "Cadastro manual com o padrão do tipo e sobrescritas (BO_MARKET, sem aprovação).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "symbol",
+                  "assetType"
+                ],
+                "properties": {
+                  "symbol": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9]{3,5}\\d{1,2}$"
+                  },
+                  "assetType": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "STOCK"
+                      },
+                      {
+                        "type": "string",
+                        "const": "UNIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "REIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ETF"
+                      },
+                      {
+                        "type": "string",
+                        "const": "BDR"
+                      }
+                    ]
+                  },
+                  "shareClass": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "ON"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PN"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PNA"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PNB"
+                      },
+                      {
+                        "type": "string",
+                        "const": "UNIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "N/A"
+                      }
+                    ]
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "properties": {
+                      "lotSize": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "tickSize": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      "shortSaleEnabled": {
+                        "type": "boolean"
+                      },
+                      "dayTradeEnabled": {
+                        "type": "boolean"
+                      },
+                      "collateralEligible": {
+                        "type": "boolean"
+                      },
+                      "haircut": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,8})?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "taxCategory": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": "STOCK"
+                          },
+                          {
+                            "type": "string",
+                            "const": "REIT"
+                          },
+                          {
+                            "type": "string",
+                            "const": "ETF_EQUITY"
+                          },
+                          {
+                            "type": "string",
+                            "const": "BDR"
+                          }
+                        ]
+                      },
+                      "shareClass": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": "ON"
+                          },
+                          {
+                            "type": "string",
+                            "const": "PN"
+                          },
+                          {
+                            "type": "string",
+                            "const": "PNA"
+                          },
+                          {
+                            "type": "string",
+                            "const": "PNB"
+                          },
+                          {
+                            "type": "string",
+                            "const": "UNIT"
+                          },
+                          {
+                            "type": "string",
+                            "const": "N/A"
+                          }
+                        ]
+                      },
+                      "isin": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[A-Z]{2}[A-Z0-9]{10}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "shortName": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 120
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "longName": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 250
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "sector": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 120
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "subsector": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 120
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "logoUrl": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado (PENDING, fora do universo).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "oddLotSymbol",
+                    "isin",
+                    "shortName",
+                    "longName",
+                    "assetType",
+                    "shareClass",
+                    "sector",
+                    "subsector",
+                    "currency",
+                    "lotSize",
+                    "tickSize",
+                    "oddLotEnabled",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory",
+                    "status",
+                    "tradable",
+                    "logoUrl",
+                    "source",
+                    "updatedAt",
+                    "statusReason",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                    },
+                    "oddLotSymbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isin": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "shortName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "longName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "shareClass": {
+                      "type": "string"
+                    },
+                    "sector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subsector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "BRL"
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "oddLotEnabled": {
+                      "type": "boolean"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SUSPENDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DELISTED"
+                        }
+                      ]
+                    },
+                    "tradable": {
+                      "type": "boolean"
+                    },
+                    "logoUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BRAPI"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MANUAL"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "statusReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instruments/{id}": {
+      "patch": {
+        "operationId": "updateInstrument",
+        "summary": "Edita atributos (lote, tick, flags, haircut, nomes); o fracionário é derivado.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lotSize": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tickSize": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,8})?$"
+                  },
+                  "shortSaleEnabled": {
+                    "type": "boolean"
+                  },
+                  "dayTradeEnabled": {
+                    "type": "boolean"
+                  },
+                  "collateralEligible": {
+                    "type": "boolean"
+                  },
+                  "haircut": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "taxCategory": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "STOCK"
+                      },
+                      {
+                        "type": "string",
+                        "const": "REIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ETF_EQUITY"
+                      },
+                      {
+                        "type": "string",
+                        "const": "BDR"
+                      }
+                    ]
+                  },
+                  "shareClass": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "ON"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PN"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PNA"
+                      },
+                      {
+                        "type": "string",
+                        "const": "PNB"
+                      },
+                      {
+                        "type": "string",
+                        "const": "UNIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "N/A"
+                      }
+                    ]
+                  },
+                  "isin": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}[A-Z0-9]{10}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "shortName": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "longName": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 250
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "sector": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "subsector": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "logoUrl": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "oddLotSymbol",
+                    "isin",
+                    "shortName",
+                    "longName",
+                    "assetType",
+                    "shareClass",
+                    "sector",
+                    "subsector",
+                    "currency",
+                    "lotSize",
+                    "tickSize",
+                    "oddLotEnabled",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory",
+                    "status",
+                    "tradable",
+                    "logoUrl",
+                    "source",
+                    "updatedAt",
+                    "statusReason",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                    },
+                    "oddLotSymbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isin": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "shortName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "longName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "shareClass": {
+                      "type": "string"
+                    },
+                    "sector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subsector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "BRL"
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "oddLotEnabled": {
+                      "type": "boolean"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SUSPENDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DELISTED"
+                        }
+                      ]
+                    },
+                    "tradable": {
+                      "type": "boolean"
+                    },
+                    "logoUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BRAPI"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MANUAL"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "statusReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instruments/{id}/status": {
+      "post": {
+        "operationId": "setStatus",
+        "summary": "Suspender, retomar ou deslistar (BO_MARKET, sem aprovação).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "SUSPENDED"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ACTIVE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "DELISTED"
+                      }
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Novo status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "oddLotSymbol",
+                    "isin",
+                    "shortName",
+                    "longName",
+                    "assetType",
+                    "shareClass",
+                    "sector",
+                    "subsector",
+                    "currency",
+                    "lotSize",
+                    "tickSize",
+                    "oddLotEnabled",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory",
+                    "status",
+                    "tradable",
+                    "logoUrl",
+                    "source",
+                    "updatedAt",
+                    "statusReason",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                    },
+                    "oddLotSymbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isin": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "shortName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "longName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "shareClass": {
+                      "type": "string"
+                    },
+                    "sector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subsector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "BRL"
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "oddLotEnabled": {
+                      "type": "boolean"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SUSPENDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DELISTED"
+                        }
+                      ]
+                    },
+                    "tradable": {
+                      "type": "boolean"
+                    },
+                    "logoUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BRAPI"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MANUAL"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "statusReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instruments/{id}/rename": {
+      "post": {
+        "operationId": "renameInstrument",
+        "summary": "Renomeia mantendo o instrument_id (RN-INS-030).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "newSymbol",
+                  "effectiveDate"
+                ],
+                "properties": {
+                  "newSymbol": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9]{3,5}\\d{1,2}$"
+                  },
+                  "effectiveDate": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Renomeado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "oddLotSymbol",
+                    "isin",
+                    "shortName",
+                    "longName",
+                    "assetType",
+                    "shareClass",
+                    "sector",
+                    "subsector",
+                    "currency",
+                    "lotSize",
+                    "tickSize",
+                    "oddLotEnabled",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory",
+                    "status",
+                    "tradable",
+                    "logoUrl",
+                    "source",
+                    "updatedAt",
+                    "statusReason",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+                    },
+                    "oddLotSymbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isin": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "shortName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "longName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "shareClass": {
+                      "type": "string"
+                    },
+                    "sector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subsector": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "BRL"
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "oddLotEnabled": {
+                      "type": "boolean"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SUSPENDED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DELISTED"
+                        }
+                      ]
+                    },
+                    "tradable": {
+                      "type": "boolean"
+                    },
+                    "logoUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "BRAPI"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MANUAL"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "statusReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instrument-type-defaults": {
+      "get": {
+        "operationId": "typeDefaults",
+        "summary": "Padrões de cadastro por tipo (Ativos §2.2).",
+        "responses": {
+          "200": {
+            "description": "Padrões.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "assetType",
+                          "lotSize",
+                          "tickSize",
+                          "shortSaleEnabled",
+                          "dayTradeEnabled",
+                          "collateralEligible",
+                          "haircut",
+                          "taxCategory"
+                        ],
+                        "properties": {
+                          "assetType": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "UNIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          },
+                          "lotSize": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "tickSize": {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,8})?$"
+                          },
+                          "shortSaleEnabled": {
+                            "type": "boolean"
+                          },
+                          "dayTradeEnabled": {
+                            "type": "boolean"
+                          },
+                          "collateralEligible": {
+                            "type": "boolean"
+                          },
+                          "haircut": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,8})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "taxCategory": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "STOCK"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REIT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "ETF_EQUITY"
+                              },
+                              {
+                                "type": "string",
+                                "const": "BDR"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/instrument-type-defaults/{assetType}": {
+      "put": {
+        "operationId": "updateTypeDefaults",
+        "summary": "Altera o padrão do tipo para os próximos cadastros.",
+        "parameters": [
+          {
+            "name": "assetType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "STOCK"
+                },
+                {
+                  "type": "string",
+                  "const": "UNIT"
+                },
+                {
+                  "type": "string",
+                  "const": "REIT"
+                },
+                {
+                  "type": "string",
+                  "const": "ETF"
+                },
+                {
+                  "type": "string",
+                  "const": "BDR"
+                }
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lotSize": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tickSize": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,8})?$"
+                  },
+                  "shortSaleEnabled": {
+                    "type": "boolean"
+                  },
+                  "dayTradeEnabled": {
+                    "type": "boolean"
+                  },
+                  "collateralEligible": {
+                    "type": "boolean"
+                  },
+                  "haircut": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "taxCategory": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "STOCK"
+                      },
+                      {
+                        "type": "string",
+                        "const": "REIT"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ETF_EQUITY"
+                      },
+                      {
+                        "type": "string",
+                        "const": "BDR"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Padrão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "assetType",
+                    "lotSize",
+                    "tickSize",
+                    "shortSaleEnabled",
+                    "dayTradeEnabled",
+                    "collateralEligible",
+                    "haircut",
+                    "taxCategory"
+                  ],
+                  "properties": {
+                    "assetType": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    },
+                    "lotSize": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "tickSize": {
+                      "type": "string",
+                      "pattern": "^\\d+(\\.\\d{1,8})?$"
+                    },
+                    "shortSaleEnabled": {
+                      "type": "boolean"
+                    },
+                    "dayTradeEnabled": {
+                      "type": "boolean"
+                    },
+                    "collateralEligible": {
+                      "type": "boolean"
+                    },
+                    "haircut": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+(\\.\\d{1,8})?$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "taxCategory": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "STOCK"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REIT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "ETF_EQUITY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "BDR"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/universe/requests": {
+      "post": {
+        "operationId": "requestUniverseChange",
+        "summary": "Propõe incluir/retirar do universo (BO_MARKET → BO_ADMIN). Recusa no limite ou com ordens abertas.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "instrumentId",
+                  "action",
+                  "justification"
+                ],
+                "properties": {
+                  "instrumentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "action": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "INCLUDE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "REMOVE"
+                      }
+                    ]
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Solicitação PENDING criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "TRADABLE_UNIVERSE_FULL, INSTRUMENT_HAS_OPEN_ORDERS, ALREADY_TRADABLE, NOT_TRADABLE.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/trading-rules/requests": {
+      "post": {
+        "operationId": "requestTradingRules",
+        "summary": "Propõe nova vigência de regras, global (instrumentId null) ou por instrumento.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "instrumentId",
+                  "rules",
+                  "validFrom",
+                  "justification"
+                ],
+                "properties": {
+                  "instrumentId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "type": "object",
+                    "properties": {
+                      "rejectionBandPct": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      "staticAuctionBandPct": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      "dynamicAuctionBandPct": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      "volatilityAuctionDurationS": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "volatilityAuctionExtensionS": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "auctionRandomEndMaxS": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "maxOrderQuantity": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "maxOrderNotional": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,2})?$"
+                      },
+                      "marketProtectionPct": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,8})?$"
+                      },
+                      "smmSpreadBps": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    }
+                  },
+                  "validFrom": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Solicitação PENDING criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "INVALID_TRADING_RULES, VALID_FROM_IN_PAST, RULES_VALIDITY_OVERLAP.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/trading-rules": {
+      "get": {
+        "operationId": "tradingRuleVersions",
+        "summary": "Vigências do escopo (global sem instrumentId).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vigências."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/calendar/requests": {
+      "post": {
+        "operationId": "requestCalendarChange",
+        "summary": "Propõe dias especiais e/ou a extensão do período carregado (RN-CAL-001).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "justification"
+                ],
+                "properties": {
+                  "extendTo": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  "days": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "date",
+                        "type"
+                      ],
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "type": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "BUSINESS_DAY"
+                            },
+                            {
+                              "type": "string",
+                              "const": "HOLIDAY"
+                            },
+                            {
+                              "type": "string",
+                              "const": "NO_TRADING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "LATE_OPEN"
+                            }
+                          ]
+                        },
+                        "description": {
+                          "type": "string",
+                          "maxLength": 200
+                        }
+                      }
+                    },
+                    "maxItems": 400
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Solicitação PENDING criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session-schedules/requests": {
+      "post": {
+        "operationId": "requestSessionSchedule",
+        "summary": "Propõe nova grade horária com vigência (RN-CAL-003).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "dayType",
+                  "validFrom",
+                  "phases",
+                  "justification"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 120
+                  },
+                  "dayType": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "BUSINESS_DAY"
+                      },
+                      {
+                        "type": "string",
+                        "const": "LATE_OPEN"
+                      }
+                    ]
+                  },
+                  "validFrom": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  "phases": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "phase",
+                        "start"
+                      ],
+                      "properties": {
+                        "phase": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "PRE_TRADING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "PRE_OPENING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CONTINUOUS"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CLOSING_CALL"
+                            },
+                            {
+                              "type": "string",
+                              "const": "POST_CLOSE"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CLOSED"
+                            }
+                          ]
+                        },
+                        "start": {
+                          "type": "string",
+                          "pattern": "^\\d{2}:\\d{2}$"
+                        }
+                      }
+                    },
+                    "minItems": 6,
+                    "maxItems": 6
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Solicitação PENDING criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session-schedules": {
+      "get": {
+        "operationId": "sessionSchedules",
+        "summary": "Grades horárias por vigência.",
+        "responses": {
+          "200": {
+            "description": "Grades."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/change-requests": {
+      "get": {
+        "operationId": "listChangeRequests",
+        "summary": "Solicitações de aprovação do serviço.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Solicitações.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "targetId",
+                          "payload",
+                          "currentState",
+                          "justification",
+                          "makerId",
+                          "status",
+                          "createdAt",
+                          "expiresAt",
+                          "decidedBy",
+                          "decidedAt",
+                          "decisionReason"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "UNIVERSE_INCLUDE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "UNIVERSE_REMOVE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "TRADING_RULES"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CALENDAR"
+                              },
+                              {
+                                "type": "string",
+                                "const": "SESSION_SCHEDULE"
+                              }
+                            ]
+                          },
+                          "targetId": {
+                            "type": "string"
+                          },
+                          "payload": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "currentState": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "justification": {
+                            "type": "string"
+                          },
+                          "makerId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "PENDING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "APPROVED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "REJECTED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "EXPIRED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CANCELED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "STALE"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "decidedBy": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decidedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decisionReason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/change-requests/{id}/approve": {
+      "post": {
+        "operationId": "approveChangeRequest",
+        "summary": "Aprova e executa (checker ≠ maker); estado mudado → STALE (RN-MC-BO-003).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "APPROVED (executada).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "REQUEST_STALE, MAKER_CANNOT_APPROVE, CHECKER_ROLE_REQUIRED, REQUEST_EXPIRED.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/change-requests/{id}/reject": {
+      "post": {
+        "operationId": "rejectChangeRequest",
+        "summary": "Reprova a solicitação.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "REJECTED.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/change-requests/{id}/cancel": {
+      "post": {
+        "operationId": "cancelChangeRequest",
+        "summary": "O maker cancela a própria solicitação pendente.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CANCELED.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "targetId",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_INCLUDE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNIVERSE_REMOVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "TRADING_RULES"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CALENDAR"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SESSION_SCHEDULE"
+                        }
+                      ]
+                    },
+                    "targetId": {
+                      "type": "string"
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PENDING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "EXPIRED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CANCELED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "STALE"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/tasks": {
+      "get": {
+        "operationId": "listTasks",
+        "summary": "Tarefas do backoffice: renomeações a confirmar, calendário acabando, catálogo.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tarefas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "kind",
+                          "instrumentId",
+                          "data",
+                          "status",
+                          "createdAt",
+                          "resolvedBy",
+                          "resolvedAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "kind": {
+                            "type": "string"
+                          },
+                          "instrumentId": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "data": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "status": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "OPEN"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DONE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "DISMISSED"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "resolvedBy": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "resolvedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/tasks/{id}/confirm": {
+      "post": {
+        "operationId": "confirmTask",
+        "summary": "Confirma a renomeação da tarefa (RN-INS-033).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Renomeado."
+          },
+          "422": {
+            "description": "CONVERSION_IS_CORPORATE_ACTION.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/tasks/{id}/resolve": {
+      "post": {
+        "operationId": "resolveTask",
+        "summary": "Conclui ou descarta a tarefa.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "DONE"
+                      },
+                      {
+                        "type": "string",
+                        "const": "DISMISSED"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarefa.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "kind",
+                    "instrumentId",
+                    "data",
+                    "status",
+                    "createdAt",
+                    "resolvedBy",
+                    "resolvedAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "instrumentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "OPEN"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DONE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "DISMISSED"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "resolvedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "resolvedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:instrument.created:v1",
+  "title": "instrument.created v1",
+  "description": "Instrumento cadastrado (brapi ou manual), com o estado completo (Ativos §2).",
+  "x-producer": "reference-data-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "symbol",
+    "oddLotSymbol",
+    "isin",
+    "shortName",
+    "longName",
+    "assetType",
+    "shareClass",
+    "sector",
+    "subsector",
+    "currency",
+    "lotSize",
+    "tickSize",
+    "oddLotEnabled",
+    "shortSaleEnabled",
+    "dayTradeEnabled",
+    "collateralEligible",
+    "haircut",
+    "taxCategory",
+    "status",
+    "tradable",
+    "logoUrl",
+    "source",
+    "updatedAt"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]{3,5}\\d{1,2}$"
+    },
+    "oddLotSymbol": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "isin": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "shortName": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "longName": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "assetType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "STOCK"
+        },
+        {
+          "type": "string",
+          "const": "UNIT"
+        },
+        {
+          "type": "string",
+          "const": "REIT"
+        },
+        {
+          "type": "string",
+          "const": "ETF"
+        },
+        {
+          "type": "string",
+          "const": "BDR"
+        }
+      ]
+    },
+    "shareClass": {
+      "type": "string"
+    },
+    "sector": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subsector": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "const": "BRL"
+    },
+    "lotSize": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tickSize": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "oddLotEnabled": {
+      "type": "boolean"
+    },
+    "shortSaleEnabled": {
+      "type": "boolean"
+    },
+    "dayTradeEnabled": {
+      "type": "boolean"
+    },
+    "collateralEligible": {
+      "type": "boolean"
+    },
+    "haircut": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "taxCategory": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "STOCK"
+        },
+        {
+          "type": "string",
+          "const": "REIT"
+        },
+        {
+          "type": "string",
+          "const": "ETF_EQUITY"
+        },
+        {
+          "type": "string",
+          "const": "BDR"
+        }
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "PENDING"
+        },
+        {
+          "type": "string",
+          "const": "ACTIVE"
+        },
+        {
+          "type": "string",
+          "const": "SUSPENDED"
+        },
+        {
+          "type": "string",
+          "const": "DELISTED"
+        }
+      ]
+    },
+    "tradable": {
+      "type": "boolean"
+    },
+    "logoUrl": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BRAPI"
+        },
+        {
+          "type": "string",
+          "const": "MANUAL"
+        }
+      ]
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

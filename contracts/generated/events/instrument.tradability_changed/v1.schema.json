@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:instrument.tradability_changed:v1",
+  "title": "instrument.tradability_changed v1",
+  "description": "Entrada ou saída do universo negociável: dispara histórico, primeira cotação, livros e FMS (RN-INS-014).",
+  "x-producer": "reference-data-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "symbol",
+    "oddLotSymbol",
+    "lotSize",
+    "tradable",
+    "approvalRequestId"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "oddLotSymbol": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lotSize": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tradable": {
+      "type": "boolean"
+    },
+    "approvalRequestId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

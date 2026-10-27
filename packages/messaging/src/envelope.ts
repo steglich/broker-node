@@ -22,7 +22,8 @@ const Actor = Type.Object({
 export const EnvelopeSchema = Type.Object({
   /** UUID v7 único global; base da deduplicação (RN-MSG-B-010). */
   eventId: Type.String({ format: 'uuid' }),
-  eventType: Type.String({ pattern: '^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9_]*)+$' }),
+  /** `<contexto>.<fato>`; o contexto pode ter `_` (`market_data.*`, `session_schedule.updated`). */
+  eventType: Type.String({ pattern: '^[a-z][a-z0-9_-]*(\\.[a-z][a-z0-9_]*)+$' }),
   eventVersion: Type.Integer({ minimum: 1 }),
   source: Type.String({ minLength: 1 }),
   environment: Type.String({ minLength: 1 }),

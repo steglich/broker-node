@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:session_schedule.updated:v1",
+  "title": "session_schedule.updated v1",
+  "description": "Nova grade horária com vigência (RN-CAL-003).",
+  "x-producer": "reference-data-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "from",
+    "to",
+    "calendar"
+  ],
+  "properties": {
+    "from": {
+      "type": "string",
+      "format": "date"
+    },
+    "to": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calendar": {
+      "type": "object",
+      "required": [
+        "coverage",
+        "days",
+        "schedules"
+      ],
+      "properties": {
+        "coverage": {
+          "type": "object",
+          "required": [
+            "from",
+            "to"
+          ],
+          "properties": {
+            "from": {
+              "type": "string",
+              "format": "date"
+            },
+            "to": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "date",
+              "type",
+              "description"
+            ],
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "HOLIDAY"
+                  },
+                  {
+                    "type": "string",
+                    "const": "NO_TRADING"
+                  },
+                  {
+                    "type": "string",
+                    "const": "LATE_OPEN"
+                  }
+                ]
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "schedules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "validFrom",
+              "validTo",
+              "dayType",
+              "phases"
+            ],
+            "properties": {
+              "validFrom": {
+                "type": "string",
+                "format": "date"
+              },
+              "validTo": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dayType": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "BUSINESS_DAY"
+                  },
+                  {
+                    "type": "string",
+                    "const": "LATE_OPEN"
+                  }
+                ]
+              },
+              "phases": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "phase",
+                    "start"
+                  ],
+                  "properties": {
+                    "phase": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "PRE_TRADING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PRE_OPENING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONTINUOUS"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CLOSING_CALL"
+                        },
+                        {
+                          "type": "string",
+                          "const": "POST_CLOSE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CLOSED"
+                        }
+                      ]
+                    },
+                    "start": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "allDaysBusiness": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

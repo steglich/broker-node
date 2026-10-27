@@ -88,6 +88,10 @@ secrets:
     file: ../secrets/db/ledger_migrator
   ledger_blind_index_key:
     file: ../secrets/crypto/ledger_blind_index_key
+  db_reference_data_app:
+    file: ../secrets/db/reference_data_app
+  db_reference_data_migrator:
+    file: ../secrets/db/reference_data_migrator
   db_audit_app:
     file: ../secrets/db/audit_app
   db_audit_migrator:
@@ -746,6 +750,74 @@ services:
       traefik.http.routers.ledger.rule: Host(`ledger.broker.localhost`)
       traefik.http.routers.ledger.entrypoints: websecure
       traefik.http.services.ledger.loadbalancer.server.port: '8080'
+
+  reference-data-migrate:
+    profiles: [core]
+    image: broker/reference-data-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/reference-data-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: reference_data
+      DB_USER: reference_data_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_reference_data_migrator
+    secrets: [db_reference_data_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Instrumentos, universo negociável (dupla aprovação local até o approval-service), regras de
+  # negociação com vigência, histórico de tickers, calendário e grade horária. No sandbox,
+  # CALENDAR_ALL_DAYS_BUSINESS=true (RN-SBX-002).
+  reference-data-service:
+    profiles: [core]
+    image: broker/reference-data-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: reference-data-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: reference_data
+      DB_USER: reference_data_app
+      DB_PASSWORD_FILE: /run/secrets/db_reference_data_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      MAX_TRADABLE_INSTRUMENTS: ${MAX_TRADABLE_INSTRUMENTS:-20}
+      CALENDAR_ALL_DAYS_BUSINESS: ${CALENDAR_ALL_DAYS_BUSINESS:-false}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_reference_data_app
+      - rabbitmq_password
+      - valkey_password
+    networks: [broker]
+    depends_on:
+      reference-data-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.reference.rule: Host(`reference.broker.localhost`)
+      traefik.http.routers.reference.entrypoints: websecure
+      traefik.http.services.reference.loadbalancer.server.port: '8080'
 
   audit-migrate:
     profiles: [core]

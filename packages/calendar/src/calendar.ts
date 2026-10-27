@@ -34,6 +34,7 @@ export interface SessionSchedule {
 export class TradingCalendar {
   private readonly from: BusinessDate;
   private readonly to: BusinessDate;
+  private readonly allDaysBusiness: boolean;
   private readonly special = new Map<number, CalendarDayData>();
   private readonly schedules: ReadonlyArray<
     SessionScheduleData & { fromDay: number; toDay: number }
@@ -42,6 +43,7 @@ export class TradingCalendar {
   constructor(data: CalendarData) {
     this.from = BusinessDate.parse(data.coverage.from);
     this.to = BusinessDate.parse(data.coverage.to);
+    this.allDaysBusiness = data.allDaysBusiness ?? false;
     for (const day of data.days) {
       const d = BusinessDate.parse(day.date);
       if (this.special.has(d.epochDay)) throw new Error(`dia repetido no calendário: ${day.date}`);
@@ -55,9 +57,10 @@ export class TradingCalendar {
     }));
   }
 
-  /** Tipo do dia (§3.1). */
+  /** Tipo do dia (§3.1). No sandbox (`allDaysBusiness`), todo dia é `BUSINESS_DAY`. */
   dayType(date: BusinessDate): DayType {
     this.assertLoaded(date);
+    if (this.allDaysBusiness) return 'BUSINESS_DAY';
     if (date.isWeekend()) return 'WEEKEND';
     return this.special.get(date.epochDay)?.type ?? 'BUSINESS_DAY';
   }

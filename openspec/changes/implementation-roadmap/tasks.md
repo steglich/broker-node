@@ -124,10 +124,10 @@
 
 ## 16. Fase 1 — reference-data-service
 
-- [ ] 16.1 Implementar `instrument` com padrões por tipo, fracionário derivado, status e o consumidor de `market_data.catalog_synced`; verificar o padrão de FII e a busca por `PETR4F` (Ativos §2–§3)
-- [ ] 16.2 Implementar o universo negociável (limite configurável, inclusão/retirada via aprovação com recusa se houver ordens abertas) e `instrument.tradability_changed`; verificar a recusa do 21º instrumento (RN-INS-011..014)
-- [ ] 16.3 Implementar `instrument_symbol_history`, a busca por ticker antigo e as tarefas de renomeação; verificar o aviso "Ticker alterado" (RN-INS-030..033)
-- [ ] 16.4 Implementar `instrument_trading_rules` com vigência (global + sobrescrita), `trading_calendar` e `session_schedule` com vigência, o alerta de 60 dias e `calendar.updated`; verificar a vigência futura e o sandbox sempre útil (RN-CAL-*, RN-SBX-002)
+- [x] 16.1 Implementar `instrument` com padrões por tipo, fracionário derivado, status e o consumidor de `market_data.catalog_synced`; verificar o padrão de FII e a busca por `PETR4F` (Ativos §2–§3)
+- [x] 16.2 Implementar o universo negociável (limite configurável, inclusão/retirada via aprovação com recusa se houver ordens abertas) e `instrument.tradability_changed`; verificar a recusa do 21º instrumento (RN-INS-011..014)
+- [x] 16.3 Implementar `instrument_symbol_history`, a busca por ticker antigo e as tarefas de renomeação; verificar o aviso "Ticker alterado" (RN-INS-030..033)
+- [x] 16.4 Implementar `instrument_trading_rules` com vigência (global + sobrescrita), `trading_calendar` e `session_schedule` com vigência, o alerta de 60 dias e `calendar.updated`; verificar a vigência futura e o sandbox sempre útil (RN-CAL-*, RN-SBX-002)
 
 ## 17. Fase 1 — market-data-service (externo e referência)
 

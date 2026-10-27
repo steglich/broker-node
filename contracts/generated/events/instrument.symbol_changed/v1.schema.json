@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:instrument.symbol_changed:v1",
+  "title": "instrument.symbol_changed v1",
+  "description": "Ticker renomeado; o instrument_id não muda (RN-INS-030).",
+  "x-producer": "reference-data-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "oldSymbol",
+    "newSymbol",
+    "effectiveDate"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "oldSymbol": {
+      "type": "string"
+    },
+    "newSymbol": {
+      "type": "string"
+    },
+    "effectiveDate": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

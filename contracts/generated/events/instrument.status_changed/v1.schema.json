@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:instrument.status_changed:v1",
+  "title": "instrument.status_changed v1",
+  "description": "Status do instrumento mudou (Ativos §5, RN-INS-020).",
+  "x-producer": "reference-data-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "symbol",
+    "from",
+    "to",
+    "reason"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "PENDING"
+        },
+        {
+          "type": "string",
+          "const": "ACTIVE"
+        },
+        {
+          "type": "string",
+          "const": "SUSPENDED"
+        },
+        {
+          "type": "string",
+          "const": "DELISTED"
+        }
+      ]
+    },
+    "to": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "PENDING"
+        },
+        {
+          "type": "string",
+          "const": "ACTIVE"
+        },
+        {
+          "type": "string",
+          "const": "SUSPENDED"
+        },
+        {
+          "type": "string",
+          "const": "DELISTED"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

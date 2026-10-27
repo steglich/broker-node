@@ -92,6 +92,15 @@ secrets:
     file: ../secrets/db/reference_data_app
   db_reference_data_migrator:
     file: ../secrets/db/reference_data_migrator
+  db_market_data_app:
+    file: ../secrets/db/market_data_app
+  db_market_data_migrator:
+    file: ../secrets/db/market_data_migrator
+  # Tokens da brapi (RN-BRP-090/094); vazios no local, que usa as fixtures (RN-BRP-095).
+  brapi_token:
+    file: ../secrets/brapi/token
+  brapi_token_next:
+    file: ../secrets/brapi/token_next
   db_audit_app:
     file: ../secrets/db/audit_app
   db_audit_migrator:
@@ -818,6 +827,86 @@ services:
       traefik.http.routers.reference.rule: Host(`reference.broker.localhost`)
       traefik.http.routers.reference.entrypoints: websecure
       traefik.http.services.reference.loadbalancer.server.port: '8080'
+
+  market-data-migrate:
+    profiles: [core]
+    image: broker/market-data-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/market-data-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: market_data
+      DB_USER: market_data_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_market_data_migrator
+    secrets: [db_market_data_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Adaptador da brapi (orçamento, fila única com líder, cache, quarentena), catálogo, histórico
+  # diário, Ibovespa e preço de referência. Local: MARKET_DATA_PROVIDER=fixture (RN-BRP-095); com
+  # `brapi`, o token vem de infra/secrets/brapi/token.
+  market-data-service:
+    profiles: [core]
+    image: broker/market-data-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: market-data-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: market_data
+      DB_USER: market_data_app
+      DB_PASSWORD_FILE: /run/secrets/db_market_data_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: broker
+      S3_SECRET_KEY_FILE: /run/secrets/minio_root_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      MARKET_DATA_PROVIDER: ${MARKET_DATA_PROVIDER:-fixture}
+      BRAPI_TOKEN_FILE: /run/secrets/brapi_token
+      BRAPI_TOKEN_NEXT_FILE: /run/secrets/brapi_token_next
+      BRAPI_SCHEMA_CHECK_ENABLED: ${BRAPI_SCHEMA_CHECK_ENABLED:-false}
+      SYNTHETIC_NOISE_ENABLED: ${SYNTHETIC_NOISE_ENABLED:-true}
+      CALENDAR_ALL_DAYS_BUSINESS: ${CALENDAR_ALL_DAYS_BUSINESS:-false}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_market_data_app
+      - rabbitmq_password
+      - valkey_password
+      - minio_root_password
+      - brapi_token
+      - brapi_token_next
+    networks: [broker]
+    depends_on:
+      market-data-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.market-data.rule: Host(`market-data.broker.localhost`)
+      traefik.http.routers.market-data.entrypoints: websecure
+      traefik.http.services.market-data.loadbalancer.server.port: '8080'
 
   audit-migrate:
     profiles: [core]

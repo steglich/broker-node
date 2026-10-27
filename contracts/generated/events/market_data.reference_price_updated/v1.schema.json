@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:market_data.reference_price_updated:v1",
+  "title": "market_data.reference_price_updated v1",
+  "description": "Preço de referência: âncora real com glide e ruído semeado só no contínuo, ou override manual (Brapi §8, RN-SYN-001..004/006).",
+  "x-producer": "market-data-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "seq",
+    "price",
+    "origin",
+    "anchorPrice",
+    "externalQuoteTime",
+    "at"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "price": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{4}$"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BRAPI"
+        },
+        {
+          "type": "string",
+          "const": "GLIDE"
+        },
+        {
+          "type": "string",
+          "const": "SYNTHETIC_NOISE"
+        },
+        {
+          "type": "string",
+          "const": "SANDBOX_MODEL"
+        },
+        {
+          "type": "string",
+          "const": "MANUAL"
+        }
+      ]
+    },
+    "anchorPrice": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{4}$"
+    },
+    "externalQuoteTime": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

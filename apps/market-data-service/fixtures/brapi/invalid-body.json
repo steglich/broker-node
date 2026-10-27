@@ -1,0 +1,18 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "JSON truncado.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "ABEV3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "bodyText": "{\"results\": [{\"requestedSymbol\": \"ABEV3\", "
+  }
+}

@@ -1,6 +1,7 @@
 import { TickedClock, type Clock } from '@broker/clock';
 import { ClockTickedV1 } from '@broker/contracts/events/clock.ticked/v1';
 import { MarketDataCatalogSyncedV1 } from '@broker/contracts/events/market_data.catalog_synced/v1';
+import { MarketDataExternalQuoteReceivedV1 } from '@broker/contracts/events/market_data.external_quote_received/v1';
 import { MarketDataInstrumentStaleV1 } from '@broker/contracts/events/market_data.instrument_stale/v1';
 import { MarketDataSymbolRenameDetectedV1 } from '@broker/contracts/events/market_data.symbol_rename_detected/v1';
 import { RoutineTriggeredV1 } from '@broker/contracts/events/routine.triggered/v1';
@@ -139,6 +140,15 @@ export async function createReferenceDataService(d: ReferenceServiceDeps) {
                   conversionRatio?: string;
                 },
               );
+            },
+          },
+          // Cotação válida: sai da defasagem e de PENDING (Ativos §5, RN-INS-020).
+          'market_data.external_quote_received': {
+            definition: MarketDataExternalQuoteReceivedV1,
+            handle: async (trx, e) => {
+              const p = e.payload as { instrumentId: string | null; stale: boolean };
+              if (p.instrumentId && !p.stale)
+                await instruments.onQuoteReceived(store.tx(trx), p.instrumentId);
             },
           },
           'market_data.instrument_stale': {

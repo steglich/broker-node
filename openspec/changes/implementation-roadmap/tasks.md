@@ -131,13 +131,13 @@
 
 ## 17. Fase 1 — market-data-service (externo e referência)
 
-- [ ] 17.1 Definir a porta `MarketDataProvider` e os adaptadores `fixture`, `replay` e `brapi` (ACL, normalização para `external_quote`), com fixtures gravadas cobrindo sucesso, `changed=true`, nulos, `400/401/403/404/429/5xx` e corpo inválido; verificar o mapeamento por teste de contrato (RN-BRP-002/003, RN-QA-022)
-- [ ] 17.2 Implementar a fila única com líder (lease), concorrência 1, intervalo mínimo, prioridades P0–P5, coalescência e disjuntor; verificar a coalescência de 10 pedidos e o disjuntor após 5 falhas (RN-BRP-040..043, RN-BRP-080)
-- [ ] 17.3 Implementar o controlador de orçamento (endpoint de uso, contador local, reserva de 20%, níveis com evento) e o agendamento adaptativo; verificar `EXHAUSTED` no `429` por cota e nenhuma requisição no fim de semana (RN-BRP-030..035, RN-BRP-050..053)
-- [ ] 17.4 Implementar `external_quote_history`, o descarte fora de ordem, a quarentena de saltos, a defasagem e `instrument_stale`, o cache no Valkey, o corpo bruto no MinIO e o snapshot pós-fechamento; verificar a quarentena de 8% e o descarte fora de ordem (RN-BRP-060..072)
-- [ ] 17.5 Implementar o catálogo diário, o histórico diário (`external_daily_candle`) e o Ibovespa externo; verificar `market_data.catalog_synced` com as fixtures
-- [ ] 17.6 Implementar o preço de referência (glide linear, ruído com reversão à média semeado, só em `CONTINUOUS`, override manual, desligável) com `reference_price_updated` e `origin`; verificar a reprodutibilidade pela semente (Brapi §8, RN-SYN-001..004/006)
-- [ ] 17.7 Implementar a segurança do token (segredo, sem log, dois tokens na rotação) e o job semanal de verificação de esquema (desligado por padrão no local); verificar que o log não contém `Authorization` (RN-BRP-090..095, RN-BRP-100)
+- [x] 17.1 Definir a porta `MarketDataProvider` e os adaptadores `fixture`, `replay` e `brapi` (ACL, normalização para `external_quote`), com fixtures gravadas cobrindo sucesso, `changed=true`, nulos, `400/401/403/404/429/5xx` e corpo inválido; verificar o mapeamento por teste de contrato (RN-BRP-002/003, RN-QA-022)
+- [x] 17.2 Implementar a fila única com líder (lease), concorrência 1, intervalo mínimo, prioridades P0–P5, coalescência e disjuntor; verificar a coalescência de 10 pedidos e o disjuntor após 5 falhas (RN-BRP-040..043, RN-BRP-080)
+- [x] 17.3 Implementar o controlador de orçamento (endpoint de uso, contador local, reserva de 20%, níveis com evento) e o agendamento adaptativo; verificar `EXHAUSTED` no `429` por cota e nenhuma requisição no fim de semana (RN-BRP-030..035, RN-BRP-050..053)
+- [x] 17.4 Implementar `external_quote_history`, o descarte fora de ordem, a quarentena de saltos, a defasagem e `instrument_stale`, o cache no Valkey, o corpo bruto no MinIO e o snapshot pós-fechamento; verificar a quarentena de 8% e o descarte fora de ordem (RN-BRP-060..072)
+- [x] 17.5 Implementar o catálogo diário, o histórico diário (`external_daily_candle`) e o Ibovespa externo; verificar `market_data.catalog_synced` com as fixtures
+- [x] 17.6 Implementar o preço de referência (glide linear, ruído com reversão à média semeado, só em `CONTINUOUS`, override manual, desligável) com `reference_price_updated` e `origin`; verificar a reprodutibilidade pela semente (Brapi §8, RN-SYN-001..004/006)
+- [x] 17.7 Implementar a segurança do token (segredo, sem log, dois tokens na rotação) e o job semanal de verificação de esquema (desligado por padrão no local); verificar que o log não contém `Authorization` (RN-BRP-090..095, RN-BRP-100)
 
 ## 18. Fase 1 — notification-service
 

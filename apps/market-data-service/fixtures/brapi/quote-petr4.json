@@ -1,0 +1,49 @@
+{
+  "origin": "recorded",
+  "recordedAt": "2026-10-27",
+  "note": "GET /api/v2/stocks/quote?symbols=PETR4 sem token (ticker de teste, RN-BRP-034).",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "PETR4"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "link": "<https://brapi.dev/versioning.md>; rel=\"deprecation\""
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "PETR4",
+          "symbol": "PETR4",
+          "changed": false,
+          "data": {
+            "shortName": "PETR4",
+            "longName": "Petroleo Brasileiro SA Pfd",
+            "currency": "BRL",
+            "regularMarketPrice": 53.88,
+            "regularMarketDayHigh": 54.23,
+            "regularMarketDayLow": 51.17,
+            "regularMarketDayRange": "51.17 - 54.23",
+            "regularMarketChange": -4.8,
+            "regularMarketChangePercent": -8.18,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": 738658540249,
+            "regularMarketVolume": 141338400,
+            "regularMarketPreviousClose": 58.68,
+            "regularMarketOpen": 51.2,
+            "fiftyTwoWeekRange": "29.53 - 59.79",
+            "fiftyTwoWeekLow": 29.53,
+            "fiftyTwoWeekHigh": 59.79,
+            "logourl": "https://icons.brapi.dev/icons/PETR4.svg"
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

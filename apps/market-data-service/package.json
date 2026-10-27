@@ -1,0 +1,38 @@
+{
+  "name": "@broker/market-data-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Adaptador da brapi (ACL, orçamento, fila única com líder, cache, quarentena), catálogo, histórico diário, Ibovespa e preço de referência com glide e ruído semeado (Brapi, RN-BRP/SYN).",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1144.0",
+    "@broker/calendar": "workspace:*",
+    "@broker/clock": "workspace:*",
+    "@broker/contracts": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/ids": "workspace:*",
+    "@broker/messaging": "workspace:*",
+    "@broker/persistence": "workspace:*",
+    "@broker/service-kit": "workspace:*",
+    "ajv": "8.20.0",
+    "iovalkey": "0.4.0",
+    "kysely": "0.29.6",
+    "pg": "^8.23.1",
+    "typebox": "1.3.34"
+  },
+  "devDependencies": {
+    "@broker/testing": "workspace:*",
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/supertest": "7.2.1",
+    "jose": "6.2.12",
+    "supertest": "7.3.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

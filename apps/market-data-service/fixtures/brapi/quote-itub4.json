@@ -1,0 +1,48 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Mesmo formato da resposta real de PETR4, com valores fictícios.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "ITUB4"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "ITUB4",
+          "symbol": "ITUB4",
+          "changed": false,
+          "data": {
+            "shortName": "ITUB4",
+            "longName": "Itau Unibanco Holding SA Pfd",
+            "currency": "BRL",
+            "regularMarketPrice": 38.15,
+            "regularMarketDayHigh": 38.7,
+            "regularMarketDayLow": 37.85,
+            "regularMarketDayRange": null,
+            "regularMarketChange": -0.25,
+            "regularMarketChangePercent": -0.651,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": 738658540249,
+            "regularMarketVolume": 141338400,
+            "regularMarketPreviousClose": 38.4,
+            "regularMarketOpen": 38.4,
+            "fiftyTwoWeekRange": null,
+            "fiftyTwoWeekLow": 29.53,
+            "fiftyTwoWeekHigh": 59.79,
+            "logourl": "https://icons.brapi.dev/icons/ITUB4.svg"
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

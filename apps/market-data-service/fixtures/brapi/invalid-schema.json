@@ -1,0 +1,25 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "JSON válido fora do esquema v2.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "SUZB3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "ticker": "SUZB3",
+          "price": 55.1
+        }
+      ]
+    }
+  }
+}

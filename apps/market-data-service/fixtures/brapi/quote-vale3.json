@@ -1,0 +1,48 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Mesmo formato da resposta real de PETR4, com valores fictícios.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "VALE3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "VALE3",
+          "symbol": "VALE3",
+          "changed": false,
+          "data": {
+            "shortName": "VALE3",
+            "longName": "Vale SA",
+            "currency": "BRL",
+            "regularMarketPrice": 61.42,
+            "regularMarketDayHigh": 61.72,
+            "regularMarketDayLow": 60.6,
+            "regularMarketDayRange": null,
+            "regularMarketChange": 0.52,
+            "regularMarketChangePercent": 0.854,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": 738658540249,
+            "regularMarketVolume": 141338400,
+            "regularMarketPreviousClose": 60.9,
+            "regularMarketOpen": 60.9,
+            "fiftyTwoWeekRange": null,
+            "fiftyTwoWeekLow": 29.53,
+            "fiftyTwoWeekHigh": 59.79,
+            "logourl": "https://icons.brapi.dev/icons/VALE3.svg"
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

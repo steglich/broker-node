@@ -1,0 +1,18 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "RENT3"
+    }
+  },
+  "response": {
+    "status": 503,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "bodyText": "<html><body>503 Service Unavailable</body></html>"
+  }
+}

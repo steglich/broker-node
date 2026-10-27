@@ -1,0 +1,48 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Campos opcionais nulos: só preço e horário presentes.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "MGLU3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "MGLU3",
+          "symbol": "MGLU3",
+          "changed": false,
+          "data": {
+            "shortName": "MGLU3",
+            "longName": null,
+            "currency": "BRL",
+            "regularMarketPrice": 9.87,
+            "regularMarketDayHigh": null,
+            "regularMarketDayLow": null,
+            "regularMarketDayRange": null,
+            "regularMarketChange": null,
+            "regularMarketChangePercent": null,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": null,
+            "regularMarketVolume": null,
+            "regularMarketPreviousClose": null,
+            "regularMarketOpen": null,
+            "fiftyTwoWeekRange": null,
+            "fiftyTwoWeekLow": null,
+            "fiftyTwoWeekHigh": null,
+            "logourl": null
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Ticker antigo: a brapi devolve o atual com changed=true (ELET3 → AXIA3, conforme /v2/tickers/resolve gravado).",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "ELET3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "ELET3",
+          "symbol": "AXIA3",
+          "changed": true,
+          "data": {
+            "shortName": "AXIA3",
+            "longName": "Axia Energia SA",
+            "currency": "BRL",
+            "regularMarketPrice": 44.1,
+            "regularMarketDayHigh": 44.5,
+            "regularMarketDayLow": 43.6,
+            "regularMarketDayRange": "51.17 - 54.23",
+            "regularMarketChange": 0.3,
+            "regularMarketChangePercent": 0.685,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": 738658540249,
+            "regularMarketVolume": 141338400,
+            "regularMarketPreviousClose": 43.8,
+            "regularMarketOpen": 43.8,
+            "fiftyTwoWeekRange": "29.53 - 59.79",
+            "fiftyTwoWeekLow": 29.53,
+            "fiftyTwoWeekHigh": 59.79,
+            "logourl": "https://icons.brapi.dev/icons/AXIA3.svg"
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

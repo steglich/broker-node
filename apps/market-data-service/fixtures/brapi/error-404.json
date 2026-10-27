@@ -1,0 +1,22 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "XXXX3"
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "error": true,
+      "message": "Não encontramos a ação XXXX3",
+      "code": "NOT_FOUND"
+    }
+  }
+}

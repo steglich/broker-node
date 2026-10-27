@@ -1,0 +1,23 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "BBAS3"
+    }
+  },
+  "response": {
+    "status": 429,
+    "headers": {
+      "content-type": "application/json",
+      "retry-after": "3600"
+    },
+    "body": {
+      "error": true,
+      "message": "Você atingiu o limite mensal de requisições do seu plano (quota exceeded)",
+      "code": "QUOTA_EXCEEDED"
+    }
+  }
+}

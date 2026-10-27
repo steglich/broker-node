@@ -1,0 +1,48 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Sem token a brapi respondeu 401 para ^BVSP; formato igual ao de PETR4.",
+  "request": {
+    "path": "/v2/stocks/quote",
+    "query": {
+      "symbols": "^BVSP"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "^BVSP",
+          "symbol": "^BVSP",
+          "changed": false,
+          "data": {
+            "shortName": "IBOVESPA",
+            "longName": "IBOVESPA",
+            "currency": "BRL",
+            "regularMarketPrice": 146512.0,
+            "regularMarketDayHigh": 148230.0,
+            "regularMarketDayLow": 145980.0,
+            "regularMarketDayRange": null,
+            "regularMarketChange": -1718.0,
+            "regularMarketChangePercent": -1.159,
+            "regularMarketTime": "2026-10-27T12:37:30.000Z",
+            "marketCap": null,
+            "regularMarketVolume": 0,
+            "regularMarketPreviousClose": 148230.0,
+            "regularMarketOpen": 148230.0,
+            "fiftyTwoWeekRange": null,
+            "fiftyTwoWeekLow": 118200.0,
+            "fiftyTwoWeekHigh": 152300.0,
+            "logourl": null
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:38:53.487Z",
+      "took": 0
+    }
+  }
+}

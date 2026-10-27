@@ -1,4 +1,5 @@
-// Consumidores pelo RabbitMQ: catálogo, renomeação e defasagem (market-data) e a rotina diária.
+// Consumidores pelo RabbitMQ: catálogo, renomeação, cotação e defasagem (market-data) e a rotina
+// diária.
 import { uuidv7 } from '@broker/ids';
 import {
   connectStream,
@@ -100,6 +101,42 @@ describe('consumidores do reference-data-service', () => {
       SELECT lot_size, tradable, source FROM instrument WHERE symbol = 'KNRI11'`.execute(env.db)
     ).rows[0];
     expect(knri).toEqual({ lot_size: 1, tradable: false, source: 'BRAPI' });
+
+    // Primeira cotação válida (market_data.external_quote_received): PENDING → ACTIVE.
+    const petr = (
+      await sql<{ id: string; status: string }>`
+      SELECT id, status FROM instrument WHERE symbol = 'PETR4'`.execute(env.db)
+    ).rows[0]!;
+    expect(petr.status).toBe('PENDING');
+    await send('market-data', 'market_data.external_quote_received', petr.id, {
+      instrumentId: petr.id,
+      symbol: 'PETR4',
+      sourceSymbol: 'PETR4',
+      kind: 'INSTRUMENT',
+      lastPrice: '38.45',
+      quoteTime: a.clock.now().toString(),
+      open: null,
+      high: null,
+      low: null,
+      previousClose: null,
+      change: null,
+      changePercent: null,
+      volume: null,
+      marketCap: null,
+      week52Low: null,
+      week52High: null,
+      currency: 'BRL',
+      stale: false,
+      source: 'fixture',
+      fetchedAt: a.clock.now().toString(),
+    });
+    const status = async () =>
+      (
+        await sql<{ status: string }>`SELECT status FROM instrument WHERE id = ${petr.id}`.execute(
+          env.db,
+        )
+      ).rows[0]!.status;
+    await waitUntil(async () => (await status()) === 'ACTIVE', { timeoutMs: 20_000 });
 
     const executionId = uuidv7();
     await send('scheduler', 'routine.triggered', REFERENCE_DAILY_ROUTINE, {

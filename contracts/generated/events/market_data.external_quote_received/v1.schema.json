@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:market_data.external_quote_received:v1",
+  "title": "market_data.external_quote_received v1",
+  "description": "Leitura externa aceita e normalizada (Brapi §9.1, RN-BRP-060); inclui o Ibovespa para o circuit breaker (RN-MD-021).",
+  "x-producer": "market-data-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "symbol",
+    "sourceSymbol",
+    "kind",
+    "lastPrice",
+    "quoteTime",
+    "open",
+    "high",
+    "low",
+    "previousClose",
+    "change",
+    "changePercent",
+    "volume",
+    "marketCap",
+    "week52Low",
+    "week52High",
+    "currency",
+    "stale",
+    "source",
+    "fetchedAt"
+  ],
+  "properties": {
+    "instrumentId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "sourceSymbol": {
+      "type": "string"
+    },
+    "kind": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "INSTRUMENT"
+        },
+        {
+          "type": "string",
+          "const": "INDEX"
+        }
+      ]
+    },
+    "lastPrice": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d+)?$"
+    },
+    "quoteTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "open": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "high": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "low": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "previousClose": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "change": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "changePercent": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "volume": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "marketCap": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "week52Low": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "week52High": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "const": "BRL"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "source": {
+      "type": "string"
+    },
+    "fetchedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

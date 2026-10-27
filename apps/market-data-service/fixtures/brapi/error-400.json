@@ -1,0 +1,24 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "",
+  "request": {
+    "path": "/v2/stocks/historical",
+    "query": {
+      "symbols": "PETR4",
+      "range": "1y",
+      "interval": "1d"
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "error": true,
+      "message": "O range 1y não está disponível no seu plano. Ranges permitidos: 1d, 5d, 1mo, 3mo",
+      "code": "INVALID_RANGE"
+    }
+  }
+}

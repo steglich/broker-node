@@ -42,8 +42,8 @@ calendário e grade horária (catálogo de serviços §4, Ativos, Pregão §3). 
   (tarefa `CALENDAR_COVERAGE_ENDING`, uma por fim de período) e suspensão por defasagem.
 
 Na Fase 1 não há OMS: as ordens abertas vêm de `NoOpenOrdersYet` (zero). A volta de `PENDING` ou
-da suspensão por defasagem para `ACTIVE` é o caso de uso `onQuoteReceived`, que o consumidor da
-cotação do market-data (grupo 17) chama.
+da suspensão por defasagem para `ACTIVE` é o caso de uso `onQuoteReceived`, chamado pelo
+consumidor de `market_data.external_quote_received` (leitura não defasada de um instrumento).
 
 Ticker: o radical aceita dígito (`B3SA3`, sugerido em RN-INS-012), embora a tabela de Ativos §2.1
 diga "4–6 letras"; vale o ticker real da B3.

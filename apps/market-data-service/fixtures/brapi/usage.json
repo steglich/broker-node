@@ -1,0 +1,27 @@
+{
+  "origin": "synthetic",
+  "recordedAt": "2026-10-27",
+  "note": "Formato de Brapi §4 (E9); exige token.",
+  "request": {
+    "path": "/v2/user/usage",
+    "query": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "planName": "free",
+      "planLimit": 15000,
+      "currentUsage": 4200,
+      "remainingUsage": 10800,
+      "usageWindow": {
+        "type": "billing_cycle",
+        "start": "2026-10-10T00:00:00.000Z",
+        "end": "2026-11-10T00:00:00.000Z"
+      },
+      "subscriptionPeriod": null
+    }
+  }
+}

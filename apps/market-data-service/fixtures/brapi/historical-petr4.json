@@ -1,0 +1,63 @@
+{
+  "origin": "recorded",
+  "recordedAt": "2026-10-27",
+  "note": "Gravado com range=5d (sem token o plano devolve poucos dias); servido para range=3mo.",
+  "request": {
+    "path": "/v2/stocks/historical",
+    "query": {
+      "symbols": "PETR4",
+      "range": "3mo",
+      "interval": "1d"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "PETR4",
+          "symbol": "PETR4",
+          "changed": false,
+          "data": {
+            "usedInterval": "1d",
+            "usedRange": "5d",
+            "historicalDataPrice": [
+              {
+                "date": 1792983600,
+                "open": 51.2,
+                "high": 54.23,
+                "low": 51.17,
+                "close": 53.88,
+                "volume": 141338400,
+                "adjustedClose": 53.88
+              },
+              {
+                "date": 1792724400,
+                "open": 58.1,
+                "high": 59.79,
+                "low": 58.01,
+                "close": 58.68,
+                "volume": 58347500,
+                "adjustedClose": 58.68
+              },
+              {
+                "date": 1792638000,
+                "open": 58.39,
+                "high": 58.6,
+                "low": 57.01,
+                "close": 57.83,
+                "volume": 39860200,
+                "adjustedClose": 57.83
+              }
+            ]
+          }
+        }
+      ],
+      "requestedAt": "2026-10-27T12:39:03.531Z",
+      "took": 0
+    }
+  }
+}

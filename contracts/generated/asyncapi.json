@@ -213,8 +213,17 @@
         "market_data.catalog_synced.v1": {
           "$ref": "#/components/messages/market_data.catalog_synced.v1"
         },
+        "market_data.external_quote_received.v1": {
+          "$ref": "#/components/messages/market_data.external_quote_received.v1"
+        },
         "market_data.instrument_stale.v1": {
           "$ref": "#/components/messages/market_data.instrument_stale.v1"
+        },
+        "market_data.provider_budget_level_changed.v1": {
+          "$ref": "#/components/messages/market_data.provider_budget_level_changed.v1"
+        },
+        "market_data.reference_price_updated.v1": {
+          "$ref": "#/components/messages/market_data.reference_price_updated.v1"
         },
         "market_data.symbol_rename_detected.v1": {
           "$ref": "#/components/messages/market_data.symbol_rename_detected.v1"
@@ -573,6 +582,17 @@
         }
       ]
     },
+    "market-data-service.send.market_data.external_quote_received.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.external_quote_received.v1"
+        }
+      ]
+    },
     "market-data-service.send.market_data.instrument_stale.v1": {
       "action": "send",
       "channel": {
@@ -581,6 +601,28 @@
       "messages": [
         {
           "$ref": "#/channels/market-data/messages/market_data.instrument_stale.v1"
+        }
+      ]
+    },
+    "market-data-service.send.market_data.provider_budget_level_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.provider_budget_level_changed.v1"
+        }
+      ]
+    },
+    "market-data-service.send.market_data.reference_price_updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-data"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-data/messages/market_data.reference_price_updated.v1"
         }
       ]
     },
@@ -2468,6 +2510,194 @@
           }
         }
       },
+      "market_data.external_quote_received.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "sourceSymbol",
+          "kind",
+          "lastPrice",
+          "quoteTime",
+          "open",
+          "high",
+          "low",
+          "previousClose",
+          "change",
+          "changePercent",
+          "volume",
+          "marketCap",
+          "week52Low",
+          "week52High",
+          "currency",
+          "stale",
+          "source",
+          "fetchedAt"
+        ],
+        "properties": {
+          "instrumentId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "sourceSymbol": {
+            "type": "string"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "INSTRUMENT"
+              },
+              {
+                "type": "string",
+                "const": "INDEX"
+              }
+            ]
+          },
+          "lastPrice": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d+)?$"
+          },
+          "quoteTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "open": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "high": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "low": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previousClose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "changePercent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "marketCap": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "week52Low": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "week52High": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string"
+          },
+          "fetchedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "market_data.instrument_stale.v1": {
         "type": "object",
         "required": [
@@ -2480,6 +2710,141 @@
             "format": "uuid"
           },
           "staleSince": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "market_data.provider_budget_level_changed.v1": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "remaining",
+          "projectedExhaustion"
+        ],
+        "properties": {
+          "from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "NORMAL"
+              },
+              {
+                "type": "string",
+                "const": "SAVING"
+              },
+              {
+                "type": "string",
+                "const": "CRITICAL"
+              },
+              {
+                "type": "string",
+                "const": "EXHAUSTED"
+              }
+            ]
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "NORMAL"
+              },
+              {
+                "type": "string",
+                "const": "SAVING"
+              },
+              {
+                "type": "string",
+                "const": "CRITICAL"
+              },
+              {
+                "type": "string",
+                "const": "EXHAUSTED"
+              }
+            ]
+          },
+          "remaining": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "projectedExhaustion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "market_data.reference_price_updated.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "seq",
+          "price",
+          "origin",
+          "anchorPrice",
+          "externalQuoteTime",
+          "at"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{4}$"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BRAPI"
+              },
+              {
+                "type": "string",
+                "const": "GLIDE"
+              },
+              {
+                "type": "string",
+                "const": "SYNTHETIC_NOISE"
+              },
+              {
+                "type": "string",
+                "const": "SANDBOX_MODEL"
+              },
+              {
+                "type": "string",
+                "const": "MANUAL"
+              }
+            ]
+          },
+          "anchorPrice": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{4}$"
+          },
+          "externalQuoteTime": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "at": {
             "type": "string",
             "format": "date-time"
           }
@@ -4204,6 +4569,43 @@
           "reference-data-service"
         ]
       },
+      "market_data.external_quote_received.v1": {
+        "name": "market_data.external_quote_received",
+        "title": "market_data.external_quote_received v1",
+        "summary": "Leitura externa aceita e normalizada (Brapi §9.1, RN-BRP-060); inclui o Ibovespa para o circuit breaker (RN-MD-021).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.external_quote_received"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.external_quote_received.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "reference-data-service",
+          "trading-session-service",
+          "engagement-service",
+          "realtime-gateway"
+        ]
+      },
       "market_data.instrument_stale.v1": {
         "name": "market_data.instrument_stale",
         "title": "market_data.instrument_stale v1",
@@ -4237,6 +4639,77 @@
         "x-consumers": [
           "reference-data-service",
           "market-maker-service"
+        ]
+      },
+      "market_data.provider_budget_level_changed.v1": {
+        "name": "market_data.provider_budget_level_changed",
+        "title": "market_data.provider_budget_level_changed v1",
+        "summary": "Nível do orçamento da brapi mudou (Brapi §5.3, RN-BRP-035).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.provider_budget_level_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.provider_budget_level_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "bff-backoffice",
+          "notification-service"
+        ]
+      },
+      "market_data.reference_price_updated.v1": {
+        "name": "market_data.reference_price_updated",
+        "title": "market_data.reference_price_updated v1",
+        "summary": "Preço de referência: âncora real com glide e ruído semeado só no contínuo, ou override manual (Brapi §8, RN-SYN-001..004/006).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "market_data.reference_price_updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/market_data.reference_price_updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-data-service",
+        "x-consumers": [
+          "market-maker-service",
+          "risk-service",
+          "trading-session-service"
         ]
       },
       "market_data.symbol_rename_detected.v1": {

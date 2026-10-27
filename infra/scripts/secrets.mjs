@@ -43,6 +43,10 @@ export function generateSecrets() {
   add('crypto/customer_field_master_key', randomBytes(32).toString('hex'));
   add('crypto/customer_blind_index_key', randomBytes(32).toString('hex'));
   add('crypto/ledger_blind_index_key', randomBytes(32).toString('hex'));
+  // Tokens da brapi (RN-BRP-090/094): vazios por padrão, o local usa fixtures (RN-BRP-095). Para a
+  // brapi real, escreva o token em brapi/token (e o próximo, na rotação, em brapi/token_next).
+  add('brapi/token', '');
+  add('brapi/token_next', '');
   for (const svc of serviceCatalog()) {
     add(`db/${svc}_app`);
     add(`db/${svc}_migrator`);

@@ -1,0 +1,37 @@
+{
+  "origin": "recorded",
+  "recordedAt": "2026-10-27",
+  "note": "",
+  "request": {
+    "path": "/v2/tickers/resolve",
+    "query": {
+      "symbols": "PETR4,ELET3"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "requestedSymbol": "PETR4",
+          "symbol": "PETR4",
+          "changed": false,
+          "status": "active",
+          "effectiveDate": null
+        },
+        {
+          "requestedSymbol": "ELET3",
+          "symbol": "AXIA3",
+          "changed": true,
+          "status": "renamed",
+          "effectiveDate": "2025-11-10"
+        }
+      ],
+      "requestedAt": "2026-10-27T12:39:04.730Z",
+      "took": 0
+    }
+  }
+}

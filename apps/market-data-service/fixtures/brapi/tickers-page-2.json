@@ -1,0 +1,159 @@
+{
+  "origin": "recorded",
+  "recordedAt": "2026-10-27",
+  "note": "Segunda página do recorte.",
+  "request": {
+    "path": "/v2/tickers",
+    "query": {
+      "page": "2",
+      "limit": "2000"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "results": [
+        {
+          "symbol": "ITUB4",
+          "name": "ITAU UNIBANCO HOLDING S.A.",
+          "longName": "Itau Unibanco Holding SA Pfd",
+          "assetType": "stock",
+          "subType": "stock",
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Finance",
+          "subsector": "Bancos Diversificados",
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/ITUB4.svg",
+          "quote": {
+            "lastPrice": 41.7,
+            "changePercent": -13.66,
+            "volume": 147395600,
+            "marketCap": 482909431321
+          }
+        },
+        {
+          "symbol": "PETR4",
+          "name": "PETROLEO BRASILEIRO S.A. PETROBRAS",
+          "longName": "Petroleo Brasileiro SA Pfd",
+          "assetType": "stock",
+          "subType": "stock",
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Energy Minerals",
+          "subsector": "Petróleo e Gás Integrado",
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/PETR4.svg",
+          "quote": {
+            "lastPrice": 53.88,
+            "changePercent": -8.18,
+            "volume": 141338400,
+            "marketCap": 738658540249
+          }
+        },
+        {
+          "symbol": "VALE3",
+          "name": "VALE S.A.",
+          "longName": "Vale S.A.",
+          "assetType": "stock",
+          "subType": "stock",
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Non-Energy Minerals",
+          "subsector": "Mineração de Minerais Metálicos",
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/VALE3.svg",
+          "quote": {
+            "lastPrice": 64.38,
+            "changePercent": 4.01,
+            "volume": 92311400,
+            "marketCap": 256588664596
+          }
+        },
+        {
+          "symbol": "SMAL11",
+          "name": "SMAL11",
+          "longName": "iShares BM&FBOVESPA Small Cap Index Fund",
+          "assetType": "fund",
+          "subType": "etf",
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Miscellaneous",
+          "subsector": null,
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/SMAL11.svg",
+          "quote": {
+            "lastPrice": 98.81,
+            "changePercent": -28.14,
+            "volume": 31356307,
+            "marketCap": null
+          }
+        },
+        {
+          "symbol": "ROXO34",
+          "name": "ROXO34",
+          "longName": "Nu Holdings Ltd. Shs -A- Sponsored Brazilian Depositary Receipt Repr 0.16667 Sh -A-",
+          "assetType": "bdr",
+          "subType": "bdr",
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Finance",
+          "subsector": null,
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/ROXO34.svg",
+          "quote": {
+            "lastPrice": 11.35,
+            "changePercent": -10.84,
+            "volume": 36567131,
+            "marketCap": 327671338518.31903
+          }
+        },
+        {
+          "symbol": "NLFA11",
+          "name": "NLFA11",
+          "longName": "Nu Letras Financeiras Anbima Classe de Indice Responsabilidade Limitada",
+          "assetType": "fund",
+          "subType": null,
+          "exchange": "B3",
+          "currency": "BRL",
+          "sector": "Miscellaneous",
+          "subsector": null,
+          "isActive": true,
+          "logoUrl": "https://icons.brapi.dev/icons/NLFA11.svg",
+          "quote": {
+            "lastPrice": 112.13,
+            "changePercent": 0.1,
+            "volume": 33280,
+            "marketCap": null
+          }
+        }
+      ],
+      "indexes": [
+        {
+          "symbol": "^BVSP",
+          "name": "IBOVESPA",
+          "exchange": "B3",
+          "assetType": "index"
+        },
+        {
+          "symbol": "IFIX.SA",
+          "name": "Índice de Fundos Imobiliários",
+          "exchange": "B3",
+          "assetType": "index"
+        }
+      ],
+      "pagination": {
+        "page": 2,
+        "limit": 6,
+        "totalItems": 12,
+        "totalPages": 2,
+        "hasNextPage": false
+      },
+      "requestedAt": "2026-10-27T12:39:22.322Z",
+      "took": 21
+    }
+  }
+}

@@ -38,6 +38,7 @@ const Config = Type.Object({
 });
 
 const config = loadConfigOrExit(Config);
+// Semente do calendário B3; a cópia local alimentada por `calendar.updated` a substitui (D15).
 const calendar = new TradingCalendar(b3Calendar2026To2027);
 let now = () => Instant.ofEpochMillis(Date.now());
 const logger = createLogger({

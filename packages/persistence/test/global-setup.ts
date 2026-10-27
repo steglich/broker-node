@@ -2,7 +2,14 @@ import { startPostgres } from '@broker/testing/containers';
 import type { TestProject } from 'vitest/node';
 
 /** Databases criados para os testes: um por arquivo, para isolar o estado. */
-export const TEST_SERVICES = ['migrations', 'unordered', 'appendonly', 'crypto', 'leader'] as const;
+export const TEST_SERVICES = [
+  'migrations',
+  'unordered',
+  'appendonly',
+  'crypto',
+  'leader',
+  'calendar',
+] as const;
 
 export interface PostgresInfo {
   host: string;

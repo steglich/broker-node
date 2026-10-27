@@ -112,8 +112,7 @@ const app = await createLedgerService({
   database,
   logger,
   clock,
-  // A semente do calendário B3; a cópia alimentada por `calendar.updated` chega com o
-  // reference-data-service (grupo 16).
+  // Semente do calendário B3; a cópia local alimentada por `calendar.updated` a substitui (D15).
   calendar: new TradingCalendar(b3Calendar2026To2027),
   newId: uuidv7,
   pix: new HttpPixGateway(config.PIX_URL),

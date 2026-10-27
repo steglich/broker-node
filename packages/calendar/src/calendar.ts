@@ -18,6 +18,15 @@ export interface SessionPhaseWindow {
   endsAt: Instant;
 }
 
+interface LoadedCalendar {
+  data: CalendarData;
+  from: BusinessDate;
+  to: BusinessDate;
+  allDaysBusiness: boolean;
+  special: Map<number, CalendarDayData>;
+  schedules: ReadonlyArray<SessionScheduleData & { fromDay: number; toDay: number }>;
+}
+
 export interface SessionSchedule {
   date: BusinessDate;
   dayType: 'BUSINESS_DAY' | 'LATE_OPEN';
@@ -26,43 +35,58 @@ export interface SessionSchedule {
 
 /**
  * Funções de calendário que todos os serviços usam (RN-CAL-002), sobre os dados publicados pelo
- * dono do calendário. Funções puras: a mesma entrada dá sempre a mesma resposta, sem relógio.
+ * dono do calendário. Funções puras sobre os dados carregados: a mesma entrada dá sempre a mesma
+ * resposta, sem relógio. Os dados só mudam por `replace` (a cópia local, D15).
  *
  * Fora do período carregado (`coverage`) as funções falham com `CALENDAR_NOT_LOADED` em vez de
  * supor que o dia é útil (RN-CAL-001 exige o ano corrente e o seguinte carregados).
  */
 export class TradingCalendar {
-  private readonly from: BusinessDate;
-  private readonly to: BusinessDate;
-  private readonly allDaysBusiness: boolean;
-  private readonly special = new Map<number, CalendarDayData>();
-  private readonly schedules: ReadonlyArray<
-    SessionScheduleData & { fromDay: number; toDay: number }
-  >;
+  private state!: LoadedCalendar;
 
   constructor(data: CalendarData) {
-    this.from = BusinessDate.parse(data.coverage.from);
-    this.to = BusinessDate.parse(data.coverage.to);
-    this.allDaysBusiness = data.allDaysBusiness ?? false;
+    this.replace(data);
+  }
+
+  /**
+   * Troca os dados pela versão nova publicada pelo dono (`calendar.updated`, D15). Valida tudo
+   * antes: com dados inválidos lança e o calendário atual continua valendo. Quem guarda a
+   * instância passa a responder com os dados novos.
+   */
+  replace(data: CalendarData): void {
+    const special = new Map<number, CalendarDayData>();
     for (const day of data.days) {
       const d = BusinessDate.parse(day.date);
-      if (this.special.has(d.epochDay)) throw new Error(`dia repetido no calendário: ${day.date}`);
+      if (special.has(d.epochDay)) throw new Error(`dia repetido no calendário: ${day.date}`);
       if (d.isWeekend()) throw new Error(`dia especial num fim de semana: ${day.date}`);
-      this.special.set(d.epochDay, day);
+      special.set(d.epochDay, day);
     }
-    this.schedules = data.schedules.map((s) => ({
-      ...s,
-      fromDay: BusinessDate.parse(s.validFrom).epochDay,
-      toDay: s.validTo === null ? Number.MAX_SAFE_INTEGER : BusinessDate.parse(s.validTo).epochDay,
-    }));
+    this.state = {
+      data,
+      from: BusinessDate.parse(data.coverage.from),
+      to: BusinessDate.parse(data.coverage.to),
+      allDaysBusiness: data.allDaysBusiness ?? false,
+      special,
+      schedules: data.schedules.map((s) => ({
+        ...s,
+        fromDay: BusinessDate.parse(s.validFrom).epochDay,
+        toDay:
+          s.validTo === null ? Number.MAX_SAFE_INTEGER : BusinessDate.parse(s.validTo).epochDay,
+      })),
+    };
+  }
+
+  /** Os dados em uso (os da semente ou os do último `calendar.updated`). */
+  data(): CalendarData {
+    return this.state.data;
   }
 
   /** Tipo do dia (§3.1). No sandbox (`allDaysBusiness`), todo dia é `BUSINESS_DAY`. */
   dayType(date: BusinessDate): DayType {
     this.assertLoaded(date);
-    if (this.allDaysBusiness) return 'BUSINESS_DAY';
+    if (this.state.allDaysBusiness) return 'BUSINESS_DAY';
     if (date.isWeekend()) return 'WEEKEND';
-    return this.special.get(date.epochDay)?.type ?? 'BUSINESS_DAY';
+    return this.state.special.get(date.epochDay)?.type ?? 'BUSINESS_DAY';
   }
 
   /** `is_business_day`: dia com negociação e liquidação (`BUSINESS_DAY` ou `LATE_OPEN`). */
@@ -100,7 +124,7 @@ export class TradingCalendar {
   sessionSchedule(date: BusinessDate): SessionSchedule | null {
     const dayType = this.dayType(date);
     if (dayType !== 'BUSINESS_DAY' && dayType !== 'LATE_OPEN') return null;
-    const schedule = this.schedules.find(
+    const schedule = this.state.schedules.find(
       (s) => s.dayType === dayType && s.fromDay <= date.epochDay && date.epochDay <= s.toDay,
     );
     if (!schedule)
@@ -122,7 +146,7 @@ export class TradingCalendar {
 
   /** Último dia carregado; o dono do calendário alerta 60 dias antes dele (RN-CAL-001). */
   coverageEnd(): BusinessDate {
-    return this.to;
+    return this.state.to;
   }
 
   private step(date: BusinessDate, n: number, direction: 1 | -1): BusinessDate {
@@ -137,9 +161,10 @@ export class TradingCalendar {
   }
 
   private assertLoaded(date: BusinessDate): void {
-    if (date.isBefore(this.from) || date.isAfter(this.to)) {
+    const { from, to } = this.state;
+    if (date.isBefore(from) || date.isAfter(to)) {
       throw new CalendarNotLoadedError(
-        `calendário não carregado para ${date.toString()} (carregado: ${this.from.toString()} a ${this.to.toString()})`,
+        `calendário não carregado para ${date.toString()} (carregado: ${from.toString()} a ${to.toString()})`,
       );
     }
   }

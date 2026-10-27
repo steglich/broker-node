@@ -1,6 +1,8 @@
-import type { TradingCalendar } from '@broker/calendar';
+import type { CalendarData, TradingCalendar } from '@broker/calendar';
+import { CalendarUpdatedV1 } from '@broker/contracts/events/calendar.updated/v1';
 import { RoutineCompletedV1 } from '@broker/contracts/events/routine.completed/v1';
 import { RoutineFailedV1 } from '@broker/contracts/events/routine.failed/v1';
+import { SessionScheduleUpdatedV1 } from '@broker/contracts/events/session_schedule.updated/v1';
 import type { BusinessDate, Instant } from '@broker/domain-kernel';
 import {
   connectStream,
@@ -12,7 +14,7 @@ import {
   topicName,
   type StreamSettings,
 } from '@broker/messaging';
-import { LeaderElector, type DatabaseConfig } from '@broker/persistence';
+import { CalendarReplica, LeaderElector, type DatabaseConfig } from '@broker/persistence';
 import { createService, type BaseConfig, type Logger } from '@broker/service-kit';
 import { sql, type Kysely } from 'kysely';
 import { registerHttp } from './adapters/http.js';
@@ -28,6 +30,7 @@ export interface SchedulerServiceDeps {
   /** Credenciais do banco para a conexão da eleição de líder e o LISTEN do relay. */
   database: DatabaseConfig;
   logger: Logger;
+  /** Semente do calendário; vira a cópia local alimentada por `calendar.updated` (D15). */
   calendar: TradingCalendar;
   newId: () => string;
   clock: { mode: ClockMode; start?: Instant; speedFactor?: number; wall?: () => number };
@@ -36,6 +39,8 @@ export interface SchedulerServiceDeps {
   stream?: StreamSettings;
   /** Contextos cujos tópicos trazem `routine.completed`/`routine.failed` (ex.: clearing, session). */
   resultContexts?: readonly string[];
+  /** Consome `calendar.updated`/`session_schedule.updated` do reference-data (padrão: sim). */
+  consumeCalendarEvents?: boolean;
   /** Intervalo do laço do líder; padrão 1 s, ou menos no modo acelerado (1 tick por minuto virtual). */
   loopIntervalMs?: number;
   leaderHeartbeatMs?: number;
@@ -64,6 +69,9 @@ export async function createSchedulerService(d: SchedulerServiceDeps) {
   const store = new PostgresSchedulerStore(d.db, publisher);
   const clock = await EnvironmentClock.load(store, d.clock, d.clock.wall);
   clockRef.current = clock;
+  // A cópia gravada (se já chegou alguma) substitui a semente antes do primeiro passo.
+  const calendarReplica = new CalendarReplica(d.db, d.calendar);
+  await calendarReplica.refresh();
   const scheduler = new Scheduler({
     store,
     calendar: d.calendar,
@@ -80,6 +88,8 @@ export async function createSchedulerService(d: SchedulerServiceDeps) {
     store,
     calendar: d.calendar,
     isLeader,
+    // O líder pode não ser a instância que consome o calendário: relê a cópia antes de cada passo.
+    refreshCalendar: () => calendarReplica.refresh().then(() => undefined),
     onError: (err) =>
       d.logger.error({ event: 'scheduler.step_failed', err }, 'falha no passo do agendador'),
   });
@@ -105,6 +115,40 @@ export async function createSchedulerService(d: SchedulerServiceDeps) {
       clock,
       onError: (err) => d.logger.error({ event: 'outbox.relay_failed', err }, 'falha no relay'),
     });
+    if (d.consumeCalendarEvents ?? true) {
+      const referenceStream = topicName(environment, 'reference');
+      await ensureSuperStream(client, referenceStream, { maxAge: '30D' });
+      const apply = async (
+        trx: Kysely<unknown>,
+        e: { eventId: string; occurredAt: string; payload: unknown },
+      ) => {
+        const applied = await calendarReplica.apply(trx, {
+          data: (e.payload as { calendar: CalendarData }).calendar,
+          eventId: e.eventId,
+          occurredAt: e.occurredAt,
+        });
+        d.logger.info({ event: 'calendar.replica_updated', applied }, 'cópia local do calendário');
+      };
+      consumers.push(
+        new EventConsumer({
+          name: 'scheduler.calendar',
+          environment,
+          superStream: referenceStream,
+          stream: d.stream,
+          db: d.db,
+          // Todos com a chave `calendar`: em ordem, o último evento é o calendário vigente.
+          ordered: true,
+          startFrom: 'first',
+          newId: d.newId,
+          onError: (err) =>
+            d.logger.error({ event: 'consumer.failed', err }, 'falha no consumidor'),
+          handlers: {
+            'calendar.updated': { definition: CalendarUpdatedV1, handle: apply },
+            'session_schedule.updated': { definition: SessionScheduleUpdatedV1, handle: apply },
+          },
+        }),
+      );
+    }
     for (const context of d.resultContexts ?? []) {
       const handle = async (trx: Kysely<unknown>, payload: Parameters<Scheduler['finish']>[0]) => {
         const outcome = await scheduler.finish(payload, store.tx(trx));
@@ -198,6 +242,7 @@ export async function createSchedulerService(d: SchedulerServiceDeps) {
     runner,
     clock,
     store,
+    calendarReplica,
     elector,
     isLeader,
     async start() {

@@ -1,8 +1,11 @@
+import type { CalendarData } from '@broker/calendar';
 import { TickedClock, type Clock } from '@broker/clock';
 import { AccountOpenedV1 } from '@broker/contracts/events/account.opened/v1';
 import { AccountStatusChangedV1 } from '@broker/contracts/events/account.status_changed/v1';
+import { CalendarUpdatedV1 } from '@broker/contracts/events/calendar.updated/v1';
 import { ClockTickedV1 } from '@broker/contracts/events/clock.ticked/v1';
 import { RoutineTriggeredV1 } from '@broker/contracts/events/routine.triggered/v1';
+import { SessionScheduleUpdatedV1 } from '@broker/contracts/events/session_schedule.updated/v1';
 import { BusinessDate } from '@broker/domain-kernel';
 import {
   connectStream,
@@ -14,7 +17,7 @@ import {
   topicName,
   type StreamSettings,
 } from '@broker/messaging';
-import type { DatabaseConfig } from '@broker/persistence';
+import { CalendarReplica, type DatabaseConfig } from '@broker/persistence';
 import {
   createService,
   IdempotencyStore,
@@ -50,6 +53,8 @@ export interface LedgerServiceDeps extends Omit<LedgerDeps, 'store' | 'holds'> {
   stream?: StreamSettings;
   /** Consome `account.opened`/`account.status_changed` do customer-service. */
   consumeCustomerEvents?: boolean;
+  /** Consome `calendar.updated`/`session_schedule.updated` do reference-data (padrão: sim). */
+  consumeCalendarEvents?: boolean;
   /** Intervalo do laço de saques, devoluções e expirações (padrão 2 s). */
   workerIntervalMs?: number;
 }
@@ -64,6 +69,9 @@ export async function createLedgerService(d: LedgerServiceDeps) {
     newId: d.newId,
   });
   const store = new PostgresLedgerStore(d.db, publisher);
+  // Cópia local do calendário (D15): a semente de `d.calendar` dá lugar à última gravada.
+  const calendarReplica = new CalendarReplica(d.db, d.calendar);
+  await calendarReplica.refresh();
   const holds = d.holds ?? new LocalRiskHoldPort({ store, clock: d.clock, calendar: d.calendar });
   const deps: LedgerDeps = { ...d, store, holds };
   const ledger = new Ledger(deps);
@@ -75,6 +83,8 @@ export async function createLedgerService(d: LedgerServiceDeps) {
 
   /** Uma rodada do trabalho de fundo: tudo idempotente e retomável depois de um reinício. */
   const work = async () => {
+    // As instâncias que não consomem o calendário (SAC) acompanham a cópia gravada.
+    await calendarReplica.refresh();
     await deposits.expireDue();
     await deposits.processRefunds();
     await withdrawals.processDue();
@@ -142,6 +152,34 @@ export async function createLedgerService(d: LedgerServiceDeps) {
                 );
               },
             },
+          },
+        }),
+      );
+    }
+    if (d.consumeCalendarEvents ?? true) {
+      const referenceStream = topicName(environment, 'reference');
+      await ensureSuperStream(client, referenceStream, { maxAge: '30D' });
+      const apply = async (
+        trx: Kysely<unknown>,
+        e: { eventId: string; occurredAt: string; payload: unknown },
+      ) => {
+        await calendarReplica.apply(trx, {
+          data: (e.payload as { calendar: CalendarData }).calendar,
+          eventId: e.eventId,
+          occurredAt: e.occurredAt,
+        });
+      };
+      consumers.push(
+        new EventConsumer({
+          ...base,
+          // Todos com a chave `calendar`: em ordem, o último evento é o calendário vigente.
+          ordered: true,
+          name: 'ledger.calendar',
+          superStream: referenceStream,
+          startFrom: 'first',
+          handlers: {
+            'calendar.updated': { definition: CalendarUpdatedV1, handle: apply },
+            'session_schedule.updated': { definition: SessionScheduleUpdatedV1, handle: apply },
           },
         }),
       );
@@ -216,6 +254,7 @@ export async function createLedgerService(d: LedgerServiceDeps) {
   return {
     service,
     store,
+    calendarReplica,
     holds,
     ledger,
     accounts,

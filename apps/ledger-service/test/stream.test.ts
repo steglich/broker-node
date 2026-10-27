@@ -1,4 +1,6 @@
 // Consumidores pelo RabbitMQ: account.opened/status_changed (customer) e a rotina pix_reconciliation.
+import { b3Calendar2026To2027 } from '@broker/calendar';
+import { BusinessDate } from '@broker/domain-kernel';
 import { uuidv7 } from '@broker/ids';
 import {
   connectStream,
@@ -114,7 +116,32 @@ describe('consumidores do ledger-service', () => {
       stats: { status: 'OK', divergences: 0 },
     });
 
+    // Cópia local do calendário (D15): calendar.updated do reference-data troca o calendário.
+    await ensureSuperStream(client, topicName('test', 'reference'), { maxAge: '30D' });
+    const calendarEvent = {
+      from: '2026-03-20',
+      to: '2026-03-20',
+      calendar: {
+        ...b3Calendar2026To2027,
+        days: [
+          ...b3Calendar2026To2027.days,
+          { date: '2026-03-20', type: 'NO_TRADING', description: 'Pregão suspenso (teste)' },
+        ],
+      },
+    };
+    await send('reference', 'calendar.updated', 'calendar', calendarEvent);
+    const friday = BusinessDate.parse('2026-03-20');
+    await waitUntil(async () => !a.calendarReplica.calendar.isBusinessDay(friday), {
+      timeoutMs: 20_000,
+    });
+    const stored = await sql<{ data: { days: { date: string }[] } }>`
+      SELECT data FROM calendar_replica`.execute(env.db);
+    expect(stored.rows).toHaveLength(1);
+    expect(stored.rows[0]!.data.days.map((x) => x.date)).toContain('2026-03-20');
     await a.stop();
+    // Reinício: a semente dá lugar à cópia gravada.
+    const restarted = await app(env);
+    expect(restarted.calendarReplica.calendar.isBusinessDay(friday)).toBe(false);
     await client.close();
   });
 });

@@ -224,3 +224,27 @@ describe('sandbox sempre útil (RN-SBX-002)', () => {
     expect(() => sandbox.isBusinessDay(d('2028-01-01'))).toThrow(CalendarNotLoadedError);
   });
 });
+
+describe('cópia local substituível (D15)', () => {
+  it('replace troca os dados de quem guarda a instância; dados inválidos não trocam nada', () => {
+    const local = new TradingCalendar(b3Calendar2026To2027);
+    expect(local.isBusinessDay(d('2026-03-20'))).toBe(true);
+    const next: CalendarData = {
+      ...b3Calendar2026To2027,
+      days: [
+        ...b3Calendar2026To2027.days,
+        { date: '2026-03-20', type: 'NO_TRADING', description: 'x' },
+      ],
+    };
+    local.replace(next);
+    expect(local.isBusinessDay(d('2026-03-20'))).toBe(false);
+    expect(local.data()).toBe(next);
+    expect(() =>
+      local.replace({
+        ...next,
+        days: [{ date: '2026-03-21', type: 'HOLIDAY', description: 'sábado' }],
+      }),
+    ).toThrow(/fim de semana/);
+    expect(local.data()).toBe(next);
+  });
+});

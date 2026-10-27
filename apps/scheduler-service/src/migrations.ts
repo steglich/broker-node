@@ -1,4 +1,4 @@
-import { baseMigrations } from '@broker/persistence';
+import { baseMigrations, calendarReplicaMigrations } from '@broker/persistence';
 import { sql, type Kysely } from 'kysely';
 import type { Migration } from 'kysely/migration';
 import { DEFAULT_ROUTINES } from './domain/catalog.js';
@@ -6,6 +6,7 @@ import { DEFAULT_ROUTINES } from './domain/catalog.js';
 /** Migrações do agendador: as da plataforma (outbox, inbox, offsets) e as próprias. */
 export const migrations: Record<string, Migration> = {
   ...baseMigrations,
+  ...calendarReplicaMigrations,
   '0001_scheduler': {
     async up(db: Kysely<unknown>) {
       await sql`

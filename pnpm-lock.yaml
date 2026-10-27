@@ -1054,6 +1054,9 @@ importers:
 
   packages/persistence:
     dependencies:
+      '@broker/calendar':
+        specifier: workspace:*
+        version: link:../calendar
       '@broker/domain-kernel':
         specifier: workspace:*
         version: link:../domain-kernel

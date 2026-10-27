@@ -23,6 +23,8 @@ export class SchedulerRunner {
       store: SchedulerStore;
       calendar: TradingCalendar;
       isLeader: () => boolean;
+      /** Atualiza a cópia local do calendário antes de decidir (D15). */
+      refreshCalendar?: () => Promise<void>;
       onError?: (err: unknown) => void;
     },
   ) {}
@@ -31,6 +33,7 @@ export class SchedulerRunner {
   tick(): Promise<void> {
     return this.serially(async () => {
       if (!this.o.isLeader()) return;
+      await this.o.refreshCalendar?.();
       await this.publishTick();
       await this.o.scheduler.step();
     });
@@ -54,6 +57,7 @@ export class SchedulerRunner {
           `o relógio não volta: ${this.o.clock.now().toString()} → ${target.toString()}`,
         );
       }
+      await this.o.refreshCalendar?.();
       await this.o.scheduler.step();
       const definitions = await this.o.store.definitions();
       for (;;) {

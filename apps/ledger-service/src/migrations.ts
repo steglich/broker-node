@@ -1,4 +1,4 @@
-import { baseMigrations, makeAppendOnly } from '@broker/persistence';
+import { baseMigrations, calendarReplicaMigrations, makeAppendOnly } from '@broker/persistence';
 import { sql, type Kysely } from 'kysely';
 import type { Migration } from 'kysely/migration';
 import { HOUSE_ACCOUNTS } from './domain/chart.js';
@@ -13,6 +13,7 @@ const appRole = async (db: Kysely<unknown>) =>
 /** Migrações do ledger-service: plataforma (outbox, inbox, sagas) e as próprias. */
 export const migrations: Record<string, Migration> = {
   ...baseMigrations,
+  ...calendarReplicaMigrations,
   '0001_ledger': {
     async up(db: Kysely<unknown>) {
       // Plano de contas (Financeiro §3). `last_sequence` é a sequência por conta (RN-LED-007): a

@@ -1,5 +1,6 @@
 export { makeAppendOnly } from './append-only.js';
 export { baseMigrations } from './base-migrations.js';
+export { CalendarReplica, calendarReplicaMigrations } from './calendar-replica.js';
 export { databaseConfigFromEnv, type DatabaseConfig } from './config.js';
 export { createDatabase, createPool } from './database.js';
 export {

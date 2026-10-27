@@ -35,6 +35,7 @@ export async function reset(db: Kysely<unknown>): Promise<void> {
     'outbox_event',
     'processed_event',
     'consumer_offset',
+    'calendar_replica',
   ]) {
     await sql`DELETE FROM ${sql.table(t)}`.execute(db);
   }

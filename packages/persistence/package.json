@@ -2,7 +2,7 @@
   "name": "@broker/persistence",
   "version": "0.0.0",
   "private": true,
-  "description": "Kysely + pg: conexão, numeric↔Decimal, transações, migrador, tabelas técnicas, criptografia de campo e eleição de líder.",
+  "description": "Kysely + pg: conexão, numeric↔Decimal, transações, migrador, tabelas técnicas, criptografia de campo e eleição de líder e cópia local do calendário.",
   "type": "module",
   "exports": {
     ".": {
@@ -20,6 +20,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@broker/calendar": "workspace:*",
     "@broker/domain-kernel": "workspace:*",
     "kysely": "0.29.6",
     "pg": "8.23.1"

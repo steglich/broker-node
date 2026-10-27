@@ -364,6 +364,55 @@ export class Accounts {
     });
   }
 
+  /**
+   * Destinatário de uma notificação, para o notification-service (Notificações §3): o usuário, a
+   * conta e o contato atual. O e-mail e o celular não trafegam nos eventos (RN-MSG-B-013), então
+   * a notificação pergunta aqui na hora de entregar. Antes da aprovação, o contato da solicitação.
+   */
+  async notificationRecipient(ref: {
+    userId?: string;
+    customerId?: string;
+    accountId?: string;
+    applicationId?: string;
+  }) {
+    return this.d.store.transaction(async (tx) => {
+      let customer: CustomerRow | null = null;
+      let account: AccountRow | null = null;
+      if (ref.accountId) {
+        account = await tx.account(ref.accountId);
+        if (account) customer = await tx.customer(account.customerId);
+      } else if (ref.customerId) customer = await tx.customer(ref.customerId);
+      else if (ref.applicationId) customer = await tx.customerOfApplication(ref.applicationId);
+      else if (ref.userId) customer = await tx.customerOfUser(ref.userId);
+
+      if (customer) {
+        account ??= await tx.accountOfCustomer(customer.id);
+        return {
+          userId: customer.userId,
+          customerId: customer.id,
+          accountId: account?.id ?? null,
+          email: this.d.fields.open(customer.emailEnc, CTX.email),
+          phone: this.d.fields.open(customer.phoneEnc, CTX.phone),
+        };
+      }
+      if (ref.accountId || ref.customerId) throw notFound('Destinatário inexistente.');
+      const app = ref.applicationId
+        ? await tx.application(ref.applicationId)
+        : await tx.applicationOfUser(ref.userId!);
+      if (!app) throw notFound('Destinatário inexistente.');
+      const contact = app.draft.contactEnc
+        ? openJson<{ email: string; phone: string }>(this.d, app.draft.contactEnc, CTX.contact)
+        : null;
+      return {
+        userId: app.userId,
+        customerId: null,
+        accountId: null,
+        email: contact?.email ?? null,
+        phone: contact?.phone ?? null,
+      };
+    });
+  }
+
   async removeWithdrawalAccount(caller: Caller, id: string): Promise<void> {
     await this.d.store.transaction(async (tx) => {
       const account = await this.callerAccount(caller, tx);

@@ -373,6 +373,46 @@ describe('14.7 contas de saque (RN-ACC-020/021)', () => {
   });
 });
 
+describe('destinatário das notificações (grupo 18)', () => {
+  it('resolve por conta, cliente, usuário e solicitação; antes da aprovação, o contato da solicitação', async () => {
+    const c = await customer();
+    const token = await serviceToken(a.clock, ['customer:notification-recipients']);
+    const get = (query: Record<string, string>) =>
+      a.http.get('/v1/internal/notification-recipients').query(query).set(bearer(token));
+    const expected = {
+      userId: c.userId,
+      customerId: c.customerId,
+      accountId: c.accountId,
+      email: c.email,
+      phone: c.phone,
+    };
+    for (const q of [
+      { accountId: c.accountId },
+      { customerId: c.customerId },
+      { userId: c.userId },
+    ])
+      expect((await get(q).expect(200)).body).toEqual(expected);
+
+    const pending = await onboardUntil(a, 'CONTACT_VERIFIED');
+    const app = (await a.http.get('/v1/me/onboarding').set(bearer(pending.token)).expect(200)).body;
+    expect((await get({ applicationId: app.applicationId as string }).expect(200)).body).toEqual({
+      userId: pending.userId,
+      customerId: null,
+      accountId: null,
+      email: pending.email,
+      phone: pending.phone,
+    });
+    await get({ userId: uuidv7() }).expect(404);
+    await get({}).expect(400);
+    await get({ userId: c.userId, accountId: c.accountId }).expect(400);
+    await a.http
+      .get('/v1/internal/notification-recipients')
+      .query({ userId: c.userId })
+      .set(bearer(await serviceToken(a.clock, ['customer:holder'])))
+      .expect(403);
+  });
+});
+
 describe('14.7 manutenção cadastral (RN-CAD-001..004)', () => {
   it('troca de nome: fica pendente de revisão; aprovada, o histórico registra a versão anterior', async () => {
     const c = await customer();

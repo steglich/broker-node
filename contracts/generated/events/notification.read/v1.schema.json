@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:notification.read:v1",
+  "title": "notification.read v1",
+  "description": "Notificações marcadas como lidas: os outros canais atualizam o contador.",
+  "x-producer": "notification-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "userId",
+    "notificationIds",
+    "readAt"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "notificationIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "readAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

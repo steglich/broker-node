@@ -143,3 +143,25 @@ export async function startMinio(): Promise<StartedMinio> {
     secretKey,
   };
 }
+
+export interface StartedMailpit {
+  container: StartedTestContainer;
+  smtpHost: string;
+  smtpPort: number;
+  /** `http://host:porta` da API (`/api/v1/messages`). */
+  apiUrl: string;
+}
+
+/** Mailpit (caixa de captura do e-mail, RN-MSG-001) com a imagem do ambiente local. */
+export async function startMailpit(): Promise<StartedMailpit> {
+  const container = await new GenericContainer('axllent/mailpit:v1.31.6')
+    .withExposedPorts(1025, 8025)
+    .withWaitStrategy(Wait.forLogMessage(/\[http\] accessible/))
+    .start();
+  return {
+    container,
+    smtpHost: container.getHost(),
+    smtpPort: container.getMappedPort(1025),
+    apiUrl: `http://${container.getHost()}:${container.getMappedPort(8025)}`,
+  };
+}

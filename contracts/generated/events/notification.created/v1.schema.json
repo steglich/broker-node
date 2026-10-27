@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:notification.created:v1",
+  "title": "notification.created v1",
+  "description": "Notificação gerada; aparece na central in-app (Notificações §7, RN-NOT-G-001).",
+  "x-producer": "notification-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "notificationId",
+    "userId",
+    "accountId",
+    "code",
+    "title",
+    "priority",
+    "channels",
+    "deepLink"
+  ],
+  "properties": {
+    "notificationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "priority": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "LOW"
+        },
+        {
+          "type": "string",
+          "const": "MEDIUM"
+        },
+        {
+          "type": "string",
+          "const": "HIGH"
+        },
+        {
+          "type": "string",
+          "const": "CRITICAL"
+        }
+      ]
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "const": "IN_APP"
+          },
+          {
+            "type": "string",
+            "const": "PUSH"
+          },
+          {
+            "type": "string",
+            "const": "EMAIL"
+          },
+          {
+            "type": "string",
+            "const": "SMS"
+          },
+          {
+            "type": "string",
+            "const": "DESKTOP"
+          }
+        ]
+      }
+    },
+    "deepLink": {
+      "type": "string"
+    }
+  }
+}

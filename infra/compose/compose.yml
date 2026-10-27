@@ -96,6 +96,14 @@ secrets:
     file: ../secrets/db/market_data_app
   db_market_data_migrator:
     file: ../secrets/db/market_data_migrator
+  db_notification_app:
+    file: ../secrets/db/notification_app
+  db_notification_migrator:
+    file: ../secrets/db/notification_migrator
+  notification_field_master_key:
+    file: ../secrets/crypto/notification_field_master_key
+  notification_blind_index_key:
+    file: ../secrets/crypto/notification_blind_index_key
   # Tokens da brapi (RN-BRP-090/094); vazios no local, que usa as fixtures (RN-BRP-095).
   brapi_token:
     file: ../secrets/brapi/token
@@ -907,6 +915,86 @@ services:
       traefik.http.routers.market-data.rule: Host(`market-data.broker.localhost`)
       traefik.http.routers.market-data.entrypoints: websecure
       traefik.http.services.market-data.loadbalancer.server.port: '8080'
+
+  notification-migrate:
+    profiles: [core]
+    image: broker/notification-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/notification-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: notification
+      DB_USER: notification_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_notification_migrator
+    secrets: [db_notification_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Notificações: catálogo, templates pt-BR, preferências, central in-app e entrega por canal
+  # (e-mail no Mailpit, SMS e push no message-sink). Destinatário e contato pelo customer-service.
+  notification-service:
+    profiles: [core]
+    image: broker/notification-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: notification-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: notification
+      DB_USER: notification_app
+      DB_PASSWORD_FILE: /run/secrets/db_notification_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      FIELD_MASTER_KEY_FILE: /run/secrets/notification_field_master_key
+      BLIND_INDEX_KEY_FILE: /run/secrets/notification_blind_index_key
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      CUSTOMER_URL: http://customer-service:8080
+      # Cliente OAuth `notification-service` (client credentials, customer:notification-recipients)
+      # cadastrado no identity pelo backoffice.
+      SERVICE_CLIENT_SECRET: ${NOTIFICATION_SERVICE_CLIENT_SECRET:-}
+      SMTP_HOST: mailpit
+      MESSAGE_SINK_URL: http://message-sink:8080
+      APP_URL: https://app.broker.localhost
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_notification_app
+      - rabbitmq_password
+      - valkey_password
+      - notification_field_master_key
+      - notification_blind_index_key
+    networks: [broker]
+    depends_on:
+      notification-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      message-sink:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.notification.rule: Host(`notification.broker.localhost`)
+      traefik.http.routers.notification.entrypoints: websecure
+      traefik.http.services.notification.loadbalancer.server.port: '8080'
 
   audit-migrate:
     profiles: [core]

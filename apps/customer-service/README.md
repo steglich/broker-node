@@ -22,6 +22,9 @@ cadastral (catálogo de serviços §2, Contas e onboarding). Rotas em
 - **Conta**: matriz de permissões por status, restrições (`NEGATIVE_BALANCE`, `REGISTRATION_EXPIRED`),
   bloqueio pelo backoffice e encerramento com as pendências dos donos (ledger, custódia, aluguel,
   liquidação, IR). Elegibilidade para os outros serviços: `GET /v1/internal/accounts/{id}/eligibility`.
+- **Destinatário das notificações**: `GET /v1/internal/notification-recipients?accountId=|customerId=|userId=|applicationId=`
+  (escopo `customer:notification-recipients`) devolve o usuário, a conta e o contato atual; antes da
+  aprovação, o contato da solicitação. O e-mail e o celular não trafegam nos eventos (RN-MSG-B-013).
 - **Contas de saque**: até 3 chaves PIX de mesma titularidade (consulta ao Banco Simulado), com
   assinatura eletrônica, MFA recente e carência de 24 h.
 - **Cadastro**: e-mail, celular e endereço com assinatura e OTP no canal antigo e no novo; nome e

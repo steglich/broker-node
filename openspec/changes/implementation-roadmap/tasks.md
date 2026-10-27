@@ -141,9 +141,9 @@
 
 ## 18. Fase 1 — notification-service
 
-- [ ] 18.1 Implementar o catálogo, os templates versionados pt-BR, as preferências, a idempotência `(event_id, code, channel)` e a central in-app (listar, marcar lida, 90 dias); verificar a formatação de moeda e a idempotência (RN-NOT-G-001..004/008)
-- [ ] 18.2 Implementar a entrega por canal (Mailpit, message-sink para SMS/push) com retentativa, horário de silêncio, agrupamento de parciais e "ocultar valores"; verificar que a crítica ignora o silêncio (RN-NOT-G-003/005..007)
-- [ ] 18.3 Ligar os consumidores dos eventos da Fase 1 (depósito, saque, onboarding, segurança, status da conta, saldo devedor, suitability); verificar `DEPOSIT_CREDITED` na caixa de captura
+- [x] 18.1 Implementar o catálogo, os templates versionados pt-BR, as preferências, a idempotência `(event_id, code, channel)` e a central in-app (listar, marcar lida, 90 dias); verificar a formatação de moeda e a idempotência (RN-NOT-G-001..004/008)
+- [x] 18.2 Implementar a entrega por canal (Mailpit, message-sink para SMS/push) com retentativa, horário de silêncio, agrupamento de parciais e "ocultar valores"; verificar que a crítica ignora o silêncio (RN-NOT-G-003/005..007)
+- [x] 18.3 Ligar os consumidores dos eventos da Fase 1 (depósito, saque, onboarding, segurança, status da conta, saldo devedor, suitability); verificar `DEPOSIT_CREDITED` na caixa de captura
 
 ## 19. Fase 1 — api-gateway e bff-web
 

@@ -10,7 +10,7 @@ import {
 import { assertWebhookSignature } from '@broker/webhooks';
 import type { TSchema } from 'typebox';
 import type { Accounts } from '../application/accounts.js';
-import { CustomerError, type Caller, type Operator } from '../application/context.js';
+import { CustomerError, invalid, type Caller, type Operator } from '../application/context.js';
 import type {
   Address,
   FinancialProfile,
@@ -467,5 +467,30 @@ export function registerHttp(service: Service, d: HttpDeps): void {
       run(async () => ({
         body: await d.accounts.withdrawalDestination(q.params.id, q.params.withdrawalAccountId),
       })),
+  });
+  // Destinatário e contato atual das notificações (grupo 18).
+  route({
+    method: 'get',
+    path: '/v1/internal/notification-recipients',
+    auth: { principal: 'service', scopes: ['customer:notification-recipients'] },
+    validate: { query: r.notificationRecipient.query },
+    handler: (q) =>
+      run(async () => {
+        const { userId, customerId, accountId, applicationId } = q.query;
+        if ([userId, customerId, accountId, applicationId].filter(Boolean).length !== 1)
+          throw invalid(
+            'ref',
+            'INVALID_REFERENCE',
+            'Informe exatamente um entre userId, customerId, accountId e applicationId.',
+          );
+        return {
+          body: await d.accounts.notificationRecipient({
+            ...(userId ? { userId } : {}),
+            ...(customerId ? { customerId } : {}),
+            ...(accountId ? { accountId } : {}),
+            ...(applicationId ? { applicationId } : {}),
+          }),
+        };
+      }),
   });
 }

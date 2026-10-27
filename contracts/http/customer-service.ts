@@ -429,6 +429,33 @@ export const customerServiceHttp = defineHttpContract({
         404: { description: 'Inexistente ou de outra conta.' },
       },
     },
+    notificationRecipient: {
+      method: 'get',
+      path: '/v1/internal/notification-recipients',
+      summary:
+        'Usuário, conta e contato atual de quem recebe uma notificação (exatamente uma referência); token de serviço com customer:notification-recipients.',
+      auth: 'service',
+      query: Type.Object({
+        userId: Type.Optional(Uuid),
+        customerId: Type.Optional(Uuid),
+        accountId: Type.Optional(Uuid),
+        applicationId: Type.Optional(Uuid),
+      }),
+      responses: {
+        200: {
+          description: 'Destinatário; antes da aprovação, o contato da solicitação.',
+          body: Type.Object({
+            userId: Uuid,
+            customerId: Type.Union([Uuid, Type.Null()]),
+            accountId: Type.Union([Uuid, Type.Null()]),
+            email: Type.Union([Type.String(), Type.Null()]),
+            phone: Type.Union([Type.String(), Type.Null()]),
+          }),
+        },
+        400: { description: 'Nenhuma ou mais de uma referência.' },
+        404: { description: 'Destinatário inexistente.' },
+      },
+    },
   },
 });
 

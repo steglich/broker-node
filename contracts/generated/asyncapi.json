@@ -230,6 +230,28 @@
         }
       }
     },
+    "notification": {
+      "address": "{environment}.notification.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "notification.created.v1": {
+          "$ref": "#/components/messages/notification.created.v1"
+        },
+        "notification.delivered.v1": {
+          "$ref": "#/components/messages/notification.delivered.v1"
+        },
+        "notification.failed.v1": {
+          "$ref": "#/components/messages/notification.failed.v1"
+        },
+        "notification.read.v1": {
+          "$ref": "#/components/messages/notification.read.v1"
+        }
+      }
+    },
     "owner-topics": {
       "address": "{environment}.{context}.events",
       "description": "Tópico do próprio serviço produtor (cada serviço publica no seu).",
@@ -634,6 +656,50 @@
       "messages": [
         {
           "$ref": "#/channels/market-data/messages/market_data.symbol_rename_detected.v1"
+        }
+      ]
+    },
+    "notification-service.send.notification.created.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/notification"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/notification/messages/notification.created.v1"
+        }
+      ]
+    },
+    "notification-service.send.notification.delivered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/notification"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/notification/messages/notification.delivered.v1"
+        }
+      ]
+    },
+    "notification-service.send.notification.failed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/notification"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/notification/messages/notification.failed.v1"
+        }
+      ]
+    },
+    "notification-service.send.notification.read.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/notification"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/notification/messages/notification.read.v1"
         }
       ]
     },
@@ -2874,6 +2940,217 @@
           }
         }
       },
+      "notification.created.v1": {
+        "type": "object",
+        "required": [
+          "notificationId",
+          "userId",
+          "accountId",
+          "code",
+          "title",
+          "priority",
+          "channels",
+          "deepLink"
+        ],
+        "properties": {
+          "notificationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "LOW"
+              },
+              {
+                "type": "string",
+                "const": "MEDIUM"
+              },
+              {
+                "type": "string",
+                "const": "HIGH"
+              },
+              {
+                "type": "string",
+                "const": "CRITICAL"
+              }
+            ]
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "IN_APP"
+                },
+                {
+                  "type": "string",
+                  "const": "PUSH"
+                },
+                {
+                  "type": "string",
+                  "const": "EMAIL"
+                },
+                {
+                  "type": "string",
+                  "const": "SMS"
+                },
+                {
+                  "type": "string",
+                  "const": "DESKTOP"
+                }
+              ]
+            }
+          },
+          "deepLink": {
+            "type": "string"
+          }
+        }
+      },
+      "notification.delivered.v1": {
+        "type": "object",
+        "required": [
+          "notificationId",
+          "userId",
+          "code",
+          "channel",
+          "attempts",
+          "deliveredAt"
+        ],
+        "properties": {
+          "notificationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PUSH"
+              },
+              {
+                "type": "string",
+                "const": "EMAIL"
+              },
+              {
+                "type": "string",
+                "const": "SMS"
+              }
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deliveredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "notification.failed.v1": {
+        "type": "object",
+        "required": [
+          "notificationId",
+          "userId",
+          "code",
+          "channel",
+          "attempts",
+          "reason"
+        ],
+        "properties": {
+          "notificationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "PUSH"
+              },
+              {
+                "type": "string",
+                "const": "EMAIL"
+              },
+              {
+                "type": "string",
+                "const": "SMS"
+              }
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "notification.read.v1": {
+        "type": "object",
+        "required": [
+          "userId",
+          "notificationIds",
+          "readAt"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "notificationIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "readAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "onboarding.approved.v1": {
         "type": "object",
         "required": [
@@ -4745,6 +5022,138 @@
         "x-consumers": [
           "reference-data-service",
           "corporate-actions-service"
+        ]
+      },
+      "notification.created.v1": {
+        "name": "notification.created",
+        "title": "notification.created v1",
+        "summary": "Notificação gerada; aparece na central in-app (Notificações §7, RN-NOT-G-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "notification.created"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/notification.created.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "notification-service",
+        "x-consumers": [
+          "realtime-gateway"
+        ]
+      },
+      "notification.delivered.v1": {
+        "name": "notification.delivered",
+        "title": "notification.delivered v1",
+        "summary": "Entregue num canal externo (Mailpit ou message-sink no local, RN-NOT-G-007).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "notification.delivered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/notification.delivered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "notification-service",
+        "x-consumers": []
+      },
+      "notification.failed.v1": {
+        "name": "notification.failed",
+        "title": "notification.failed v1",
+        "summary": "Falha definitiva da entrega num canal, depois das retentativas (RN-NOT-G-007).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "notification.failed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/notification.failed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "notification-service",
+        "x-consumers": []
+      },
+      "notification.read.v1": {
+        "name": "notification.read",
+        "title": "notification.read v1",
+        "summary": "Notificações marcadas como lidas: os outros canais atualizam o contador.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "notification.read"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/notification.read.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "notification-service",
+        "x-consumers": [
+          "realtime-gateway"
         ]
       },
       "onboarding.approved.v1": {

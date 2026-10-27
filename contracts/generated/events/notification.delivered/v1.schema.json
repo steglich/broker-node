@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:notification.delivered:v1",
+  "title": "notification.delivered v1",
+  "description": "Entregue num canal externo (Mailpit ou message-sink no local, RN-NOT-G-007).",
+  "x-producer": "notification-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "notificationId",
+    "userId",
+    "code",
+    "channel",
+    "attempts",
+    "deliveredAt"
+  ],
+  "properties": {
+    "notificationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "code": {
+      "type": "string"
+    },
+    "channel": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "PUSH"
+        },
+        {
+          "type": "string",
+          "const": "EMAIL"
+        },
+        {
+          "type": "string",
+          "const": "SMS"
+        }
+      ]
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "deliveredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

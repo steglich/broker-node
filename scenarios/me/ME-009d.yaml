@@ -1,0 +1,19 @@
+cenario: ME-009d preço teórico, critério 3 - desequilíbrio vendedor leva ao menor preço
+regras: [RN-AUC-010]
+entradas:
+  instrumento: { band_reference_price: '10.00', auction_random_end_max_s: 0 }
+  fase: PRE_OPENING
+  comandos:
+    - { t: 1, cmd: PhaseChange, fase: PRE_OPENING, auction_id: L1, auction_end_t: 10 }
+    - { t: 2, cmd: NewOrder, id: S1, side: SELL, qty: 300, price: '10.01', account: A }
+    - { t: 3, cmd: NewOrder, id: B1, side: BUY, qty: 100, price: '10.05', account: B }
+    - { t: 10, cmd: PhaseChange, fase: CONTINUOUS, concludes: L1 }
+saidas_esperadas:
+  trades:
+    - { buy: B1, sell: S1, price: '10.01', qty: 100, auction: L1 }
+  leiloes:
+    - { evento: FIM, price: '10.01', qty: 100, fim_efetivo_t: 10 }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.01', orders: [{ id: S1, qty: 200 }] }]
+  fase: CONTINUOUS

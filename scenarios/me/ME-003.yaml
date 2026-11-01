@@ -1,0 +1,28 @@
+cenario: ME-003 ordem a mercado para no preço de proteção
+regras: [RN-ME-030, RN-ORD-001]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.10', account: X }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 100, price: '10.20', account: Y }
+    - { t: 3, cmd: NewOrder, id: S3, side: SELL, qty: 100, price: '10.25', account: Z }
+    - {
+        t: 4,
+        cmd: NewOrder,
+        id: M1,
+        side: BUY,
+        type: MARKET,
+        qty: 500,
+        protection: '10.20',
+        tif: IOC,
+        account: W,
+      }
+saidas_esperadas:
+  trades:
+    - { buy: M1, sell: S1, price: '10.10', qty: 100 }
+    - { buy: M1, sell: S2, price: '10.20', qty: 100 }
+  canceladas:
+    - { id: M1, qty: 300, reason: MARKET_NO_LIQUIDITY }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.25', orders: [{ id: S3, qty: 100 }] }]
+  fase: CONTINUOUS

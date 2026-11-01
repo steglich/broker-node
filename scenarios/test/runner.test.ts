@@ -22,7 +22,11 @@ describe('cenários de referência (golden master)', () => {
   const scenarios = loadScenarios(root);
 
   it('carrega os cenários do repositório (e não as fixtures de teste)', () => {
-    expect(scenarios.map((s) => s.id)).toEqual(['CAL-001', 'FEE-010', 'LED-001']);
+    const ids = scenarios.map((s) => s.id);
+    expect(ids.filter((id) => !id.startsWith('ME-'))).toEqual(['CAL-001', 'FEE-010', 'LED-001']);
+    // A lista mínima da estratégia de testes §3.1.
+    const engine = new Set(ids.filter((id) => id.startsWith('ME-')).map((id) => id.slice(0, 6)));
+    for (let n = 1; n <= 14; n++) expect(engine).toContain(`ME-${String(n).padStart(3, '0')}`);
   });
 
   it.each(scenarios.map((s) => [s.title, s] as const))('%s', (_title, scenario) => {
@@ -88,8 +92,11 @@ describe('runner', () => {
   });
 
   it('erro inesperado e domínio sem adaptador reprovam com mensagem', () => {
-    const noAdapter = parseScenario('cenario: ME-001 t\nentradas: {}\nsaidas_esperadas: {}\n', 'x');
-    expect(runScenario(noAdapter, adapters).error).toBe('sem adaptador para o domínio ME');
+    const noAdapter = parseScenario(
+      'cenario: ZZZ-001 t\nentradas: {}\nsaidas_esperadas: {}\n',
+      'x',
+    );
+    expect(runScenario(noAdapter, adapters).error).toBe('sem adaptador para o domínio ZZZ');
   });
 
   it.each([

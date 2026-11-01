@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.trade_bust:v1",
+  "title": "engine.trade_bust v1",
+  "description": "Comando `TradeBust`, vindo da dupla aprovação (RN-BST-001).",
+  "x-producer": "trading-session-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "tradeId",
+    "approvalRequestId"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tradeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "approvalRequestId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

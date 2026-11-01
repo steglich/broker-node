@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.notes_cutoff:v1",
+  "title": "engine.notes_cutoff v1",
+  "description": "Corte do trade bust: as notas do dia começaram a ser geradas (RN-BST-001). O próprio Motor o coloca no tópico de comandos ao ver a rotina `brokerage_notes`, para ele ser sequenciado com os demais.",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "tradingDate"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tradingDate": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

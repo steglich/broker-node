@@ -1,0 +1,23 @@
+cenario: ME-010 leilão sem cruzamento termina sem preço e sem mudar a referência
+regras: [RN-AUC-020]
+entradas:
+  instrumento:
+    { band_reference_price: '10.00', rejection_band_pct: '0.20', auction_random_end_max_s: 0 }
+  fase: PRE_OPENING
+  comandos:
+    - { t: 1, cmd: PhaseChange, fase: PRE_OPENING, auction_id: L1, auction_end_t: 10 }
+    - { t: 2, cmd: NewOrder, id: B1, side: BUY, qty: 100, price: '9.90', account: A }
+    - { t: 3, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.10', account: B }
+    - { t: 10, cmd: PhaseChange, fase: CONTINUOUS, concludes: L1 }
+    # O túnel de rejeição continua centrado em 10,00.
+    - { t: 11, cmd: NewOrder, id: R1, side: SELL, qty: 100, price: '12.01', account: C }
+saidas_esperadas:
+  trades: []
+  rejeitadas:
+    - { id: R1, reason: PRICE_OUTSIDE_REJECTION_BAND }
+  leiloes:
+    - { evento: FIM, price: null, qty: 0, fim_efetivo_t: 10 }
+  livro_final:
+    bids: [{ price: '9.90', orders: [{ id: B1, qty: 100 }] }]
+    asks: [{ price: '10.10', orders: [{ id: S1, qty: 100 }] }]
+  fase: CONTINUOUS

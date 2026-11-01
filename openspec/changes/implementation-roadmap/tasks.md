@@ -164,12 +164,12 @@
 
 ## 22. Fase 2 — matching-engine
 
-- [ ] 22.1 Implementar o livro em memória (níveis ordenados, FIFO por nível, índice por ordem, `MAIN`/`ODD_LOT`), a prioridade preço-tempo e o preço do negócio; verificar os cenários ME-001, ME-002, ME-005 e ME-014 no runner
-- [ ] 22.2 Implementar `MARKET` com proteção, `IOC`, `FOK` com simulação prévia, STP (três políticas) e iceberg; verificar ME-003, ME-004, ME-006 e ME-007
-- [ ] 22.3 Implementar os túneis (rejeição, estático, dinâmico), o leilão por volatilidade, o acúmulo e o preço teórico com os 5 critérios, a conclusão e o encerramento aleatório semeado; verificar ME-008, ME-009 (cada critério), ME-010, ME-011 e ME-013
-- [ ] 22.4 Implementar o sequenciador por partição (SAC + lease), `engine_journal` com group commit antes do processamento, `engine_output` com `engine_seq` e o relay para `engine.events`; verificar que uma queda após o journal não perde a entrada (RN-ME-003/004, RNF-031)
-- [ ] 22.5 Implementar snapshots (10 mil entradas ou 5 min), a recuperação com replay idêntico, o `HALTED` durante a recuperação, o EOD com reapresentação de GTC/GTD e a API administrativa; verificar ME-012 e o tempo de recuperação < 30 s
-- [ ] 22.6 Criar um benchmark do matching em memória (p99 e vazão por livro) e registrar a linha de base no README do Motor (RNF-002)
+- [x] 22.1 Implementar o livro em memória (níveis ordenados, FIFO por nível, índice por ordem, `MAIN`/`ODD_LOT`), a prioridade preço-tempo e o preço do negócio; verificar os cenários ME-001, ME-002, ME-005 e ME-014 no runner
+- [x] 22.2 Implementar `MARKET` com proteção, `IOC`, `FOK` com simulação prévia, STP (três políticas) e iceberg; verificar ME-003, ME-004, ME-006 e ME-007
+- [x] 22.3 Implementar os túneis (rejeição, estático, dinâmico), o leilão por volatilidade, o acúmulo e o preço teórico com os 5 critérios, a conclusão e o encerramento aleatório semeado; verificar ME-008, ME-009 (cada critério), ME-010, ME-011 e ME-013
+- [x] 22.4 Implementar o sequenciador por partição (SAC + lease), `engine_journal` com group commit antes do processamento, `engine_output` com `engine_seq` e o relay para `engine.events`; verificar que uma queda após o journal não perde a entrada (RN-ME-003/004, RNF-031)
+- [x] 22.5 Implementar snapshots (10 mil entradas ou 5 min), a recuperação com replay idêntico, o `HALTED` durante a recuperação, o EOD com reapresentação de GTC/GTD e a API administrativa; verificar ME-012 e o tempo de recuperação < 30 s
+- [x] 22.6 Criar um benchmark do matching em memória (p99 e vazão por livro) e registrar a linha de base no README do Motor (RNF-002)
 
 ## 23. Fase 2 — market-maker-service
 

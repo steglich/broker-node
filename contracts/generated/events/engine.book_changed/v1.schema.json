@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.book_changed:v1",
+  "title": "engine.book_changed v1",
+  "description": "Delta de um nível do livro (Motor §9).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "side",
+    "price",
+    "newQuantity",
+    "ordersCount"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "side": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BUY"
+        },
+        {
+          "type": "string",
+          "const": "SELL"
+        }
+      ]
+    },
+    "price": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "newQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ordersCount": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

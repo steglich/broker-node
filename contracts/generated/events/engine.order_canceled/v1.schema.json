@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.order_canceled:v1",
+  "title": "engine.order_canceled v1",
+  "description": "Ordem cancelada no Motor, por comando ou regra (RN-CAN-003).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "orderId",
+    "canceledQuantity",
+    "reason"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "canceledQuantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

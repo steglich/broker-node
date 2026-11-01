@@ -1,0 +1,30 @@
+cenario: ME-015 fim do dia esvazia DAY e reapresenta GTC na ordem de prioridade
+regras: [RN-REC-005]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: G1, side: SELL, qty: 100, price: '10.00', tif: GTC, account: X }
+    - { t: 2, cmd: NewOrder, id: D1, side: SELL, qty: 100, price: '10.00', account: Y }
+    - { t: 3, cmd: NewOrder, id: G2, side: SELL, qty: 100, price: '10.00', tif: GTC, account: Z }
+    - { t: 4, cmd: PhaseChange, fase: POST_CLOSE }
+    - { t: 5, cmd: PhaseChange, fase: CLOSED }
+    # Fora do pregão, cancelar uma GTC guardada funciona e a ordem não volta.
+    - { t: 6, cmd: NewOrder, id: G3, side: SELL, qty: 100, price: '10.00', account: Q }
+    - { t: 86400, cmd: PhaseChange, fase: PRE_TRADING }
+    - { t: 86401, cmd: PhaseChange, fase: PRE_OPENING, auction_id: L2, auction_end_t: 86500 }
+    - { t: 86402, cmd: NewOrder, id: N1, side: SELL, qty: 100, price: '10.00', account: W }
+saidas_esperadas:
+  trades: []
+  canceladas:
+    - { id: D1, qty: 100, reason: END_OF_DAY }
+  rejeitadas:
+    - { id: G3, reason: BOOK_NOT_OPEN }
+  livro_final:
+    bids: []
+    asks:
+      [
+        {
+          price: '10.00',
+          orders: [{ id: G1, qty: 100 }, { id: G2, qty: 100 }, { id: N1, qty: 100 }],
+        },
+      ]
+  fase: PRE_OPENING

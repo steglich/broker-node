@@ -1,0 +1,305 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "matching-engine",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/admin/engine/books": {
+      "get": {
+        "operationId": "books",
+        "summary": "Livros conhecidos, com a partição e o estado nesta instância.",
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrumentId",
+                          "partition",
+                          "phase",
+                          "inputSeq"
+                        ],
+                        "properties": {
+                          "instrumentId": {
+                            "type": "string"
+                          },
+                          "partition": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "const": "CLOSED"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "PRE_TRADING"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "PRE_OPENING"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "CONTINUOUS"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "CLOSING_CALL"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "POST_CLOSE"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "AFTER_MARKET"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "VOLATILITY_AUCTION"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "const": "HALTED"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "inputSeq": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/engine/books/{instrumentId}/snapshot": {
+      "post": {
+        "operationId": "snapshot",
+        "summary": "Tira um snapshot agora (RN-REC-001).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshot gravado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "inputSeq"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string"
+                    },
+                    "inputSeq": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Livro não está nesta instância.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/engine/books/{instrumentId}/replay": {
+      "post": {
+        "operationId": "replay",
+        "summary": "Reprocessa o journal à parte, sem efeito nenhum, e compara com as saídas gravadas (ADR-0005).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado da comparação.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "inputs",
+                    "outputs",
+                    "identical",
+                    "firstDifference"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string"
+                    },
+                    "inputs": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "outputs": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "identical": {
+                      "type": "boolean"
+                    },
+                    "firstDifference": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

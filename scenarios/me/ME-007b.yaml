@@ -1,0 +1,23 @@
+cenario: ME-007b STP CANCEL_RESTING tira a ordem em repouso e segue
+regras: [RN-SLF-002]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 100, price: '10.00', account: Z }
+    - {
+        t: 3,
+        cmd: NewOrder,
+        id: B,
+        side: BUY,
+        qty: 100,
+        price: '10.00',
+        stp: CANCEL_RESTING,
+        account: X,
+      }
+saidas_esperadas:
+  trades:
+    - { buy: B, sell: S2, price: '10.00', qty: 100 }
+  canceladas:
+    - { id: S1, qty: 100, reason: SELF_TRADE_PREVENTION }
+  livro_final: { bids: [], asks: [] }
+  fase: CONTINUOUS

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.order_replaced:v1",
+  "title": "engine.order_replaced v1",
+  "description": "Alteração aceita, informando se a prioridade foi mantida (RN-ALT-003).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "orderId",
+    "quantity",
+    "limitPrice",
+    "priorityKept",
+    "version"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "limitPrice": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "priorityKept": {
+      "type": "boolean"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 2
+    }
+  }
+}

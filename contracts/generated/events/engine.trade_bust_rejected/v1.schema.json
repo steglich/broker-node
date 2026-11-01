@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.trade_bust_rejected:v1",
+  "title": "engine.trade_bust_rejected v1",
+  "description": "Pedido de trade bust recusado (RN-BST-001).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "tradeId",
+    "approvalRequestId",
+    "reason"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tradeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "approvalRequestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "TRADE_NOT_FOUND"
+        },
+        {
+          "type": "string",
+          "const": "NOTES_ALREADY_GENERATED"
+        },
+        {
+          "type": "string",
+          "const": "ALREADY_BUSTED"
+        }
+      ]
+    }
+  }
+}

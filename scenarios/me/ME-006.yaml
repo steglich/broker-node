@@ -1,0 +1,18 @@
+cenario: ME-006 iceberg recarrega com nova prioridade
+regras: [RN-ICE-001, RN-ME-011]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: I, side: SELL, qty: 300, display: 100, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: B, side: SELL, qty: 100, price: '10.00', account: Y }
+    # Consome a parte aparente de I: a recarga vai para trás de B.
+    - { t: 3, cmd: NewOrder, id: C1, side: BUY, qty: 100, price: '10.00', account: W }
+    - { t: 4, cmd: NewOrder, id: C2, side: BUY, qty: 150, price: '10.00', account: Z }
+saidas_esperadas:
+  trades:
+    - { buy: C1, sell: I, price: '10.00', qty: 100 }
+    - { buy: C2, sell: B, price: '10.00', qty: 100 }
+    - { buy: C2, sell: I, price: '10.00', qty: 50 }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.00', orders: [{ id: I, qty: 150, aparente: 50 }] }]
+  fase: CONTINUOUS

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.cancel_order:v1",
+  "title": "engine.cancel_order v1",
+  "description": "Comando `CancelOrder` (Catálogo de eventos §6).",
+  "x-producer": "oms-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "orderId",
+    "reason"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

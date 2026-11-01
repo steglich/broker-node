@@ -1,0 +1,24 @@
+cenario: ME-005 redução mantém a prioridade; aumento e mudança de preço perdem
+regras: [RN-ME-011, RN-ALT-002, RN-ALT-003]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: A, side: SELL, qty: 300, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: B, side: SELL, qty: 100, price: '10.00', account: Y }
+    - { t: 3, cmd: NewOrder, id: C, side: SELL, qty: 100, price: '10.00', account: Z }
+    # Reduz: A segue na frente.
+    - { t: 4, cmd: ReplaceOrder, id: A, qty: 100, version: 1 }
+    # Aumenta: B vai para o fim.
+    - { t: 5, cmd: ReplaceOrder, id: B, qty: 200, version: 1 }
+    # Versão velha e quantidade zerando o restante são recusadas.
+    - { t: 6, cmd: ReplaceOrder, id: C, qty: 50, version: 9 }
+    - { t: 7, cmd: NewOrder, id: D, side: BUY, qty: 200, price: '10.00', account: W }
+saidas_esperadas:
+  trades:
+    - { buy: D, sell: A, price: '10.00', qty: 100 }
+    - { buy: D, sell: C, price: '10.00', qty: 100 }
+  rejeitadas:
+    - { id: C, reason: INVALID_REPLACE }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.00', orders: [{ id: B, qty: 200 }] }]
+  fase: CONTINUOUS

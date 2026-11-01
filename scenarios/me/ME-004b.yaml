@@ -1,0 +1,17 @@
+cenario: ME-004b FOK não executável não gera negócio
+regras: [RN-ME-030]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 300, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 300, price: '10.05', account: Y }
+    - { t: 3, cmd: NewOrder, id: F1, side: BUY, qty: 500, price: '10.00', tif: FOK, account: W }
+saidas_esperadas:
+  trades: []
+  canceladas:
+    - { id: F1, qty: 500, reason: FOK_NOT_FILLED }
+  livro_final:
+    bids: []
+    asks:
+      - { price: '10.00', orders: [{ id: S1, qty: 300 }] }
+      - { price: '10.05', orders: [{ id: S2, qty: 300 }] }
+  fase: CONTINUOUS

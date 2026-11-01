@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.snapshot_taken:v1",
+  "title": "engine.snapshot_taken v1",
+  "description": "Controle interno: snapshot gravado (RN-REC-001). Fica fora de `engine_seq`: tirar snapshot não pode mudar as saídas.",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "inputSeq"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

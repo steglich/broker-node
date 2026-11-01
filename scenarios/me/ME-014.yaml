@@ -1,0 +1,35 @@
+cenario: ME-014 fracionário em livro separado, sem casar com o principal
+regras: [RN-INS-003]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: M1, side: SELL, qty: 100, price: '10.00', account: X }
+    - {
+        t: 2,
+        cmd: NewOrder,
+        id: F1,
+        side: BUY,
+        qty: 50,
+        price: '10.00',
+        board: ODD_LOT,
+        account: Y,
+      }
+    - {
+        t: 3,
+        cmd: NewOrder,
+        id: F2,
+        side: SELL,
+        qty: 30,
+        price: '10.00',
+        board: ODD_LOT,
+        account: Z,
+      }
+saidas_esperadas:
+  trades:
+    - { buy: F1, sell: F2, price: '10.00', qty: 30, board: ODD_LOT }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.00', orders: [{ id: M1, qty: 100 }] }]
+  livro_fracionario:
+    bids: [{ price: '10.00', orders: [{ id: F1, qty: 20 }] }]
+    asks: []
+  fase: CONTINUOUS

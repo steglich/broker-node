@@ -1,0 +1,18 @@
+cenario: ME-002 agressão em vários níveis; preço da ordem em repouso
+regras: [RN-ME-020, RN-ME-021, RN-ME-022]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.01', account: X }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 100, price: '10.02', account: Y }
+    - { t: 3, cmd: NewOrder, id: S3, side: SELL, qty: 100, price: '10.03', account: Z }
+    # O limite é 10,05, mas cada negócio sai no preço do nível em repouso; o resto fica no livro.
+    - { t: 4, cmd: NewOrder, id: B1, side: BUY, qty: 400, price: '10.05', account: W }
+saidas_esperadas:
+  trades:
+    - { buy: B1, sell: S1, price: '10.01', qty: 100 }
+    - { buy: B1, sell: S2, price: '10.02', qty: 100 }
+    - { buy: B1, sell: S3, price: '10.03', qty: 100 }
+  livro_final:
+    bids: [{ price: '10.05', orders: [{ id: B1, qty: 100 }] }]
+    asks: []
+  fase: CONTINUOUS

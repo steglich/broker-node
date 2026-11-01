@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.order_rejected:v1",
+  "title": "engine.order_rejected v1",
+  "description": "O Motor recusou uma entrada pelo estado do livro (Motor §4.3).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "orderId",
+    "reason"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BOOK_NOT_OPEN"
+        },
+        {
+          "type": "string",
+          "const": "PRICE_OUTSIDE_REJECTION_BAND"
+        },
+        {
+          "type": "string",
+          "const": "DUPLICATE_ORDER_ID"
+        },
+        {
+          "type": "string",
+          "const": "UNKNOWN_ORDER"
+        },
+        {
+          "type": "string",
+          "const": "INVALID_REPLACE"
+        }
+      ]
+    }
+  }
+}

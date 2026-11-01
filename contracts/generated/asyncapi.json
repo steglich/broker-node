@@ -195,11 +195,35 @@
         "engine.auction_triggered.v1": {
           "$ref": "#/components/messages/engine.auction_triggered.v1"
         },
+        "engine.book_changed.v1": {
+          "$ref": "#/components/messages/engine.book_changed.v1"
+        },
         "engine.book_recovered.v1": {
           "$ref": "#/components/messages/engine.book_recovered.v1"
         },
         "engine.book_recovering.v1": {
           "$ref": "#/components/messages/engine.book_recovering.v1"
+        },
+        "engine.order_booked.v1": {
+          "$ref": "#/components/messages/engine.order_booked.v1"
+        },
+        "engine.order_canceled.v1": {
+          "$ref": "#/components/messages/engine.order_canceled.v1"
+        },
+        "engine.order_rejected.v1": {
+          "$ref": "#/components/messages/engine.order_rejected.v1"
+        },
+        "engine.order_replaced.v1": {
+          "$ref": "#/components/messages/engine.order_replaced.v1"
+        },
+        "engine.snapshot_taken.v1": {
+          "$ref": "#/components/messages/engine.snapshot_taken.v1"
+        },
+        "engine.trade_bust_rejected.v1": {
+          "$ref": "#/components/messages/engine.trade_bust_rejected.v1"
+        },
+        "engine.trade_busted.v1": {
+          "$ref": "#/components/messages/engine.trade_busted.v1"
         },
         "engine.trade_executed.v1": {
           "$ref": "#/components/messages/engine.trade_executed.v1"
@@ -217,8 +241,23 @@
         "engine.band_update.v1": {
           "$ref": "#/components/messages/engine.band_update.v1"
         },
+        "engine.cancel_order.v1": {
+          "$ref": "#/components/messages/engine.cancel_order.v1"
+        },
+        "engine.new_order.v1": {
+          "$ref": "#/components/messages/engine.new_order.v1"
+        },
+        "engine.notes_cutoff.v1": {
+          "$ref": "#/components/messages/engine.notes_cutoff.v1"
+        },
         "engine.phase_change.v1": {
           "$ref": "#/components/messages/engine.phase_change.v1"
+        },
+        "engine.replace_order.v1": {
+          "$ref": "#/components/messages/engine.replace_order.v1"
+        },
+        "engine.trade_bust.v1": {
+          "$ref": "#/components/messages/engine.trade_bust.v1"
         }
       }
     },
@@ -514,6 +553,17 @@
         }
       ]
     },
+    "matching-engine.send.engine.book_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.book_changed.v1"
+        }
+      ]
+    },
     "matching-engine.send.engine.book_recovered.v1": {
       "action": "send",
       "channel": {
@@ -536,6 +586,83 @@
         }
       ]
     },
+    "oms-service.send.engine.cancel_order.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.cancel_order.v1"
+        }
+      ]
+    },
+    "oms-service.send.engine.new_order.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.new_order.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.notes_cutoff.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.notes_cutoff.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.order_booked.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.order_booked.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.order_canceled.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.order_canceled.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.order_rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.order_rejected.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.order_replaced.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.order_replaced.v1"
+        }
+      ]
+    },
     "trading-session-service.send.engine.phase_change.v1": {
       "action": "send",
       "channel": {
@@ -544,6 +671,61 @@
       "messages": [
         {
           "$ref": "#/channels/engine-commands/messages/engine.phase_change.v1"
+        }
+      ]
+    },
+    "oms-service.send.engine.replace_order.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.replace_order.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.snapshot_taken.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.snapshot_taken.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.engine.trade_bust.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.trade_bust.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.trade_bust_rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.trade_bust_rejected.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.trade_busted.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.trade_busted.v1"
         }
       ]
     },
@@ -1978,6 +2160,69 @@
           }
         }
       },
+      "engine.book_changed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "side",
+          "price",
+          "newQuantity",
+          "ordersCount"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BUY"
+              },
+              {
+                "type": "string",
+                "const": "SELL"
+              }
+            ]
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "newQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ordersCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "engine.book_recovered.v1": {
         "type": "object",
         "required": [
@@ -1999,6 +2244,425 @@
           "instrumentId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "engine.cancel_order.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "orderId",
+          "reason"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "engine.new_order.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "orderId",
+          "accountId",
+          "participantType",
+          "board",
+          "side",
+          "type",
+          "quantity",
+          "timeInForce",
+          "stpPolicy"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "participantType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CUSTOMER"
+              },
+              {
+                "type": "string",
+                "const": "MARKET_MAKER"
+              },
+              {
+                "type": "string",
+                "const": "SYSTEM"
+              }
+            ]
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BUY"
+              },
+              {
+                "type": "string",
+                "const": "SELL"
+              }
+            ]
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "LIMIT"
+              },
+              {
+                "type": "string",
+                "const": "MARKET"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limitPrice": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "protectionPrice": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "timeInForce": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "DAY"
+              },
+              {
+                "type": "string",
+                "const": "GTC"
+              },
+              {
+                "type": "string",
+                "const": "GTD"
+              },
+              {
+                "type": "string",
+                "const": "IOC"
+              },
+              {
+                "type": "string",
+                "const": "FOK"
+              }
+            ]
+          },
+          "displayQuantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "stpPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CANCEL_AGGRESSOR"
+              },
+              {
+                "type": "string",
+                "const": "CANCEL_RESTING"
+              },
+              {
+                "type": "string",
+                "const": "CANCEL_BOTH"
+              }
+            ]
+          }
+        }
+      },
+      "engine.notes_cutoff.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "tradingDate"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tradingDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "engine.order_booked.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "orderId",
+          "price",
+          "remainingQuantity",
+          "prioritySeq"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "remainingQuantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "prioritySeq": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "engine.order_canceled.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "orderId",
+          "canceledQuantity",
+          "reason"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "canceledQuantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "engine.order_rejected.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "orderId",
+          "reason"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BOOK_NOT_OPEN"
+              },
+              {
+                "type": "string",
+                "const": "PRICE_OUTSIDE_REJECTION_BAND"
+              },
+              {
+                "type": "string",
+                "const": "DUPLICATE_ORDER_ID"
+              },
+              {
+                "type": "string",
+                "const": "UNKNOWN_ORDER"
+              },
+              {
+                "type": "string",
+                "const": "INVALID_REPLACE"
+              }
+            ]
+          }
+        }
+      },
+      "engine.order_replaced.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "orderId",
+          "quantity",
+          "limitPrice",
+          "priorityKept",
+          "version"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limitPrice": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "priorityKept": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 2
           }
         }
       },
@@ -2105,6 +2769,182 @@
               }
             },
             "additionalProperties": false
+          }
+        }
+      },
+      "engine.replace_order.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "orderId",
+          "expectedVersion"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "newQuantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "newLimitPrice": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "engine.snapshot_taken.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "inputSeq"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "engine.trade_bust.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "tradeId",
+          "approvalRequestId"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approvalRequestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "engine.trade_bust_rejected.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "tradeId",
+          "approvalRequestId",
+          "reason"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approvalRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "TRADE_NOT_FOUND"
+              },
+              {
+                "type": "string",
+                "const": "NOTES_ALREADY_GENERATED"
+              },
+              {
+                "type": "string",
+                "const": "ALREADY_BUSTED"
+              }
+            ]
+          }
+        }
+      },
+      "engine.trade_busted.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "tradeId",
+          "approvalRequestId"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approvalRequestId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -5386,6 +6226,40 @@
           "matching-engine"
         ]
       },
+      "engine.book_changed.v1": {
+        "name": "engine.book_changed",
+        "title": "engine.book_changed v1",
+        "summary": "Delta de um nível do livro (Motor §9).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.book_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.book_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "market-data-service"
+        ]
+      },
       "engine.book_recovered.v1": {
         "name": "engine.book_recovered",
         "title": "engine.book_recovered v1",
@@ -5454,6 +6328,248 @@
           "trading-session-service"
         ]
       },
+      "engine.cancel_order.v1": {
+        "name": "engine.cancel_order",
+        "title": "engine.cancel_order v1",
+        "summary": "Comando `CancelOrder` (Catálogo de eventos §6).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.cancel_order"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.cancel_order.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.new_order.v1": {
+        "name": "engine.new_order",
+        "title": "engine.new_order v1",
+        "summary": "Comando `NewOrder`: ordem nova para o livro (Catálogo de eventos §6).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.new_order"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.new_order.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.notes_cutoff.v1": {
+        "name": "engine.notes_cutoff",
+        "title": "engine.notes_cutoff v1",
+        "summary": "Corte do trade bust: as notas do dia começaram a ser geradas (RN-BST-001). O próprio Motor o coloca no tópico de comandos ao ver a rotina `brokerage_notes`, para ele ser sequenciado com os demais.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.notes_cutoff"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.notes_cutoff.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.order_booked.v1": {
+        "name": "engine.order_booked",
+        "title": "engine.order_booked v1",
+        "summary": "Ordem entrou (ou voltou) no livro; `price` nulo é `MARKET` em leilão (Motor §9).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.order_booked"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.order_booked.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service"
+        ]
+      },
+      "engine.order_canceled.v1": {
+        "name": "engine.order_canceled",
+        "title": "engine.order_canceled v1",
+        "summary": "Ordem cancelada no Motor, por comando ou regra (RN-CAN-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.order_canceled"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.order_canceled.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service"
+        ]
+      },
+      "engine.order_rejected.v1": {
+        "name": "engine.order_rejected",
+        "title": "engine.order_rejected v1",
+        "summary": "O Motor recusou uma entrada pelo estado do livro (Motor §4.3).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.order_rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.order_rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service"
+        ]
+      },
+      "engine.order_replaced.v1": {
+        "name": "engine.order_replaced",
+        "title": "engine.order_replaced v1",
+        "summary": "Alteração aceita, informando se a prioridade foi mantida (RN-ALT-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.order_replaced"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.order_replaced.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service"
+        ]
+      },
       "engine.phase_change.v1": {
         "name": "engine.phase_change",
         "title": "engine.phase_change v1",
@@ -5486,6 +6602,178 @@
         "x-producer": "trading-session-service",
         "x-consumers": [
           "matching-engine"
+        ]
+      },
+      "engine.replace_order.v1": {
+        "name": "engine.replace_order",
+        "title": "engine.replace_order v1",
+        "summary": "Comando `ReplaceOrder`; a perda de prioridade segue RN-ALT-003.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.replace_order"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.replace_order.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.snapshot_taken.v1": {
+        "name": "engine.snapshot_taken",
+        "title": "engine.snapshot_taken v1",
+        "summary": "Controle interno: snapshot gravado (RN-REC-001). Fica fora de `engine_seq`: tirar snapshot não pode mudar as saídas.",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.snapshot_taken"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.snapshot_taken.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": []
+      },
+      "engine.trade_bust.v1": {
+        "name": "engine.trade_bust",
+        "title": "engine.trade_bust v1",
+        "summary": "Comando `TradeBust`, vindo da dupla aprovação (RN-BST-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.trade_bust"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.trade_bust.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.trade_bust_rejected.v1": {
+        "name": "engine.trade_bust_rejected",
+        "title": "engine.trade_bust_rejected v1",
+        "summary": "Pedido de trade bust recusado (RN-BST-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.trade_bust_rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.trade_bust_rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "trading-session-service"
+        ]
+      },
+      "engine.trade_busted.v1": {
+        "name": "engine.trade_busted",
+        "title": "engine.trade_busted v1",
+        "summary": "Negócio cancelado; as ordens não voltam ao livro (RN-BST-001..003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.trade_busted"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.trade_busted.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "clearing-service",
+          "custody-service",
+          "risk-service",
+          "market-data-service"
         ]
       },
       "engine.trade_executed.v1": {

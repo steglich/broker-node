@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.trade_busted:v1",
+  "title": "engine.trade_busted v1",
+  "description": "Negócio cancelado; as ordens não voltam ao livro (RN-BST-001..003).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "tradeId",
+    "approvalRequestId"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tradeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "approvalRequestId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

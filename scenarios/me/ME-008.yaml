@@ -1,0 +1,28 @@
+cenario: ME-008 túnel dinâmico dispara leilão e a ordem para no ponto do disparo
+regras: [RN-AUC-030, RN-AUC-031, RN-AUC-032]
+entradas:
+  instrumento:
+    {
+      band_reference_price: '10.00',
+      static_auction_band_pct: '0.08',
+      dynamic_auction_band_pct: '0.03',
+      volatility_auction_duration_s: 300,
+    }
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 100, price: '10.40', account: Y }
+    - { t: 3, cmd: NewOrder, id: B1, side: BUY, qty: 200, price: '10.50', account: W }
+    # No leilão a ordem entra sem executar, mesmo cruzando.
+    - { t: 4, cmd: NewOrder, id: B2, side: BUY, qty: 100, price: '10.45', account: Z }
+saidas_esperadas:
+  # O 1º negócio define o último preço; 10,40 é 4% acima dele, com túnel de 3%.
+  trades:
+    - { buy: B1, sell: S1, price: '10.00', qty: 100 }
+  leiloes:
+    - { evento: INICIO, tipo: VOLATILITY, motivo: DYNAMIC_BAND, fim_previsto_t: 303 }
+  livro_final:
+    bids:
+      - { price: '10.50', orders: [{ id: B1, qty: 100 }] }
+      - { price: '10.45', orders: [{ id: B2, qty: 100 }] }
+    asks: [{ price: '10.40', orders: [{ id: S2, qty: 100 }] }]
+  fase: VOLATILITY_AUCTION

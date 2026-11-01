@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.replace_order:v1",
+  "title": "engine.replace_order v1",
+  "description": "Comando `ReplaceOrder`; a perda de prioridade segue RN-ALT-003.",
+  "x-producer": "oms-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "orderId",
+    "expectedVersion"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "newQuantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "newLimitPrice": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "expectedVersion": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

@@ -1,0 +1,17 @@
+cenario: ME-007a STP padrão cancela a agressora no ponto do conflito
+regras: [RN-SLF-001]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 100, price: '10.00', account: Y }
+    - { t: 2, cmd: NewOrder, id: S2, side: SELL, qty: 100, price: '10.00', account: X }
+    - { t: 3, cmd: NewOrder, id: S3, side: SELL, qty: 100, price: '10.00', account: Z }
+    - { t: 4, cmd: NewOrder, id: B, side: BUY, qty: 300, price: '10.00', account: X }
+saidas_esperadas:
+  trades:
+    - { buy: B, sell: S1, price: '10.00', qty: 100 }
+  canceladas:
+    - { id: B, qty: 200, reason: SELF_TRADE_PREVENTION }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.00', orders: [{ id: S2, qty: 100 }, { id: S3, qty: 100 }] }]
+  fase: CONTINUOUS

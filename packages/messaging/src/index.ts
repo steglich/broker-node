@@ -51,7 +51,9 @@ export {
 export { OutboxRelay, toEnvelope, type OutboxRelayOptions } from './relay.js';
 export { connectStream, type StreamSettings } from './stream/connection.js';
 export { PartitionedProducer, type ProducedMessage } from './stream/producer.js';
+export { PartitionReader, type PartitionReaderOptions } from './stream/partition-reader.js';
 export { murmur32, partitionIndex } from './stream/routing.js';
 export { ensureSuperStream, topicName, type SuperStreamOptions } from './stream/topology.js';
 export { runDlqCli } from './bin/dlq-cli.js';
 export { activeTraceparent, withConsumerSpan } from './tracing.js';
+export { validationErrors } from './validation.js';

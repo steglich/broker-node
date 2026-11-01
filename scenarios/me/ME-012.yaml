@@ -1,0 +1,29 @@
+cenario: ME-012 recuperação por snapshot e replay gera saídas e estado idênticos
+regras: [RN-REC-001, RN-REC-002, RN-ME-002]
+entradas:
+  instrumento: { band_reference_price: '10.00', auction_random_end_max_s: 30 }
+  comandos:
+    - { t: 1, cmd: NewOrder, id: A, side: SELL, qty: 300, display: 100, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: B, side: SELL, qty: 100, price: '10.00', account: Y }
+    - { t: 3, cmd: NewOrder, id: C, side: BUY, qty: 100, price: '10.00', account: Z }
+    # O snapshot é tirado aqui: iceberg já recarregado, último preço e sequências em andamento.
+    - { t: 4, cmd: ReplaceOrder, id: B, qty: 50, version: 1 }
+    - { t: 5, cmd: NewOrder, id: D, side: BUY, qty: 100, price: '10.00', account: W }
+    - { t: 6, cmd: PhaseChange, fase: PRE_OPENING, auction_id: L1, auction_end_t: 20, seed: '42' }
+    - { t: 7, cmd: NewOrder, id: E, side: BUY, qty: 50, price: '10.01', account: Q }
+    - { t: 8, cmd: PhaseChange, fase: CONTINUOUS, concludes: L1 }
+    - { t: 60, cmd: Tick }
+  recuperacao: { snapshot_apos: 3 }
+saidas_esperadas:
+  trades:
+    - { buy: C, sell: A, price: '10.00', qty: 100 }
+    - { buy: D, sell: B, price: '10.00', qty: 50 }
+    - { buy: D, sell: A, price: '10.00', qty: 50 }
+    - { buy: E, sell: A, price: '10.00', qty: 50, auction: L1 }
+  leiloes:
+    - { evento: FIM, price: '10.00', qty: 50, fim_efetivo_t: 38.033 }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.00', orders: [{ id: A, qty: 100, aparente: 100 }] }]
+  fase: CONTINUOUS
+  recuperacao: { saidas_identicas: true, estado_identico: true }

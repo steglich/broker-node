@@ -1,0 +1,17 @@
+cenario: ME-001 prioridade preço-tempo
+regras: [RN-ME-010, RN-ME-020, RN-ME-022]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: A, side: SELL, qty: 100, price: '10.02', account: X }
+    - { t: 2, cmd: NewOrder, id: B, side: SELL, qty: 100, price: '10.01', account: Y }
+    - { t: 3, cmd: NewOrder, id: C, side: SELL, qty: 100, price: '10.01', account: Z }
+    - { t: 4, cmd: NewOrder, id: D, side: BUY, qty: 250, price: '10.02', account: W }
+saidas_esperadas:
+  trades:
+    - { buy: D, sell: B, price: '10.01', qty: 100 }
+    - { buy: D, sell: C, price: '10.01', qty: 100 }
+    - { buy: D, sell: A, price: '10.02', qty: 50 }
+  livro_final:
+    bids: []
+    asks: [{ price: '10.02', orders: [{ id: A, qty: 50 }] }]
+  fase: CONTINUOUS

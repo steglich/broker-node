@@ -25,6 +25,7 @@
     "@broker/clock": "workspace:*",
     "@broker/domain-kernel": "workspace:*",
     "@broker/ledger-service": "workspace:*",
+    "@broker/matching-engine": "workspace:*",
     "@broker/testing": "workspace:*",
     "yaml": "2.9.1"
   },

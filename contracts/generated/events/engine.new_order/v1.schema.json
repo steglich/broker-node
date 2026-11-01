@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.new_order:v1",
+  "title": "engine.new_order v1",
+  "description": "Comando `NewOrder`: ordem nova para o livro (Catálogo de eventos §6).",
+  "x-producer": "oms-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "orderId",
+    "accountId",
+    "participantType",
+    "board",
+    "side",
+    "type",
+    "quantity",
+    "timeInForce",
+    "stpPolicy"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "participantType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CUSTOMER"
+        },
+        {
+          "type": "string",
+          "const": "MARKET_MAKER"
+        },
+        {
+          "type": "string",
+          "const": "SYSTEM"
+        }
+      ]
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "side": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BUY"
+        },
+        {
+          "type": "string",
+          "const": "SELL"
+        }
+      ]
+    },
+    "type": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "LIMIT"
+        },
+        {
+          "type": "string",
+          "const": "MARKET"
+        }
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "limitPrice": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "protectionPrice": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "timeInForce": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "DAY"
+        },
+        {
+          "type": "string",
+          "const": "GTC"
+        },
+        {
+          "type": "string",
+          "const": "GTD"
+        },
+        {
+          "type": "string",
+          "const": "IOC"
+        },
+        {
+          "type": "string",
+          "const": "FOK"
+        }
+      ]
+    },
+    "displayQuantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stpPolicy": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CANCEL_AGGRESSOR"
+        },
+        {
+          "type": "string",
+          "const": "CANCEL_RESTING"
+        },
+        {
+          "type": "string",
+          "const": "CANCEL_BOTH"
+        }
+      ]
+    }
+  }
+}

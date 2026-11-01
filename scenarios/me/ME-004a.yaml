@@ -1,0 +1,13 @@
+cenario: ME-004a IOC parcial cancela o restante
+regras: [RN-ME-030]
+entradas:
+  comandos:
+    - { t: 1, cmd: NewOrder, id: S1, side: SELL, qty: 300, price: '10.00', account: X }
+    - { t: 2, cmd: NewOrder, id: I1, side: BUY, qty: 500, price: '10.00', tif: IOC, account: W }
+saidas_esperadas:
+  trades:
+    - { buy: I1, sell: S1, price: '10.00', qty: 300 }
+  canceladas:
+    - { id: I1, qty: 200, reason: IOC_REMAINDER }
+  livro_final: { bids: [], asks: [] }
+  fase: CONTINUOUS

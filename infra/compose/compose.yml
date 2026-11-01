@@ -96,6 +96,10 @@ secrets:
     file: ../secrets/db/trading_session_app
   db_trading_session_migrator:
     file: ../secrets/db/trading_session_migrator
+  db_matching_engine_app:
+    file: ../secrets/db/matching_engine_app
+  db_matching_engine_migrator:
+    file: ../secrets/db/matching_engine_migrator
   db_market_data_app:
     file: ../secrets/db/market_data_app
   db_market_data_migrator:
@@ -930,6 +934,66 @@ services:
       traefik.http.routers.session.rule: Host(`session.broker.localhost`)
       traefik.http.routers.session.entrypoints: websecure
       traefik.http.services.session.loadbalancer.server.port: '8080'
+
+  matching-engine-migrate:
+    profiles: [core]
+    image: broker/matching-engine:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/matching-engine'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: matching_engine
+      DB_USER: matching_engine_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_matching_engine_migrator
+    secrets: [db_matching_engine_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Livros em memória, matching, leilões, journal e snapshots (D12). Sem rota de negócio: ordem só
+  # entra por `engine.commands`; a API é administrativa (Catálogo §9).
+  matching-engine:
+    profiles: [core]
+    image: broker/matching-engine:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: matching-engine
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: matching_engine
+      DB_USER: matching_engine_app
+      DB_PASSWORD_FILE: /run/secrets/db_matching_engine_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_matching_engine_app
+      - rabbitmq_password
+      - valkey_password
+    networks: [broker]
+    depends_on:
+      matching-engine-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
 
   market-data-migrate:
     profiles: [core]

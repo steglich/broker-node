@@ -24,7 +24,7 @@ export default defineEventContract({
   producer: 'trading-session-service',
   context: 'engine',
   kind: 'commands',
-  consumers: ['matching-engine'],
+  consumers: ['matching-engine', 'market-maker-service'],
   summary:
     'Comando `BandUpdate`: referência dos túneis do pregão e regras de túnel (RN-INS-040, RN-FCH-002).',
 });

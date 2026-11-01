@@ -173,9 +173,9 @@
 
 ## 23. Fase 2 — market-maker-service
 
-- [ ] 23.1 Implementar o cálculo das cotações (meio-spread, passo, inclinação, níveis, quantidades, arredondamento direcional) e as garantias de forma e de inventário; verificar com testes de propriedade `bid_1 < ask_1` e preços dentro do túnel (Motor §6.3, RN-SMM-001/002)
-- [ ] 23.2 Implementar a recotação (limiar, nível executado, fase, manutenção) por cancelar + nova ordem, a varredura limitada, o comportamento por fase e o alargamento por defasagem; verificar o cancelamento total em `HALTED` e o spread ×8 após 3 h (RN-SMM-010..012/032)
-- [ ] 23.3 Implementar a conta `MARKET_MAKER`, o estoque inicial por emissão simulada (custódia do FMS, criada na Fase 3 como movimento retroativo pelo evento de ativação), o kill switch e as métricas `smm.*`; verificar o kill switch global (RN-SMM-020..022/030/031)
+- [x] 23.1 Implementar o cálculo das cotações (meio-spread, passo, inclinação, níveis, quantidades, arredondamento direcional) e as garantias de forma e de inventário; verificar com testes de propriedade `bid_1 < ask_1` e preços dentro do túnel (Motor §6.3, RN-SMM-001/002)
+- [x] 23.2 Implementar a recotação (limiar, nível executado, fase, manutenção) por cancelar + nova ordem, a varredura limitada, o comportamento por fase e o alargamento por defasagem; verificar o cancelamento total em `HALTED` e o spread ×8 após 3 h (RN-SMM-010..012/032)
+- [x] 23.3 Implementar a conta `MARKET_MAKER`, o estoque inicial por emissão simulada (custódia do FMS, criada na Fase 3 como movimento retroativo pelo evento de ativação), o kill switch e as métricas `smm.*`; verificar o kill switch global (RN-SMM-020..022/030/031)
 
 ## 24. Fase 2 — risk-service (à vista)
 

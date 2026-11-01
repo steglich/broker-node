@@ -22,6 +22,6 @@ export const EngineBookChangedV1 = defineEvent({
 export default defineEventContract({
   definition: EngineBookChangedV1,
   producer: 'matching-engine',
-  consumers: ['market-data-service'],
+  consumers: ['market-data-service', 'market-maker-service'],
   summary: 'Delta de um nível do livro (Motor §9).',
 });

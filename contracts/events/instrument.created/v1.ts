@@ -18,6 +18,7 @@ export default defineEventContract({
     'risk-service',
     'custody-service',
     'engagement-service',
+    'market-maker-service',
   ],
   summary: 'Instrumento cadastrado (brapi ou manual), com o estado completo (Ativos §2).',
 });

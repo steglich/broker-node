@@ -18,6 +18,7 @@ export default defineEventContract({
     'risk-service',
     'custody-service',
     'engagement-service',
+    'market-maker-service',
   ],
   summary: 'Instrumento alterado; traz o estado completo para a cópia local dos consumidores.',
 });

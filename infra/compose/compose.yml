@@ -100,6 +100,10 @@ secrets:
     file: ../secrets/db/matching_engine_app
   db_matching_engine_migrator:
     file: ../secrets/db/matching_engine_migrator
+  db_market_maker_app:
+    file: ../secrets/db/market_maker_app
+  db_market_maker_migrator:
+    file: ../secrets/db/market_maker_migrator
   db_market_data_app:
     file: ../secrets/db/market_data_app
   db_market_data_migrator:
@@ -994,6 +998,71 @@ services:
       valkey:
         condition: service_healthy
     <<: [*ready-check, *small]
+
+  market-maker-migrate:
+    profiles: [core]
+    image: broker/market-maker-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/market-maker-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: market_maker
+      DB_USER: market_maker_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_market_maker_migrator
+    secrets: [db_market_maker_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Formador de Mercado Simulado (Motor §6): cotações, recotação, inventário e kill switch. Ordens só
+  # por `engine.commands`, sem passar por Risco, custos nem IR (RN-SMM-022).
+  market-maker-service:
+    profiles: [core]
+    image: broker/market-maker-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: market-maker-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: market_maker
+      DB_USER: market_maker_app
+      DB_PASSWORD_FILE: /run/secrets/db_market_maker_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_market_maker_app
+      - rabbitmq_password
+      - valkey_password
+    networks: [broker]
+    depends_on:
+      market-maker-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.smm.rule: Host(`smm.broker.localhost`)
+      traefik.http.routers.smm.entrypoints: websecure
+      traefik.http.services.smm.loadbalancer.server.port: '8080'
 
   market-data-migrate:
     profiles: [core]

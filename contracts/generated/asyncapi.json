@@ -385,6 +385,25 @@
           "$ref": "#/components/messages/session.trading_day_opened.v1"
         }
       }
+    },
+    "market-maker": {
+      "address": "{environment}.market-maker.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "smm.instrument_activated.v1": {
+          "$ref": "#/components/messages/smm.instrument_activated.v1"
+        },
+        "smm.metrics.v1": {
+          "$ref": "#/components/messages/smm.metrics.v1"
+        },
+        "smm.status_changed.v1": {
+          "$ref": "#/components/messages/smm.status_changed.v1"
+        }
+      }
     }
   },
   "operations": {
@@ -1232,6 +1251,39 @@
       "messages": [
         {
           "$ref": "#/channels/reference/messages/session_schedule.updated.v1"
+        }
+      ]
+    },
+    "market-maker-service.send.smm.instrument_activated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-maker"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-maker/messages/smm.instrument_activated.v1"
+        }
+      ]
+    },
+    "market-maker-service.send.smm.metrics.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-maker"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-maker/messages/smm.metrics.v1"
+        }
+      ]
+    },
+    "market-maker-service.send.smm.status_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/market-maker"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/market-maker/messages/smm.status_changed.v1"
         }
       ]
     },
@@ -5484,6 +5536,185 @@
           }
         }
       },
+      "smm.instrument_activated.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "symbol",
+          "accountId",
+          "initialStock",
+          "activatedAt"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "initialStock": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "activatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "smm.metrics.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "inventory",
+          "realizedPnl",
+          "unrealizedPnl",
+          "volume",
+          "requotes",
+          "effectiveSpreadBps",
+          "quotedSeconds",
+          "bestBid",
+          "bestAsk",
+          "at"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "inventory": {
+            "type": "integer"
+          },
+          "realizedPnl": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d+)?$"
+          },
+          "unrealizedPnl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "volume": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "requotes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "effectiveSpreadBps": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quotedSeconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bestBid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bestAsk": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "smm.status_changed.v1": {
+        "type": "object",
+        "required": [
+          "scope",
+          "status",
+          "reason",
+          "actorId",
+          "approvalRequestId"
+        ],
+        "properties": {
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "GLOBAL"
+              },
+              {
+                "type": "string",
+                "format": "uuid"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ON"
+              },
+              {
+                "type": "string",
+                "const": "OFF"
+              },
+              {
+                "type": "string",
+                "const": "STOPPED"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actorId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approvalRequestId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "suitability.assessed.v1": {
         "type": "object",
         "required": [
@@ -6119,7 +6350,8 @@
         "x-producer": "matching-engine",
         "x-consumers": [
           "trading-session-service",
-          "market-data-service"
+          "market-data-service",
+          "market-maker-service"
         ]
       },
       "engine.auction_indicative.v1": {
@@ -6223,7 +6455,8 @@
         },
         "x-producer": "trading-session-service",
         "x-consumers": [
-          "matching-engine"
+          "matching-engine",
+          "market-maker-service"
         ]
       },
       "engine.book_changed.v1": {
@@ -6257,7 +6490,8 @@
         },
         "x-producer": "matching-engine",
         "x-consumers": [
-          "market-data-service"
+          "market-data-service",
+          "market-maker-service"
         ]
       },
       "engine.book_recovered.v1": {
@@ -6331,7 +6565,7 @@
       "engine.cancel_order.v1": {
         "name": "engine.cancel_order",
         "title": "engine.cancel_order v1",
-        "summary": "Comando `CancelOrder` (Catálogo de eventos §6).",
+        "summary": "Comando `CancelOrder`; o FMS também publica (Catálogo de eventos §6).",
         "contentType": "application/json",
         "payload": {
           "allOf": [
@@ -6365,7 +6599,7 @@
       "engine.new_order.v1": {
         "name": "engine.new_order",
         "title": "engine.new_order v1",
-        "summary": "Comando `NewOrder`: ordem nova para o livro (Catálogo de eventos §6).",
+        "summary": "Comando `NewOrder`: ordem nova para o livro; o FMS também publica (Catálogo de eventos §6).",
         "contentType": "application/json",
         "payload": {
           "allOf": [
@@ -6773,7 +7007,8 @@
           "clearing-service",
           "custody-service",
           "risk-service",
-          "market-data-service"
+          "market-data-service",
+          "market-maker-service"
         ]
       },
       "engine.trade_executed.v1": {
@@ -7162,7 +7397,8 @@
           "oms-service",
           "risk-service",
           "custody-service",
-          "engagement-service"
+          "engagement-service",
+          "market-maker-service"
         ]
       },
       "instrument.status_changed.v1": {
@@ -7347,7 +7583,8 @@
           "oms-service",
           "risk-service",
           "custody-service",
-          "engagement-service"
+          "engagement-service",
+          "market-maker-service"
         ]
       },
       "ledger.balance_changed.v1": {
@@ -8404,6 +8641,108 @@
           "scheduler-service",
           "trading-session-service",
           "ledger-service"
+        ]
+      },
+      "smm.instrument_activated.v1": {
+        "name": "smm.instrument_activated",
+        "title": "smm.instrument_activated v1",
+        "summary": "Instrumento ativado no FMS, uma vez só: a custódia registra o estoque inicial, retroativo na Fase 3 (RN-SMM-020, RN-INS-014).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "smm.instrument_activated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/smm.instrument_activated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-maker-service",
+        "x-consumers": [
+          "custody-service"
+        ]
+      },
+      "smm.metrics.v1": {
+        "name": "smm.metrics",
+        "title": "smm.metrics v1",
+        "summary": "Métricas do FMS por instrumento, a cada `smm_refresh_interval` (RN-SMM-031).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "smm.metrics"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/smm.metrics.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-maker-service",
+        "x-consumers": [
+          "reporting-service"
+        ]
+      },
+      "smm.status_changed.v1": {
+        "name": "smm.status_changed",
+        "title": "smm.status_changed v1",
+        "summary": "O FMS foi ligado, desligado (kill switch) ou parou de cotar (RN-SMM-030/032).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "smm.status_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/smm.status_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "market-maker-service",
+        "x-consumers": [
+          "audit-service"
         ]
       },
       "suitability.assessed.v1": {

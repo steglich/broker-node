@@ -37,5 +37,6 @@ export default defineEventContract({
   context: 'engine',
   kind: 'commands',
   consumers: ['matching-engine'],
-  summary: 'Comando `NewOrder`: ordem nova para o livro (Catálogo de eventos §6).',
+  summary:
+    'Comando `NewOrder`: ordem nova para o livro; o FMS também publica (Catálogo de eventos §6).',
 });

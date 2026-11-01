@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:smm.status_changed:v1",
+  "title": "smm.status_changed v1",
+  "description": "O FMS foi ligado, desligado (kill switch) ou parou de cotar (RN-SMM-030/032).",
+  "x-producer": "market-maker-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "scope",
+    "status",
+    "reason",
+    "actorId",
+    "approvalRequestId"
+  ],
+  "properties": {
+    "scope": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "GLOBAL"
+        },
+        {
+          "type": "string",
+          "format": "uuid"
+        }
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "ON"
+        },
+        {
+          "type": "string",
+          "const": "OFF"
+        },
+        {
+          "type": "string",
+          "const": "STOPPED"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvalRequestId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

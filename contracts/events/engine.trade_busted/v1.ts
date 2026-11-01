@@ -24,6 +24,7 @@ export default defineEventContract({
     'custody-service',
     'risk-service',
     'market-data-service',
+    'market-maker-service',
   ],
   summary: 'Negócio cancelado; as ordens não voltam ao livro (RN-BST-001..003).',
 });

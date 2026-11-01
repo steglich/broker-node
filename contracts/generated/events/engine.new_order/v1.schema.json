@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:broker:event:engine.new_order:v1",
   "title": "engine.new_order v1",
-  "description": "Comando `NewOrder`: ordem nova para o livro (Catálogo de eventos §6).",
+  "description": "Comando `NewOrder`: ordem nova para o livro; o FMS também publica (Catálogo de eventos §6).",
   "x-producer": "oms-service",
   "x-auditable": false,
   "type": "object",

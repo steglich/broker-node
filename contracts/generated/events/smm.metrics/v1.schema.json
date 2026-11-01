@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:smm.metrics:v1",
+  "title": "smm.metrics v1",
+  "description": "Métricas do FMS por instrumento, a cada `smm_refresh_interval` (RN-SMM-031).",
+  "x-producer": "market-maker-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "inventory",
+    "realizedPnl",
+    "unrealizedPnl",
+    "volume",
+    "requotes",
+    "effectiveSpreadBps",
+    "quotedSeconds",
+    "bestBid",
+    "bestAsk",
+    "at"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "inventory": {
+      "type": "integer"
+    },
+    "realizedPnl": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d+)?$"
+    },
+    "unrealizedPnl": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "volume": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "requotes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "effectiveSpreadBps": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "quotedSeconds": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bestBid": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bestAsk": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

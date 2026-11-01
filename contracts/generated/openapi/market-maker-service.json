@@ -1,0 +1,1276 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "market-maker-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/bo/smm/kill-switch": {
+      "post": {
+        "operationId": "killSwitch",
+        "summary": "Desliga o FMS, por instrumento ou global, ou propõe religar (RN-SMM-030).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "enabled",
+                  "justification"
+                ],
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "instrumentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Desligado; todas as ofertas do escopo canceladas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "scope",
+                    "status"
+                  ],
+                  "properties": {
+                    "scope": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "const": "OFF"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Solicitação de religar aberta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMM_ENABLE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SMM_PARAMETERS"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instrumento sem FMS ativado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "O FMS já está ligado neste escopo.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/smm/change-requests": {
+      "get": {
+        "operationId": "changeRequests",
+        "summary": "Solicitações de religar e de parâmetros.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "PENDING"
+                },
+                {
+                  "type": "string",
+                  "const": "APPROVED"
+                },
+                {
+                  "type": "string",
+                  "const": "REJECTED"
+                },
+                {
+                  "type": "string",
+                  "const": "EXPIRED"
+                },
+                {
+                  "type": "string",
+                  "const": "CANCELED"
+                },
+                {
+                  "type": "string",
+                  "const": "STALE"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "payload",
+                          "justification",
+                          "makerId",
+                          "status",
+                          "createdAt",
+                          "expiresAt",
+                          "decidedBy",
+                          "decidedAt",
+                          "decisionReason"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "SMM_ENABLE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "SMM_PARAMETERS"
+                              }
+                            ]
+                          },
+                          "payload": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "justification": {
+                            "type": "string"
+                          },
+                          "makerId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "decidedBy": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decidedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decisionReason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/smm/change-requests/{id}/approve": {
+      "post": {
+        "operationId": "approveRequest",
+        "summary": "Aprova; `STALE` se o estado mudou desde a proposta (RN-MC-BO-003).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Solicitação depois da decisão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMM_ENABLE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SMM_PARAMETERS"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Solicitação inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Solicitação fora de `PENDING` ou expirada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/smm/change-requests/{id}/reject": {
+      "post": {
+        "operationId": "rejectRequest",
+        "summary": "Rejeita com motivo.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Solicitação depois da decisão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMM_ENABLE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SMM_PARAMETERS"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Solicitação inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Solicitação fora de `PENDING` ou expirada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/smm/change-requests/{id}/cancel": {
+      "post": {
+        "operationId": "cancelRequest",
+        "summary": "Quem propôs desiste.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Solicitação depois da decisão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMM_ENABLE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SMM_PARAMETERS"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Solicitação inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Solicitação fora de `PENDING` ou expirada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/smm/{instrumentId}": {
+      "get": {
+        "operationId": "state",
+        "summary": "Inventário, P&L, spread efetivo, ofertas e parâmetros (RN-SMM-031).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "accountId",
+                    "enabled",
+                    "globalEnabled",
+                    "stopped",
+                    "initialStock",
+                    "reference",
+                    "spreadMultiplier",
+                    "liveOrders",
+                    "parameters",
+                    "metrics"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "accountId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "globalEnabled": {
+                      "type": "boolean"
+                    },
+                    "stopped": {
+                      "type": "boolean"
+                    },
+                    "initialStock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "reference": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "spreadMultiplier": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "liveOrders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "orderId",
+                          "board",
+                          "side",
+                          "price",
+                          "remaining",
+                          "status"
+                        ],
+                        "properties": {
+                          "orderId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "board": {
+                            "type": "string"
+                          },
+                          "side": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "string"
+                          },
+                          "remaining": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "parameters": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "metrics": {
+                      "type": "object",
+                      "required": [
+                        "instrumentId",
+                        "inventory",
+                        "realizedPnl",
+                        "unrealizedPnl",
+                        "volume",
+                        "requotes",
+                        "effectiveSpreadBps",
+                        "quotedSeconds",
+                        "bestBid",
+                        "bestAsk",
+                        "at"
+                      ],
+                      "properties": {
+                        "instrumentId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "inventory": {
+                          "type": "integer"
+                        },
+                        "realizedPnl": {
+                          "type": "string"
+                        },
+                        "unrealizedPnl": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "volume": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "requotes": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "effectiveSpreadBps": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "quotedSeconds": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "bestBid": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "bestAsk": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instrumento sem FMS ativado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "parameters",
+        "summary": "Propõe nova vigência dos parâmetros `smm_*` (Backoffice §3).",
+        "parameters": [
+          {
+            "name": "instrumentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "params",
+                  "justification"
+                ],
+                "properties": {
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "levels": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20
+                      },
+                      "levelStepBps": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "baseQuantityLots": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "levelMultiplier": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,4})?$"
+                      },
+                      "inventoryLimitLots": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "skewFactor": {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,4})?$"
+                      },
+                      "maxSweepLots": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "oddLotEnabled": {
+                        "type": "boolean"
+                      },
+                      "requoteThresholdTicks": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "refreshIntervalS": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "minProperties": 1,
+                    "additionalProperties": false
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Solicitação aberta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "SMM_ENABLE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SMM_PARAMETERS"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instrumento sem FMS ativado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

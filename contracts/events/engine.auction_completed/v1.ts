@@ -21,6 +21,6 @@ export const EngineAuctionCompletedV1 = defineEvent({
 export default defineEventContract({
   definition: EngineAuctionCompletedV1,
   producer: 'matching-engine',
-  consumers: ['trading-session-service', 'market-data-service'],
+  consumers: ['trading-session-service', 'market-data-service', 'market-maker-service'],
   summary: 'Leilão concluído no Motor, com preço e quantidade (RN-AUC-020..022).',
 });

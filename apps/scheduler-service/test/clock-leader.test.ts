@@ -2,9 +2,18 @@
 import { Instant } from '@broker/domain-kernel';
 import pg from 'pg';
 import request from 'supertest';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { EnvironmentClock } from '../src/application/environment-clock.js';
-import { app, brt, reset, startDb, ticks, triggered, waitUntil, type Env } from './helpers.js';
+import {
+  app as createApp,
+  brt,
+  reset,
+  startDb,
+  ticks,
+  triggered,
+  waitUntil,
+  type Env,
+} from './helpers.js';
 
 let env: Env;
 beforeAll(async () => {
@@ -15,6 +24,17 @@ afterAll(async () => {
   await env?.pg.container.stop();
 });
 beforeEach(() => reset(env.db));
+
+// Um teste que falha antes do `stop` não pode deixar o lock de líder preso para os seguintes.
+const started: Awaited<ReturnType<typeof createApp>>[] = [];
+const app: typeof createApp = async (...args) => {
+  const a = await createApp(...args);
+  started.push(a);
+  return a;
+};
+afterEach(async () => {
+  await Promise.all(started.splice(0).map((a) => a.stop()));
+});
 
 describe('relógio ACCELERATED (RN-CLK-002/003)', () => {
   it('publica clock.ticked a cada minuto virtual e grava o tempo', async () => {

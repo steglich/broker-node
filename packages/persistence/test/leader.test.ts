@@ -1,7 +1,7 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LeaderElector } from '../src/index.js';
 import { configFor, superuserConfig } from './helpers.js';
 
@@ -106,6 +106,56 @@ describe('eleição de líder por advisory lock (RN-ENV-021)', () => {
     await first.stop();
     await expect.poll(() => second.isLeader(), { timeout: 5000 }).toBe(true);
     expect(events).toEqual(['first:elected', 'first:revoked', 'second:elected']);
+  });
+
+  /** Banco lento: toda resposta demora `ms`, sem a sessão cair nem o lock ser solto. */
+  function slowDatabase(ms: number) {
+    const query = pg.Client.prototype.query as (...args: unknown[]) => Promise<unknown>;
+    return vi.spyOn(pg.Client.prototype, 'query').mockImplementation(async function (
+      this: pg.Client,
+      ...args: unknown[]
+    ) {
+      const result = await query.apply(this, args);
+      await new Promise((r) => setTimeout(r, ms));
+      return result;
+    } as never);
+  }
+
+  it('banco lento por pouco tempo não derruba o líder: perder o heartbeat é só acima do prazo', async () => {
+    const revoked: string[] = [];
+    const elector = new LeaderElector({
+      database: configFor('leader', 'app'),
+      name: 'banco-lento',
+      heartbeatMs: 200,
+      onRevoked: (reason) => revoked.push(reason),
+    });
+    electors.push(elector);
+    await elector.start();
+    expect(elector.isLeader()).toBe(true);
+
+    const slow = slowDatabase(1_500);
+    await new Promise((r) => setTimeout(r, 2_000));
+    slow.mockRestore();
+
+    expect(revoked).toEqual([]);
+    expect(elector.isLeader()).toBe(true);
+  });
+
+  it('acima do prazo o líder se destitui, mesmo sem a sessão ter caído', async () => {
+    const revoked: string[] = [];
+    const elector = new LeaderElector({
+      database: configFor('leader', 'app'),
+      name: 'banco-parado',
+      heartbeatMs: 50,
+      heartbeatTimeoutMs: 100,
+      onRevoked: (reason) => revoked.push(reason),
+    });
+    electors.push(elector);
+    await elector.start();
+    const slow = slowDatabase(1_000);
+    await vi.waitFor(() => expect(revoked).toHaveLength(1), { timeout: 2_000 });
+    slow.mockRestore();
+    expect(revoked[0]).toContain('heartbeat passou de 100 ms');
   });
 
   it('o líder percebe a perda da sessão (conexão encerrada no servidor) e deixa de liderar', async () => {

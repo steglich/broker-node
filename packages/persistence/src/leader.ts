@@ -8,7 +8,7 @@ export interface LeaderElectorOptions {
   name: string;
   /** Intervalo do heartbeat e das tentativas de assumir (padrão 2 s). */
   heartbeatMs?: number;
-  /** Tempo máximo de uma consulta do heartbeat; se passar, a liderança é dada como perdida. */
+  /** Tempo máximo de uma consulta do heartbeat (padrão 5 s); se passar, a liderança é dada como perdida. */
   heartbeatTimeoutMs?: number;
   onElected?: () => void;
   onRevoked?: (reason: string) => void;
@@ -41,7 +41,7 @@ export class LeaderElector {
 
   constructor(private readonly options: LeaderElectorOptions) {
     this.heartbeatMs = options.heartbeatMs ?? 2000;
-    this.heartbeatTimeoutMs = options.heartbeatTimeoutMs ?? Math.max(1000, this.heartbeatMs);
+    this.heartbeatTimeoutMs = options.heartbeatTimeoutMs ?? Math.max(5000, this.heartbeatMs);
   }
 
   isLeader(): boolean {

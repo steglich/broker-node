@@ -10,12 +10,14 @@ import {
   createLogger,
   loadConfigOrExit,
   RevocationList,
+  RpcClient,
   ServiceTokenProvider,
   SignatureVerifier,
 } from '@broker/service-kit';
 import { Valkey } from 'iovalkey';
 import Type from 'typebox';
 import { HttpCustomerDirectory, HttpPixGateway } from './adapters/integrations.js';
+import { RpcRiskHoldPort } from './adapters/risk-holds.js';
 import { createLedgerService } from './app.js';
 import { DEFAULT_DEPOSIT_EXPIRY_SECONDS } from './domain/deposit.js';
 
@@ -48,6 +50,7 @@ const Config = Type.Object({
   PIX_URL: Type.String({ default: 'http://pix-simulator:8080' }),
   PIX_WEBHOOK_SECRET: Type.String({ minLength: 16 }),
   CUSTOMER_URL: Type.String({ default: 'http://customer-service:8080' }),
+  RISK_URL: Type.String({ default: 'http://risk-service:8080' }),
   CONSUME_CUSTOMER_EVENTS: Type.Boolean({ default: true }),
   SERVICE_TOKEN_URL: Type.String({ default: 'http://identity-service:8080/v1/oauth/token' }),
   SERVICE_CLIENT_ID: Type.String({ default: 'ledger-service' }),
@@ -101,8 +104,15 @@ const tokens = new ServiceTokenProvider({
   tokenUrl: config.SERVICE_TOKEN_URL,
   clientId: config.SERVICE_CLIENT_ID,
   clientSecret: config.SERVICE_CLIENT_SECRET,
-  scopes: ['customer:eligibility', 'customer:holder', 'customer:withdrawal-accounts'],
+  scopes: ['customer:eligibility', 'customer:holder', 'customer:withdrawal-accounts', 'risk:holds'],
   clock,
+});
+// D11: o saque não tem a pressa do pré-trade, e um hold repetido não reserva duas vezes.
+const riskRpc = new RpcClient({
+  name: 'risk',
+  baseUrl: config.RISK_URL,
+  timeoutMs: 2000,
+  tokenProvider: tokens,
 });
 const brl = (v: string) => Money.of(v, 'BRL');
 
@@ -117,6 +127,7 @@ const app = await createLedgerService({
   newId: uuidv7,
   pix: new HttpPixGateway(config.PIX_URL),
   customers: new HttpCustomerDirectory(config.CUSTOMER_URL, tokens),
+  holds: (store) => new RpcRiskHoldPort({ rpc: riskRpc, store }),
   taxIds: { hash: (taxId) => index.hash(taxId, 'payer_tax_id') },
   depositRules: {
     min: brl(config.DEPOSIT_MIN),

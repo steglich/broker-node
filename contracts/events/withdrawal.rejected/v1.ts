@@ -18,6 +18,6 @@ export default defineEventContract({
   definition: WithdrawalRejectedV1,
   producer: 'ledger-service',
   context: 'ledger',
-  consumers: ['notification-service', 'reporting-service'],
+  consumers: ['risk-service', 'notification-service', 'reporting-service'],
   summary: 'Saque recusado (saldo sacável insuficiente ou reprovado na revisão).',
 });

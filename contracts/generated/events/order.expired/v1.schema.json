@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:order.expired:v1",
+  "title": "order.expired v1",
+  "description": "Validade da ordem terminou; o Risco libera o que restava do hold (RN-HLD-004).",
+  "x-producer": "oms-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "orderId",
+    "accountId",
+    "canceledQuantity",
+    "reason"
+  ],
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "canceledQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

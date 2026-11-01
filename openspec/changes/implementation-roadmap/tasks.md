@@ -179,10 +179,10 @@
 
 ## 24. Fase 2 — risk-service (à vista)
 
-- [ ] 24.1 Implementar a projeção em memória por partição (P2 do ledger, U dos negócios do Motor casados por `trade_id`, H, posições, preços) com snapshot e offsets e `readiness` só após a reconstrução; verificar que o lançamento do ledger move o valor de U para P2 sem alterar o BP (ADR-0003)
-- [ ] 24.2 Implementar os holds (`ORDER_CASH`, `ORDER_POSITION`, `WITHDRAWAL`) persistidos antes da resposta, a redução proporcional por execução, a liberação por cancelamento/expiração e a reconciliação de órfãos a cada 5 min; verificar a execução parcial abaixo do limite (RN-HLD-001..004/007)
-- [ ] 24.3 Implementar o pré-trade síncrono (sequência §11, `BP_cash`, `Q_disp`, venda coberta, limites de ordens abertas, resposta com valores) com serialização por conta, além de `CreateHold`/`ReleaseHold` para saques, substituindo o adaptador provisório do ledger; verificar RSK-001 e RSK-030 (compra e saque simultâneos)
-- [ ] 24.4 Medir o p99 do pré-trade sob carga local e registrar no README (RNF-003)
+- [x] 24.1 Implementar a projeção em memória por partição (P2 do ledger, U dos negócios do Motor casados por `trade_id`, H, posições, preços) com snapshot e offsets e `readiness` só após a reconstrução; verificar que o lançamento do ledger move o valor de U para P2 sem alterar o BP (ADR-0003)
+- [x] 24.2 Implementar os holds (`ORDER_CASH`, `ORDER_POSITION`, `WITHDRAWAL`) persistidos antes da resposta, a redução proporcional por execução, a liberação por cancelamento/expiração e a reconciliação de órfãos a cada 5 min; verificar a execução parcial abaixo do limite (RN-HLD-001..004/007)
+- [x] 24.3 Implementar o pré-trade síncrono (sequência §11, `BP_cash`, `Q_disp`, venda coberta, limites de ordens abertas, resposta com valores) com serialização por conta, além de `CreateHold`/`ReleaseHold` para saques, substituindo o adaptador provisório do ledger; verificar RSK-001 e RSK-030 (compra e saque simultâneos)
+- [x] 24.4 Medir o p99 do pré-trade sob carga local e registrar no README (RNF-003)
 
 ## 25. Fase 2 — oms-service (básico)
 

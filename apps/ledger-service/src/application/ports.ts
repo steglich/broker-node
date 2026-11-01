@@ -280,13 +280,10 @@ export interface LedgerTx {
   claimDueWithdrawal(now: Instant, leaseMs: number): Promise<WithdrawalRow | null>;
   withdrawalsWithOpenHold(limit: number): Promise<WithdrawalRow[]>;
 
-  // holds locais (adaptador provisório do Risco)
-  insertHold(h: { id: string; accountId: string; amount: Money }, at: Instant): Promise<boolean>;
-  hold(
-    id: string,
-  ): Promise<{ id: string; accountId: string; amount: Money; status: string } | null>;
-  settleHold(id: string, status: 'CONSUMED' | 'RELEASED', at: Instant): Promise<void>;
-  activeHolds(accountId: string): Promise<Money>;
+  // cópia dos holds de dinheiro do Risco, por `risk.hold_*`
+  upsertHoldCopy(h: { holdId: string; accountId: string; amount: Money }): Promise<void>;
+  deleteHoldCopy(holdId: string): Promise<void>;
+  heldAmount(accountId: string): Promise<Money>;
 
   // extrato e encerramento
   statement(accountId: string, filter: StatementFilter): Promise<StatementLine[]>;
@@ -378,9 +375,8 @@ export interface CustomerDirectory {
 }
 
 /**
- * Porta dos holds do Risco (RN-LED-030/032, `risk.CreateHold/ReleaseHold`). Na Fase 1 o adaptador
- * é local e calcula o sacável no próprio ledger; na Fase 2 vira o RPC do risk-service. Idempotente
- * pelo `holdId`, escolhido por quem pede.
+ * Porta dos holds do Risco (RN-LED-030/032, `risk.CreateHold/ReleaseHold`). Idempotente pelo
+ * `holdId`, escolhido por quem pede.
  */
 export interface RiskHoldPort {
   createHold(input: {

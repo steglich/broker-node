@@ -3,6 +3,7 @@ import { calAdapter } from './cal.js';
 import { feeAdapter } from './fee.js';
 import { ledAdapter } from './led.js';
 import { meAdapter } from './me.js';
+import { rskAdapter } from './rsk.js';
 
 /** Adaptadores por prefixo de ID. Cada domínio novo (ME, ORD, RSK, LED…) registra o seu aqui. */
 export const adapters: Readonly<Record<string, ScenarioAdapter>> = {
@@ -10,4 +11,5 @@ export const adapters: Readonly<Record<string, ScenarioAdapter>> = {
   FEE: feeAdapter,
   LED: ledAdapter,
   ME: meAdapter,
+  RSK: rskAdapter,
 };

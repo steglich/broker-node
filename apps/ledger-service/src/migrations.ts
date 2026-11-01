@@ -259,7 +259,7 @@ export const migrations: Record<string, Migration> = {
         db,
       );
 
-      // Adaptador provisório da porta RiskHoldPort (Fase 1): holds de saque no próprio ledger.
+      // Adaptador provisório da porta RiskHoldPort (Fase 1). Sem uso desde o risk-service: sai depois.
       await sql`
         CREATE TABLE withdrawal_hold (
           id          uuid PRIMARY KEY,
@@ -285,6 +285,18 @@ export const migrations: Record<string, Migration> = {
           divergences    jsonb NOT NULL,
           created_at     timestamptz NOT NULL
         )`.execute(db);
+    },
+  },
+  '0002_risk_hold_copy': {
+    async up(db: Kysely<unknown>) {
+      // Holds de dinheiro ativos, por `risk.hold_*`: o `withdrawable_balance` os desconta (Financeiro §4).
+      await sql`
+        CREATE TABLE risk_hold_copy (
+          hold_id     uuid PRIMARY KEY,
+          account_id  uuid NOT NULL,
+          amount      numeric(18, 2) NOT NULL
+        )`.execute(db);
+      await sql`CREATE INDEX risk_hold_copy_account_idx ON risk_hold_copy (account_id)`.execute(db);
     },
   },
 };

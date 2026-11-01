@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:risk.hold_released:v1",
+  "title": "risk.hold_released v1",
+  "description": "Reserva liberada: cancelamento, expiração, saque desfeito ou órfã (RN-HLD-007).",
+  "x-producer": "risk-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "holdId",
+    "accountId",
+    "type",
+    "resource",
+    "amount",
+    "reference"
+  ],
+  "properties": {
+    "holdId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "ORDER_CASH"
+        },
+        {
+          "type": "string",
+          "const": "ORDER_POSITION"
+        },
+        {
+          "type": "string",
+          "const": "ORDER_MARGIN"
+        },
+        {
+          "type": "string",
+          "const": "WITHDRAWAL"
+        },
+        {
+          "type": "string",
+          "const": "BTC_COLLATERAL"
+        },
+        {
+          "type": "string",
+          "const": "BTC_LENT"
+        }
+      ]
+    },
+    "resource": {
+      "type": "string",
+      "minLength": 1
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d{2}$"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

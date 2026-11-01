@@ -18,6 +18,6 @@ export default defineEventContract({
   definition: WithdrawalCompletedV1,
   producer: 'ledger-service',
   context: 'ledger',
-  consumers: ['notification-service', 'reporting-service'],
+  consumers: ['risk-service', 'notification-service', 'reporting-service'],
   summary: 'PIX de saque confirmado e lançado; hold consumido.',
 });

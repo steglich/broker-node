@@ -1,0 +1,12 @@
+cenario: RSK-030 compra e saque simultâneos não gastam o mesmo saldo
+regras: [RN-RSK-001, RN-LED-030]
+relogio: '2026-01-05T13:00:00Z'
+entradas:
+  p2: '10000.00'
+  # A ordem de chegada é do Risco; em qualquer uma, só a primeira passa.
+  operacoes:
+    - compra: { quantidade: 800, preco: '10.00' }
+    - saque: '8000.00'
+saidas_esperadas:
+  bp_cash: '1997.36'
+  decisoes: ['APROVADO', 'INSUFFICIENT_WITHDRAWABLE_BALANCE']

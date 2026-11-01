@@ -18,7 +18,7 @@ export default defineEventContract({
   definition: WithdrawalFailedV1,
   producer: 'ledger-service',
   context: 'ledger',
-  consumers: ['notification-service', 'reporting-service'],
+  consumers: ['risk-service', 'notification-service', 'reporting-service'],
   summary:
     'Saque não realizado (recusa do PIX ou tentativas esgotadas); hold liberado (RN-SAQ-007).',
 });

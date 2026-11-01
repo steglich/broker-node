@@ -172,7 +172,12 @@ describe('Fase 1 — critério de pronto (E2E pela borda)', () => {
       { timeoutMs: 60_000, intervalMs: 1000 },
     );
     expect(completed.endToEndId).toMatch(/^ESIM/);
-    expect(await balances(web)).toMatchObject({ settled: '1100.00', withdrawable: '1100.00' });
+    // O hold consumido volta ao ledger por `risk.hold_consumed`: até lá, o sacável segue descontado.
+    await eventually(
+      async () =>
+        expect(await balances(web)).toMatchObject({ settled: '1100.00', withdrawable: '1100.00' }),
+      { timeoutMs: 30_000, intervalMs: 500 },
+    );
 
     // O dinheiro saiu do banco no depósito e voltou no saque.
     const bankAfter = expectStatus(

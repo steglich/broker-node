@@ -4,9 +4,13 @@ import { AccountOpenedV1 } from '@broker/contracts/events/account.opened/v1';
 import { AccountStatusChangedV1 } from '@broker/contracts/events/account.status_changed/v1';
 import { CalendarUpdatedV1 } from '@broker/contracts/events/calendar.updated/v1';
 import { ClockTickedV1 } from '@broker/contracts/events/clock.ticked/v1';
+import { RiskHoldAdjustedV1 } from '@broker/contracts/events/risk.hold_adjusted/v1';
+import { RiskHoldConsumedV1 } from '@broker/contracts/events/risk.hold_consumed/v1';
+import { RiskHoldCreatedV1 } from '@broker/contracts/events/risk.hold_created/v1';
+import { RiskHoldReleasedV1 } from '@broker/contracts/events/risk.hold_released/v1';
 import { RoutineTriggeredV1 } from '@broker/contracts/events/routine.triggered/v1';
 import { SessionScheduleUpdatedV1 } from '@broker/contracts/events/session_schedule.updated/v1';
-import { BusinessDate } from '@broker/domain-kernel';
+import { BusinessDate, Money } from '@broker/domain-kernel';
 import {
   connectStream,
   ensureSuperStream,
@@ -27,11 +31,11 @@ import {
 } from '@broker/service-kit';
 import { sql, type Kysely } from 'kysely';
 import { registerHttp } from './adapters/http.js';
-import { LocalRiskHoldPort } from './adapters/local-risk-hold.js';
 import { PostgresLedgerStore } from './adapters/postgres-store.js';
 import { LedgerAccounts } from './application/accounts.js';
 import type { LedgerDeps } from './application/context.js';
 import { Deposits } from './application/deposits.js';
+import type { LedgerStore } from './application/ports.js';
 import { Ledger } from './application/posting.js';
 import { PixReconciliation } from './application/reconciliation.js';
 import { Statement } from './application/statement.js';
@@ -48,8 +52,8 @@ export interface LedgerServiceDeps extends Omit<LedgerDeps, 'store' | 'holds'> {
   authenticator: Authenticator;
   signatureVerifier: SignatureVerifier;
   pixWebhookSecret: string;
-  /** Porta dos holds; sem ela, o adaptador provisório local da Fase 1. */
-  holds?: LedgerDeps['holds'];
+  /** Porta dos holds: o RPC do risk-service. Recebe a loja para a cópia de `risk.hold_*`. */
+  holds: (store: LedgerStore) => LedgerDeps['holds'];
   stream?: StreamSettings;
   /** Consome `account.opened`/`account.status_changed` do customer-service. */
   consumeCustomerEvents?: boolean;
@@ -77,7 +81,7 @@ export async function createLedgerService(d: LedgerServiceDeps) {
   // Cópia local do calendário (D15): a semente de `d.calendar` dá lugar à última gravada.
   const calendarReplica = new CalendarReplica(d.db, d.calendar);
   await calendarReplica.refresh();
-  const holds = d.holds ?? new LocalRiskHoldPort({ store, clock: d.clock, calendar: d.calendar });
+  const holds = d.holds(store);
   const deps: LedgerDeps = { ...d, store, holds };
   const ledger = new Ledger(deps);
   const accounts = new LedgerAccounts(deps);
@@ -161,6 +165,41 @@ export async function createLedgerService(d: LedgerServiceDeps) {
         }),
       );
     }
+    const riskStream = topicName(environment, 'risk');
+    await ensureSuperStream(client, riskStream, { maxAge: '90D' });
+    const copyHold = async (trx: Kysely<unknown>, e: { payload: unknown }) => {
+      const p = e.payload as {
+        holdId: string;
+        accountId: string;
+        resource: string;
+        amount: string;
+      };
+      if (p.resource !== 'CASH') return;
+      await store.tx(trx).upsertHoldCopy({
+        holdId: p.holdId,
+        accountId: p.accountId,
+        amount: Money.of(p.amount, 'BRL'),
+      });
+    };
+    const dropHold = async (trx: Kysely<unknown>, e: { payload: unknown }) => {
+      await store.tx(trx).deleteHoldCopy((e.payload as { holdId: string }).holdId);
+    };
+    consumers.push(
+      new EventConsumer({
+        ...base,
+        // Ordenado por conta: um `consumed` não passa na frente do `created` do mesmo hold.
+        ordered: true,
+        name: 'ledger.risk',
+        superStream: riskStream,
+        startFrom: 'first',
+        handlers: {
+          'risk.hold_created': { definition: RiskHoldCreatedV1, handle: copyHold },
+          'risk.hold_adjusted': { definition: RiskHoldAdjustedV1, handle: copyHold },
+          'risk.hold_released': { definition: RiskHoldReleasedV1, handle: dropHold },
+          'risk.hold_consumed': { definition: RiskHoldConsumedV1, handle: dropHold },
+        },
+      }),
+    );
     if (d.consumeCalendarEvents ?? true) {
       const referenceStream = topicName(environment, 'reference');
       await ensureSuperStream(client, referenceStream, { maxAge: '30D' });

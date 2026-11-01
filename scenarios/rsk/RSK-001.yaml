@@ -1,0 +1,9 @@
+cenario: RSK-001 poder de compra com P2, U e H
+regras: [RN-BP-001, RN-BP-003]
+relogio: '2026-01-05T13:00:00Z'
+entradas:
+  p2: '10000.00'
+  vendas_do_dia: ['2000.00']
+  holds_dinheiro: ['3000.00']
+saidas_esperadas:
+  bp_cash: '9000.00'

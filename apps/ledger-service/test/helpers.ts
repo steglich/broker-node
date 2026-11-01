@@ -13,12 +13,15 @@ import { createHash, randomInt } from 'node:crypto';
 import { Writable } from 'node:stream';
 import request from 'supertest';
 import { createLedgerService, type LedgerServiceDeps } from '../src/app.js';
+import { computeBalances, settlementDays } from '../src/domain/balances.js';
 import {
   IntegrationError,
   type BankTransaction,
   type CriticalLedgerAlert,
   type CustomerDirectory,
+  type LedgerStore,
   type PixGateway,
+  type RiskHoldPort,
   type WithdrawalDestination,
 } from '../src/application/ports.js';
 import { migrations } from '../src/migrations.js';
@@ -58,6 +61,72 @@ type SendBehavior = 'OK' | 'TRANSIENT' | { definitive: string };
 let e2eSeq = 0;
 const e2e = (at: Instant) =>
   `ESIM${at.toString().replace(/[-:T]/g, '').slice(0, 14)}${(++e2eSeq).toString(36).padStart(14, '0')}`;
+
+/**
+ * O Risco nos testes do ledger: calcula o sacável como o Risco faria só com os saldos e guarda os holds
+ * em memória. O RPC de verdade é coberto por `test/risk-holds.test.ts` e pelos testes do risk-service.
+ */
+export class FakeRiskHolds implements RiskHoldPort {
+  /** Comum às instâncias: o Risco não reinicia junto com o ledger. */
+  static readonly all = new Map<string, { accountId: string; amount: Money; status: string }>();
+  holds = FakeRiskHolds.all;
+  unavailable = false;
+  private tail: Promise<unknown> = Promise.resolve();
+
+  constructor(
+    private readonly o: { store: LedgerStore; clock: VirtualClock; calendar: TradingCalendar },
+  ) {}
+
+  /** Em série, como o Risco de verdade (RN-RSK-001). */
+  createHold(input: { holdId: string; accountId: string; amount: Money }) {
+    const run = this.tail.then(() => this.decide(input));
+    this.tail = run.catch(() => undefined);
+    return run;
+  }
+
+  private async decide(input: { holdId: string; accountId: string; amount: Money }) {
+    if (this.unavailable) throw new Error('fora do ar');
+    if (this.holds.has(input.holdId)) return { approved: true as const };
+    const refused = {
+      approved: false as const,
+      code: 'INSUFFICIENT_WITHDRAWABLE_BALANCE' as const,
+    };
+    const free = await this.o.store.transaction(async (tx) => {
+      const cash = await tx.account({ code: 'CUST_CASH', ownerId: input.accountId });
+      if (!cash) return null;
+      return computeBalances(
+        await tx.balanceInputs(cash.id),
+        settlementDays(this.o.calendar, this.o.clock.now().businessDate()),
+        await this.activeHolds(input.accountId),
+      ).withdrawable;
+    });
+    if (!free || input.amount.compare(free) > 0) return refused;
+    this.holds.set(input.holdId, { ...input, status: 'ACTIVE' });
+    return { approved: true as const };
+  }
+
+  private settle(holdId: string, status: string) {
+    if (this.unavailable) return Promise.reject(new Error('fora do ar'));
+    const h = this.holds.get(holdId);
+    if (h?.status === 'ACTIVE') h.status = status;
+    return Promise.resolve();
+  }
+
+  consumeHold(holdId: string) {
+    return this.settle(holdId, 'CONSUMED');
+  }
+
+  releaseHold(holdId: string) {
+    return this.settle(holdId, 'RELEASED');
+  }
+
+  activeHolds(accountId: string) {
+    let total = Money.of('0', 'BRL');
+    for (const h of this.holds.values())
+      if (h.accountId === accountId && h.status === 'ACTIVE') total = total.plus(h.amount);
+    return Promise.resolve(total);
+  }
+}
 
 /** Simula o Banco Simulado: cobranças, pagamentos (geram o webhook), devoluções e envios. */
 export class FakePix implements PixGateway {
@@ -225,6 +294,8 @@ export async function app(
   const pix = new FakePix(clock);
   const customers = new FakeCustomers();
   const alerts: CriticalLedgerAlert[] = [];
+  let riskHolds!: FakeRiskHolds;
+  const calendar = new TradingCalendar(b3Calendar2026To2027);
   const a = await createLedgerService({
     config: {
       SERVICE_NAME: 'ledger-service',
@@ -239,8 +310,9 @@ export async function app(
     database: env.database,
     logger,
     clock,
-    calendar: new TradingCalendar(b3Calendar2026To2027),
+    calendar,
     newId: uuidv7,
+    holds: (store) => (riskHolds = new FakeRiskHolds({ store, clock, calendar })),
     pix,
     customers,
     taxIds: { hash: (v) => createHash('sha256').update(`teste:${v}`).digest('hex') },
@@ -262,7 +334,7 @@ export async function app(
     ...overrides,
   });
   const http = request(a.service.app);
-  return { ...a, clock, http, pix, customers, alerts };
+  return { ...a, clock, http, pix, customers, alerts, riskHolds };
 }
 
 // ------------------------------------------------------------------ tokens

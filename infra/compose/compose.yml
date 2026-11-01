@@ -100,6 +100,10 @@ secrets:
     file: ../secrets/db/matching_engine_app
   db_matching_engine_migrator:
     file: ../secrets/db/matching_engine_migrator
+  db_risk_app:
+    file: ../secrets/db/risk_app
+  db_risk_migrator:
+    file: ../secrets/db/risk_migrator
   db_market_maker_app:
     file: ../secrets/db/market_maker_app
   db_market_maker_migrator:
@@ -751,7 +755,7 @@ services:
     restart: 'no'
 
   # Ledger de partidas dobradas, saldos, depósito e saque PIX (webhook do Banco Simulado), extrato
-  # e reconciliação PIX. Holds de saque no próprio ledger até o risk-service (Fase 2).
+  # e reconciliação PIX. Holds de saque por RPC no risk-service (RN-LED-030).
   ledger-service:
     profiles: [core]
     image: broker/ledger-service:local
@@ -777,6 +781,7 @@ services:
       PIX_URL: http://pix-simulator:8080
       PIX_WEBHOOK_SECRET_FILE: /run/secrets/webhook_pix_simulator
       CUSTOMER_URL: http://customer-service:8080
+      RISK_URL: http://risk-service:8080
       # Cliente OAuth `ledger-service` (client credentials): no local, o `env:up` o cadastra no
       # identity com este segredo (infra/identity/service-clients.json).
       SERVICE_CLIENT_SECRET_FILE: /run/secrets/service_client_ledger
@@ -1063,6 +1068,66 @@ services:
       traefik.http.routers.smm.rule: Host(`smm.broker.localhost`)
       traefik.http.routers.smm.entrypoints: websecure
       traefik.http.services.smm.loadbalancer.server.port: '8080'
+
+  risk-migrate:
+    profiles: [core]
+    image: broker/risk-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/risk-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: risk
+      DB_USER: risk_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_risk_migrator
+    secrets: [db_risk_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Risco à vista (ADR-0003): projeção por conta, holds, pré-trade e saques em série. Só tem
+  # `readiness` depois de reconstruir a projeção; sem ele, ordens e saques são recusados (RN-RSK-002).
+  risk-service:
+    profiles: [core]
+    image: broker/risk-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: risk-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: risk
+      DB_USER: risk_app
+      DB_PASSWORD_FILE: /run/secrets/db_risk_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_risk_app
+      - rabbitmq_password
+      - valkey_password
+    networks: [broker]
+    depends_on:
+      risk-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
 
   market-data-migrate:
     profiles: [core]

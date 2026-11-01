@@ -1,0 +1,530 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "risk-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/internal/risk/pre-trade": {
+      "post": {
+        "operationId": "preTrade",
+        "summary": "Decide a ordem e cria o hold, em série por conta (Risco §11, RN-PTC-001).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "requestId",
+                  "accountId",
+                  "orderId",
+                  "instrumentId",
+                  "board",
+                  "side",
+                  "type",
+                  "quantity",
+                  "referencePrice",
+                  "timeInForce",
+                  "tradeIntent",
+                  "operation"
+                ],
+                "properties": {
+                  "requestId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "accountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "instrumentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "board": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "MAIN"
+                      },
+                      {
+                        "type": "string",
+                        "const": "ODD_LOT"
+                      }
+                    ]
+                  },
+                  "side": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "BUY"
+                      },
+                      {
+                        "type": "string",
+                        "const": "SELL"
+                      }
+                    ]
+                  },
+                  "type": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "MARKET"
+                      },
+                      {
+                        "type": "string",
+                        "const": "LIMIT"
+                      }
+                    ]
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "referencePrice": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,8})?$"
+                  },
+                  "timeInForce": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "DAY"
+                      },
+                      {
+                        "type": "string",
+                        "const": "GTC"
+                      },
+                      {
+                        "type": "string",
+                        "const": "GTD"
+                      },
+                      {
+                        "type": "string",
+                        "const": "IOC"
+                      },
+                      {
+                        "type": "string",
+                        "const": "FOK"
+                      }
+                    ]
+                  },
+                  "tradeIntent": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "NORMAL"
+                      },
+                      {
+                        "type": "string",
+                        "const": "DAY_TRADE"
+                      }
+                    ]
+                  },
+                  "operation": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "NEW"
+                      },
+                      {
+                        "type": "string",
+                        "const": "REPLACE"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decisão; repetir o `requestId` devolve a mesma.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "decision"
+                  ],
+                  "properties": {
+                    "decision": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        }
+                      ]
+                    },
+                    "holdId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "classification": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "COVERED_BUY"
+                        },
+                        {
+                          "type": "string",
+                          "const": "COVERED_SELL"
+                        },
+                        {
+                          "type": "string",
+                          "const": "SHORT_SALE"
+                        }
+                      ]
+                    },
+                    "rejectCode": {
+                      "type": "string"
+                    },
+                    "figures": {
+                      "type": "object",
+                      "required": [
+                        "required",
+                        "available"
+                      ],
+                      "properties": {
+                        "required": {
+                          "type": "string"
+                        },
+                        "available": {
+                          "type": "string"
+                        },
+                        "buyingPower": {
+                          "type": "string",
+                          "pattern": "^-?\\d+\\.\\d{2}$"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Projeção em reconstrução ou instância em espera (fail closed).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    },
+    "/v1/internal/risk/holds": {
+      "post": {
+        "operationId": "createHold",
+        "summary": "Reserva o valor do saque sobre o sacável da projeção (RN-LED-030).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "requestId",
+                  "holdType",
+                  "accountId",
+                  "amount",
+                  "reference"
+                ],
+                "properties": {
+                  "requestId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "holdType": {
+                    "type": "string",
+                    "const": "WITHDRAWAL"
+                  },
+                  "accountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d{2}$"
+                  },
+                  "reference": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "WITHDRAWAL"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decisão; repetir o `requestId` não reserva duas vezes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "decision"
+                  ],
+                  "properties": {
+                    "decision": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "APPROVED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "REJECTED"
+                        }
+                      ]
+                    },
+                    "holdId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "rejectCode": {
+                      "type": "string"
+                    },
+                    "figures": {
+                      "type": "object",
+                      "required": [
+                        "required",
+                        "available"
+                      ],
+                      "properties": {
+                        "required": {
+                          "type": "string"
+                        },
+                        "available": {
+                          "type": "string"
+                        },
+                        "buyingPower": {
+                          "type": "string",
+                          "pattern": "^-?\\d+\\.\\d{2}$"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Projeção em reconstrução ou instância em espera (fail closed).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    },
+    "/v1/internal/risk/holds/{id}/release": {
+      "post": {
+        "operationId": "releaseHold",
+        "summary": "Consome ou libera o hold; idempotente, e hold desconhecido não é erro (RN-LED-032).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "outcome"
+                ],
+                "properties": {
+                  "outcome": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "CONSUMED"
+                      },
+                      {
+                        "type": "string",
+                        "const": "CANCELED"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado do hold depois do pedido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "holdId",
+                    "status"
+                  ],
+                  "properties": {
+                    "holdId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "ACTIVE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONSUMED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "RELEASED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "UNKNOWN"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Projeção em reconstrução ou instância em espera (fail closed).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "service": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

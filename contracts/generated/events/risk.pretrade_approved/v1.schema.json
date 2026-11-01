@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:risk.pretrade_approved:v1",
+  "title": "risk.pretrade_approved v1",
+  "description": "Ordem aprovada no pré-trade, com o hold criado (Risco §11).",
+  "x-producer": "risk-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "requestId",
+    "accountId",
+    "orderId",
+    "holdId",
+    "classification",
+    "figures"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "holdId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "classification": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "COVERED_BUY"
+        },
+        {
+          "type": "string",
+          "const": "COVERED_SELL"
+        },
+        {
+          "type": "string",
+          "const": "SHORT_SALE"
+        }
+      ]
+    },
+    "figures": {
+      "type": "object",
+      "required": [
+        "required",
+        "available"
+      ],
+      "properties": {
+        "required": {
+          "type": "string"
+        },
+        "available": {
+          "type": "string"
+        },
+        "buyingPower": {
+          "type": "string",
+          "pattern": "^-?\\d+\\.\\d{2}$"
+        }
+      }
+    }
+  }
+}

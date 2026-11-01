@@ -140,6 +140,10 @@ export class EventConsumer {
     return this.options.ordered;
   }
 
+  get superStream(): string {
+    return this.options.superStream;
+  }
+
   /** Nomes das filas AMQP deste consumidor. */
   queueNames(): { retry: string[]; ret: string; dlq: string } {
     const base = `${this.options.environment}.${this.options.name}`;

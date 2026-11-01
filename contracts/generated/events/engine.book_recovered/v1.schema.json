@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.book_recovered:v1",
+  "title": "engine.book_recovered v1",
+  "description": "Livro recuperado: a sessão retoma o instrumento por leilão (RN-REC-003).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

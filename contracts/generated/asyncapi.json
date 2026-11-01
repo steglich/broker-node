@@ -178,6 +178,50 @@
         }
       }
     },
+    "engine": {
+      "address": "{environment}.engine.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "engine.auction_completed.v1": {
+          "$ref": "#/components/messages/engine.auction_completed.v1"
+        },
+        "engine.auction_indicative.v1": {
+          "$ref": "#/components/messages/engine.auction_indicative.v1"
+        },
+        "engine.auction_triggered.v1": {
+          "$ref": "#/components/messages/engine.auction_triggered.v1"
+        },
+        "engine.book_recovered.v1": {
+          "$ref": "#/components/messages/engine.book_recovered.v1"
+        },
+        "engine.book_recovering.v1": {
+          "$ref": "#/components/messages/engine.book_recovering.v1"
+        },
+        "engine.trade_executed.v1": {
+          "$ref": "#/components/messages/engine.trade_executed.v1"
+        }
+      }
+    },
+    "engine-commands": {
+      "address": "{environment}.engine.commands",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "engine.band_update.v1": {
+          "$ref": "#/components/messages/engine.band_update.v1"
+        },
+        "engine.phase_change.v1": {
+          "$ref": "#/components/messages/engine.phase_change.v1"
+        }
+      }
+    },
     "example": {
       "address": "{environment}.example.events",
       "parameters": {
@@ -272,6 +316,34 @@
         },
         "notification.read.v1": {
           "$ref": "#/components/messages/notification.read.v1"
+        }
+      }
+    },
+    "session": {
+      "address": "{environment}.session.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "session.circuit_breaker_triggered.v1": {
+          "$ref": "#/components/messages/session.circuit_breaker_triggered.v1"
+        },
+        "session.halt_ended.v1": {
+          "$ref": "#/components/messages/session.halt_ended.v1"
+        },
+        "session.halt_started.v1": {
+          "$ref": "#/components/messages/session.halt_started.v1"
+        },
+        "session.phase_changed.v1": {
+          "$ref": "#/components/messages/session.phase_changed.v1"
+        },
+        "session.trading_day_closed.v1": {
+          "$ref": "#/components/messages/session.trading_day_closed.v1"
+        },
+        "session.trading_day_opened.v1": {
+          "$ref": "#/components/messages/session.trading_day_opened.v1"
         }
       }
     }
@@ -395,6 +467,94 @@
       "messages": [
         {
           "$ref": "#/channels/ledger/messages/deposit.requested.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.auction_completed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.auction_completed.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.auction_indicative.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.auction_indicative.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.auction_triggered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.auction_triggered.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.engine.band_update.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.band_update.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.book_recovered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.book_recovered.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.book_recovering.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.book_recovering.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.engine.phase_change.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine-commands"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine-commands/messages/engine.phase_change.v1"
+        }
+      ]
+    },
+    "matching-engine.send.engine.trade_executed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/engine"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/engine/messages/engine.trade_executed.v1"
         }
       ]
     },
@@ -813,6 +973,72 @@
       "messages": [
         {
           "$ref": "#/channels/scheduler/messages/routine.triggered.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.circuit_breaker_triggered.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.circuit_breaker_triggered.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.halt_ended.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.halt_ended.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.halt_started.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.halt_started.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.phase_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.phase_changed.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.trading_day_closed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.trading_day_closed.v1"
+        }
+      ]
+    },
+    "trading-session-service.send.session.trading_day_opened.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/session"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/session/messages/session.trading_day_opened.v1"
         }
       ]
     },
@@ -1502,6 +1728,518 @@
           },
           "reason": {
             "type": "string"
+          }
+        }
+      },
+      "engine.auction_completed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "auctionId",
+          "price",
+          "quantity"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "engine.auction_indicative.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "auctionId",
+          "theoreticalPrice",
+          "theoreticalQuantity",
+          "imbalanceSide",
+          "imbalanceQuantity"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "theoreticalPrice": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "theoreticalQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "imbalanceSide": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BUY"
+              },
+              {
+                "type": "string",
+                "const": "SELL"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "imbalanceQuantity": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "engine.auction_triggered.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "auctionId",
+          "type",
+          "reason",
+          "expectedEndAt"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "OPENING"
+              },
+              {
+                "type": "string",
+                "const": "CLOSING"
+              },
+              {
+                "type": "string",
+                "const": "VOLATILITY"
+              },
+              {
+                "type": "string",
+                "const": "REOPENING"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "expectedEndAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "engine.band_update.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "bandReferencePrice",
+          "rejectionBandPct",
+          "staticAuctionBandPct",
+          "dynamicAuctionBandPct",
+          "volatilityAuctionDurationS",
+          "auctionRandomEndMaxS"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bandReferencePrice": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "rejectionBandPct": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "staticAuctionBandPct": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "dynamicAuctionBandPct": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "volatilityAuctionDurationS": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "auctionRandomEndMaxS": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "engine.book_recovered.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "engine.book_recovering.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "engine.phase_change.v1": {
+        "type": "object",
+        "required": [
+          "scope",
+          "phase"
+        ],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CLOSED"
+              },
+              {
+                "type": "string",
+                "const": "PRE_TRADING"
+              },
+              {
+                "type": "string",
+                "const": "PRE_OPENING"
+              },
+              {
+                "type": "string",
+                "const": "CONTINUOUS"
+              },
+              {
+                "type": "string",
+                "const": "CLOSING_CALL"
+              },
+              {
+                "type": "string",
+                "const": "POST_CLOSE"
+              },
+              {
+                "type": "string",
+                "const": "AFTER_MARKET"
+              },
+              {
+                "type": "string",
+                "const": "VOLATILITY_AUCTION"
+              },
+              {
+                "type": "string",
+                "const": "HALTED"
+              }
+            ]
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "auctionType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "OPENING"
+              },
+              {
+                "type": "string",
+                "const": "CLOSING"
+              },
+              {
+                "type": "string",
+                "const": "VOLATILITY"
+              },
+              {
+                "type": "string",
+                "const": "REOPENING"
+              }
+            ]
+          },
+          "auctionEndAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "randomSeed": {
+            "type": "string"
+          },
+          "concludesAuctionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priceLimit": {
+            "type": "object",
+            "required": [
+              "min",
+              "max"
+            ],
+            "properties": {
+              "min": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              },
+              "max": {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,8})?$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "engine.trade_executed.v1": {
+        "type": "object",
+        "required": [
+          "instrumentId",
+          "board",
+          "engineSeq",
+          "inputSeq",
+          "tradeId",
+          "price",
+          "quantity",
+          "buyOrderId",
+          "sellOrderId",
+          "buyAccountId",
+          "sellAccountId",
+          "buyParticipantType",
+          "sellParticipantType",
+          "aggressorSide",
+          "executedAt",
+          "tradingDate"
+        ],
+        "properties": {
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MAIN"
+              },
+              {
+                "type": "string",
+                "const": "ODD_LOT"
+              }
+            ]
+          },
+          "engineSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inputSeq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "buyOrderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sellOrderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buyAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sellAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buyParticipantType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CUSTOMER"
+              },
+              {
+                "type": "string",
+                "const": "MARKET_MAKER"
+              },
+              {
+                "type": "string",
+                "const": "SYSTEM"
+              }
+            ]
+          },
+          "sellParticipantType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CUSTOMER"
+              },
+              {
+                "type": "string",
+                "const": "MARKET_MAKER"
+              },
+              {
+                "type": "string",
+                "const": "SYSTEM"
+              }
+            ]
+          },
+          "aggressorSide": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BUY"
+              },
+              {
+                "type": "string",
+                "const": "SELL"
+              },
+              {
+                "type": "string",
+                "const": "NONE"
+              }
+            ]
+          },
+          "executedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tradingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -3458,6 +4196,278 @@
           }
         }
       },
+      "session.circuit_breaker_triggered.v1": {
+        "type": "object",
+        "required": [
+          "level",
+          "indexChangePercent",
+          "resumesAt",
+          "origin"
+        ],
+        "properties": {
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "indexChangePercent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?\\d+(\\.\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resumesAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "INDEX"
+              },
+              {
+                "type": "string",
+                "const": "BACKOFFICE"
+              },
+              {
+                "type": "string",
+                "const": "SANDBOX"
+              }
+            ]
+          }
+        }
+      },
+      "session.halt_ended.v1": {
+        "type": "object",
+        "required": [
+          "haltId",
+          "scope",
+          "reasonCode"
+        ],
+        "properties": {
+          "haltId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MARKET"
+              },
+              {
+                "type": "string",
+                "format": "uuid"
+              }
+            ]
+          },
+          "reasonCode": {
+            "type": "string"
+          }
+        }
+      },
+      "session.halt_started.v1": {
+        "type": "object",
+        "required": [
+          "haltId",
+          "scope",
+          "reasonCode",
+          "cancelAllOnHalt",
+          "resumesAt"
+        ],
+        "properties": {
+          "haltId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MARKET"
+              },
+              {
+                "type": "string",
+                "format": "uuid"
+              }
+            ]
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "cancelAllOnHalt": {
+            "type": "boolean"
+          },
+          "resumesAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "session.phase_changed.v1": {
+        "type": "object",
+        "required": [
+          "scope",
+          "from",
+          "to",
+          "reason",
+          "effectiveAt",
+          "expectedEndAt"
+        ],
+        "properties": {
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "MARKET"
+              },
+              {
+                "type": "string",
+                "format": "uuid"
+              }
+            ]
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CLOSED"
+              },
+              {
+                "type": "string",
+                "const": "PRE_TRADING"
+              },
+              {
+                "type": "string",
+                "const": "PRE_OPENING"
+              },
+              {
+                "type": "string",
+                "const": "CONTINUOUS"
+              },
+              {
+                "type": "string",
+                "const": "CLOSING_CALL"
+              },
+              {
+                "type": "string",
+                "const": "POST_CLOSE"
+              },
+              {
+                "type": "string",
+                "const": "AFTER_MARKET"
+              },
+              {
+                "type": "string",
+                "const": "VOLATILITY_AUCTION"
+              },
+              {
+                "type": "string",
+                "const": "HALTED"
+              }
+            ]
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "CLOSED"
+              },
+              {
+                "type": "string",
+                "const": "PRE_TRADING"
+              },
+              {
+                "type": "string",
+                "const": "PRE_OPENING"
+              },
+              {
+                "type": "string",
+                "const": "CONTINUOUS"
+              },
+              {
+                "type": "string",
+                "const": "CLOSING_CALL"
+              },
+              {
+                "type": "string",
+                "const": "POST_CLOSE"
+              },
+              {
+                "type": "string",
+                "const": "AFTER_MARKET"
+              },
+              {
+                "type": "string",
+                "const": "VOLATILITY_AUCTION"
+              },
+              {
+                "type": "string",
+                "const": "HALTED"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "effectiveAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expectedEndAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "auctionId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "session.trading_day_closed.v1": {
+        "type": "object",
+        "required": [
+          "businessDate"
+        ],
+        "properties": {
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "session.trading_day_opened.v1": {
+        "type": "object",
+        "required": [
+          "businessDate"
+        ],
+        "properties": {
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
       "session_schedule.updated.v1": {
         "type": "object",
         "required": [
@@ -4235,6 +5245,286 @@
         "x-consumers": [
           "notification-service",
           "reporting-service"
+        ]
+      },
+      "engine.auction_completed.v1": {
+        "name": "engine.auction_completed",
+        "title": "engine.auction_completed v1",
+        "summary": "Leilão concluído no Motor, com preço e quantidade (RN-AUC-020..022).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.auction_completed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.auction_completed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "trading-session-service",
+          "market-data-service"
+        ]
+      },
+      "engine.auction_indicative.v1": {
+        "name": "engine.auction_indicative",
+        "title": "engine.auction_indicative v1",
+        "summary": "Preço teórico do leilão a cada mudança no livro (RN-AUC-002/023); a sessão o compara ao túnel estático no fim previsto (RN-AUC-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.auction_indicative"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.auction_indicative.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "market-data-service",
+          "trading-session-service"
+        ]
+      },
+      "engine.auction_triggered.v1": {
+        "name": "engine.auction_triggered",
+        "title": "engine.auction_triggered v1",
+        "summary": "O Motor abriu um leilão por volatilidade (RN-AUC-030..032).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.auction_triggered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.auction_triggered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "trading-session-service",
+          "market-data-service"
+        ]
+      },
+      "engine.band_update.v1": {
+        "name": "engine.band_update",
+        "title": "engine.band_update v1",
+        "summary": "Comando `BandUpdate`: referência dos túneis do pregão e regras de túnel (RN-INS-040, RN-FCH-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.band_update"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.band_update.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.book_recovered.v1": {
+        "name": "engine.book_recovered",
+        "title": "engine.book_recovered v1",
+        "summary": "Livro recuperado: a sessão retoma o instrumento por leilão (RN-REC-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.book_recovered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.book_recovered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "trading-session-service"
+        ]
+      },
+      "engine.book_recovering.v1": {
+        "name": "engine.book_recovering",
+        "title": "engine.book_recovering v1",
+        "summary": "Livro em recuperação: o instrumento fica `HALTED` com `ENGINE_RECOVERY` (RN-REC-003).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.book_recovering"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.book_recovering.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "trading-session-service"
+        ]
+      },
+      "engine.phase_change.v1": {
+        "name": "engine.phase_change",
+        "title": "engine.phase_change v1",
+        "summary": "Comando `PhaseChange`: fase efetiva de um instrumento no Motor (RN-SES-002, Catálogo §6).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.phase_change"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.phase_change.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "matching-engine"
+        ]
+      },
+      "engine.trade_executed.v1": {
+        "name": "engine.trade_executed",
+        "title": "engine.trade_executed v1",
+        "summary": "Negócio executado (RN-ME-021); a sessão usa o último do contínuo no fechamento (RN-FCH-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "engine.trade_executed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/engine.trade_executed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "matching-engine",
+        "x-consumers": [
+          "oms-service",
+          "clearing-service",
+          "market-data-service",
+          "risk-service",
+          "market-maker-service",
+          "trading-session-service"
         ]
       },
       "example.pinged.v1": {
@@ -5569,6 +6859,227 @@
         "x-producer": "scheduler-service",
         "x-consumers": [
           "routine-owner"
+        ]
+      },
+      "session.circuit_breaker_triggered.v1": {
+        "name": "session.circuit_breaker_triggered",
+        "title": "session.circuit_breaker_triggered v1",
+        "summary": "Circuit breaker simulado disparado (Pregão §6, RN-CB-001..004).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.circuit_breaker_triggered"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.circuit_breaker_triggered.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service",
+          "market-data-service",
+          "realtime-gateway",
+          "risk-service",
+          "notification-service"
+        ]
+      },
+      "session.halt_ended.v1": {
+        "name": "session.halt_ended",
+        "title": "session.halt_ended v1",
+        "summary": "Fim de uma suspensão; a retomada segue por leilão (RN-HLT-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.halt_ended"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.halt_ended.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service",
+          "market-data-service",
+          "realtime-gateway",
+          "risk-service"
+        ]
+      },
+      "session.halt_started.v1": {
+        "name": "session.halt_started",
+        "title": "session.halt_started v1",
+        "summary": "Suspensão de um instrumento ou do mercado (Pregão §5).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.halt_started"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": true
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.halt_started.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service",
+          "market-data-service",
+          "realtime-gateway",
+          "risk-service"
+        ]
+      },
+      "session.phase_changed.v1": {
+        "name": "session.phase_changed",
+        "title": "session.phase_changed v1",
+        "summary": "Fase do mercado (`MARKET`) ou fase efetiva do instrumento que tem estado próprio mudou (RN-SES-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.phase_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.phase_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "oms-service",
+          "market-maker-service",
+          "market-data-service",
+          "realtime-gateway",
+          "risk-service"
+        ]
+      },
+      "session.trading_day_closed.v1": {
+        "name": "session.trading_day_closed",
+        "title": "session.trading_day_closed v1",
+        "summary": "Fim do dia de negociação, depois do pós-fechamento (Pregão §8).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.trading_day_closed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.trading_day_closed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "all-services"
+        ]
+      },
+      "session.trading_day_opened.v1": {
+        "name": "session.trading_day_opened",
+        "title": "session.trading_day_opened v1",
+        "summary": "Abertura lógica do dia de negociação pela rotina das 07:00 (Pregão §8).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "session.trading_day_opened"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/session.trading_day_opened.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "trading-session-service",
+        "x-consumers": [
+          "all-services"
         ]
       },
       "session_schedule.updated.v1": {

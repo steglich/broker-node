@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.trade_executed:v1",
+  "title": "engine.trade_executed v1",
+  "description": "Negócio executado (RN-ME-021); a sessão usa o último do contínuo no fechamento (RN-FCH-001).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "tradeId",
+    "price",
+    "quantity",
+    "buyOrderId",
+    "sellOrderId",
+    "buyAccountId",
+    "sellAccountId",
+    "buyParticipantType",
+    "sellParticipantType",
+    "aggressorSide",
+    "executedAt",
+    "tradingDate"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tradeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "price": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "buyOrderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sellOrderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "buyAccountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sellAccountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "buyParticipantType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CUSTOMER"
+        },
+        {
+          "type": "string",
+          "const": "MARKET_MAKER"
+        },
+        {
+          "type": "string",
+          "const": "SYSTEM"
+        }
+      ]
+    },
+    "sellParticipantType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CUSTOMER"
+        },
+        {
+          "type": "string",
+          "const": "MARKET_MAKER"
+        },
+        {
+          "type": "string",
+          "const": "SYSTEM"
+        }
+      ]
+    },
+    "aggressorSide": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BUY"
+        },
+        {
+          "type": "string",
+          "const": "SELL"
+        },
+        {
+          "type": "string",
+          "const": "NONE"
+        }
+      ]
+    },
+    "executedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tradingDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "auctionId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

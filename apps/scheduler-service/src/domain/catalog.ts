@@ -27,6 +27,8 @@ export const DEFAULT_ROUTINES: readonly RoutineDefinition[] = [
   }),
   trading('closing_call', 'trading-session', { phase: 'CLOSING_CALL' }, ['continuous']),
   trading('post_close', 'trading-session', { phase: 'POST_CLOSE' }, ['closing_call']),
+  // Fim do pós-fechamento: mercado em CLOSED, fechamento definido e fim do dia (Pregão §8–§9).
+  trading('session_close', 'trading-session', { phase: 'CLOSED' }, ['post_close']),
   trading('eod_orders', 'oms-service', { at: '17:05' }, ['post_close']),
   // Notas só depois do fechamento e do fim das ordens do dia (RN-ROT-002).
   trading('brokerage_notes', 'clearing-service', { at: '17:10' }, ['post_close', 'eod_orders']),

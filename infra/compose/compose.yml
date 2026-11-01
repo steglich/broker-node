@@ -92,6 +92,10 @@ secrets:
     file: ../secrets/db/reference_data_app
   db_reference_data_migrator:
     file: ../secrets/db/reference_data_migrator
+  db_trading_session_app:
+    file: ../secrets/db/trading_session_app
+  db_trading_session_migrator:
+    file: ../secrets/db/trading_session_migrator
   db_market_data_app:
     file: ../secrets/db/market_data_app
   db_market_data_migrator:
@@ -530,7 +534,7 @@ services:
       CLOCK_START: ${CLOCK_START:-}
       CLOCK_SPEED_FACTOR: ${CLOCK_SPEED_FACTOR:-1}
       # Tópicos de onde vêm os routine.completed/failed dos donos das rotinas.
-      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-audit,customer}
+      ROUTINE_RESULT_CONTEXTS: ${ROUTINE_RESULT_CONTEXTS:-audit,customer,session}
       ADMIN_API_ENABLED: 'true'
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets: [db_scheduler_app, rabbitmq_password]
@@ -542,6 +546,8 @@ services:
       audit-service:
         condition: service_healthy
       customer-service:
+        condition: service_healthy
+      trading-session-service:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -856,6 +862,74 @@ services:
       traefik.http.routers.reference.rule: Host(`reference.broker.localhost`)
       traefik.http.routers.reference.entrypoints: websecure
       traefik.http.services.reference.loadbalancer.server.port: '8080'
+
+  trading-session-migrate:
+    profiles: [core]
+    image: broker/trading-session-service:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE: '@broker/trading-session-service'
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DB_HOST: postgres
+      DB_NAME: trading_session
+      DB_USER: trading_session_migrator
+      DB_PASSWORD_FILE: /run/secrets/db_trading_session_migrator
+    secrets: [db_trading_session_migrator]
+    networks: [broker]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  # Fases do mercado e dos instrumentos, leilões programados, suspensões, circuit breaker e preço de
+  # fechamento (líder único). No sandbox, SANDBOX_COMMANDS_ENABLED=true (RN-SBX-005).
+  trading-session-service:
+    profiles: [core]
+    image: broker/trading-session-service:local
+    command: ['node', '--import', '@broker/service-kit/telemetry', 'dist/main.js']
+    environment:
+      SERVICE_NAME: trading-session-service
+      ENVIRONMENT: ${BROKER_ENVIRONMENT:-local}
+      PORT: '8080'
+      DB_HOST: postgres
+      DB_NAME: trading_session
+      DB_USER: trading_session_app
+      DB_PASSWORD_FILE: /run/secrets/db_trading_session_app
+      STREAM_HOST: rabbitmq
+      STREAM_USER: broker
+      STREAM_PASSWORD_FILE: /run/secrets/rabbitmq_password
+      VALKEY_HOST: valkey
+      VALKEY_PASSWORD_FILE: /run/secrets/valkey_password
+      CLOCK_MODE: ${CLOCK_MODE:-REAL}
+      CLOCK_START: ${CLOCK_START:-}
+      AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      AUTH_ISSUER: https://auth.broker.localhost
+      AUCTION_EXTENSION_POLICY: ${AUCTION_EXTENSION_POLICY:-CONCLUDE_AT_BAND}
+      MARKET_DATA_OUTAGE_MINUTES: ${MARKET_DATA_OUTAGE_MINUTES:-10}
+      SANDBOX_COMMANDS_ENABLED: ${SANDBOX_COMMANDS_ENABLED:-false}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    secrets:
+      - db_trading_session_app
+      - rabbitmq_password
+      - valkey_password
+    networks: [broker]
+    depends_on:
+      trading-session-migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    <<: [*ready-check, *small]
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.session.rule: Host(`session.broker.localhost`)
+      traefik.http.routers.session.entrypoints: websecure
+      traefik.http.services.session.loadbalancer.server.port: '8080'
 
   market-data-migrate:
     profiles: [core]

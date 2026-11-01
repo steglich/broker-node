@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:session.circuit_breaker_triggered:v1",
+  "title": "session.circuit_breaker_triggered v1",
+  "description": "Circuit breaker simulado disparado (Pregão §6, RN-CB-001..004).",
+  "x-producer": "trading-session-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "level",
+    "indexChangePercent",
+    "resumesAt",
+    "origin"
+  ],
+  "properties": {
+    "level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "indexChangePercent": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "resumesAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "INDEX"
+        },
+        {
+          "type": "string",
+          "const": "BACKOFFICE"
+        },
+        {
+          "type": "string",
+          "const": "SANDBOX"
+        }
+      ]
+    }
+  }
+}

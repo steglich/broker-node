@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.band_update:v1",
+  "title": "engine.band_update v1",
+  "description": "Comando `BandUpdate`: referência dos túneis do pregão e regras de túnel (RN-INS-040, RN-FCH-002).",
+  "x-producer": "trading-session-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "bandReferencePrice",
+    "rejectionBandPct",
+    "staticAuctionBandPct",
+    "dynamicAuctionBandPct",
+    "volatilityAuctionDurationS",
+    "auctionRandomEndMaxS"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "bandReferencePrice": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "rejectionBandPct": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "staticAuctionBandPct": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "dynamicAuctionBandPct": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,8})?$"
+    },
+    "volatilityAuctionDurationS": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "auctionRandomEndMaxS": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

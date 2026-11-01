@@ -7,6 +7,7 @@ export const UPSTREAMS = [
   'ledger',
   'referenceData',
   'marketData',
+  'tradingSession',
   'notification',
 ] as const;
 export type Upstream = (typeof UPSTREAMS)[number];
@@ -18,6 +19,7 @@ export const UPSTREAM_CONTRACTS: Record<Upstream, string> = {
   ledger: 'ledger-service',
   referenceData: 'reference-data-service',
   marketData: 'market-data-service',
+  tradingSession: 'trading-session-service',
   notification: 'notification-service',
 };
 
@@ -160,6 +162,8 @@ export const ROUTES: readonly ForwardRoute[] = [
     upstream: '/v1/market-data/history/:symbol',
   }),
   me('get', '/v1/market/calendar', 'referenceData', { upstream: '/v1/calendar' }),
+  me('get', '/v1/market/session', 'tradingSession'),
+  me('get', '/v1/market/session/:symbol', 'tradingSession'),
 
   // §8 notificações
   me('get', '/v1/me/notifications', 'notification'),

@@ -104,4 +104,14 @@ export const migrations: Record<string, Migration> = {
         ON CONFLICT (name) DO NOTHING`.execute(db);
     },
   },
+  '0007_session_close': {
+    // Rotina do trading-session-service (grupo 21): CLOSED, preço de fechamento e fim do dia.
+    async up(db: Kysely<unknown>) {
+      const r = DEFAULT_ROUTINES.find((d) => d.name === 'session_close')!;
+      await sql`
+        INSERT INTO routine_definition (name, owner, schedule, days, depends_on, enabled)
+        VALUES (${r.name}, ${r.owner}, ${JSON.stringify(r.schedule)}, ${r.days}, ${[...r.dependsOn]}, ${r.enabled})
+        ON CONFLICT (name) DO NOTHING`.execute(db);
+    },
+  },
 };

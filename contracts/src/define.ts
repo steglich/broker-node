@@ -18,6 +18,8 @@ export interface EventContract<S extends TSchema = TSchema> {
    * no próprio tópico (ex.: `routine.completed`, publicado pelo serviço dono da rotina).
    */
   readonly context?: string;
+  /** Tópico `<ambiente>.<contexto>.commands` em vez de `.events` (ex.: comandos do Motor). */
+  readonly kind?: 'events' | 'commands';
 }
 
 export function defineEventContract<S extends TSchema>(

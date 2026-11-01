@@ -40,6 +40,7 @@ const Config = Type.Object({
   LEDGER_URL: Type.String({ default: 'http://ledger-service:8080' }),
   REFERENCE_DATA_URL: Type.String({ default: 'http://reference-data-service:8080' }),
   MARKET_DATA_URL: Type.String({ default: 'http://market-data-service:8080' }),
+  TRADING_SESSION_URL: Type.String({ default: 'http://trading-session-service:8080' }),
   NOTIFICATION_URL: Type.String({ default: 'http://notification-service:8080' }),
 });
 
@@ -86,6 +87,7 @@ const app = await createBffWeb({
     ledger: config.LEDGER_URL,
     referenceData: config.REFERENCE_DATA_URL,
     marketData: config.MARKET_DATA_URL,
+    tradingSession: config.TRADING_SESSION_URL,
     notification: config.NOTIFICATION_URL,
   },
   clientId: config.OAUTH_CLIENT_ID,

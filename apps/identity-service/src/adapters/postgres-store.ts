@@ -183,6 +183,9 @@ export class PostgresIdentityStore implements IdentityStore {
           toUser,
         );
       },
+      async lockCustomer(customerId) {
+        await sql`SELECT pg_advisory_xact_lock(hashtextextended(${customerId}, 0))`.execute(trx);
+      },
       async linkCustomerAccount(customerId, accountId) {
         await sql`INSERT INTO customer_account (customer_id, account_id) VALUES (${customerId}, ${accountId}) ON CONFLICT DO NOTHING`.execute(
           trx,

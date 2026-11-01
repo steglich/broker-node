@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { s256 } from '../src/domain/pkce.js';
+import { migrations } from '../src/migrations.js';
 import {
   app,
   bearer,
@@ -125,6 +126,52 @@ describe('13.2 Authorization Code + PKCE, access token e refresh (Autenticação
     await a.store.transaction((tx) =>
       a.accounts.onCustomerCreated(tx, { customerId, userId: c.userId }),
     );
+    expect(decodeJwt((await login(a, c)).access_token).account_id).toBe(accountId);
+  });
+
+  // As chaves de partição são diferentes (`customer.id` e `account.id`): os dois eventos rodam em
+  // paralelo, e cada transação pode não ver o que a outra ainda não confirmou.
+  it.each([
+    ['account.opened', 'customer.created'],
+    ['customer.created', 'account.opened'],
+  ])('account_id não se perde com %s e %s ao mesmo tempo', async (first) => {
+    const c = await register(a);
+    const customerId = crypto.randomUUID();
+    const accountId = crypto.randomUUID();
+    const handlers = {
+      'account.opened': (tx: Parameters<Parameters<typeof a.store.transaction>[0]>[0]) =>
+        a.accounts.onAccountOpened(tx, { accountId, customerId }),
+      'customer.created': (tx: Parameters<Parameters<typeof a.store.transaction>[0]>[0]) =>
+        a.accounts.onCustomerCreated(tx, { customerId, userId: c.userId }),
+    };
+    const second = first === 'account.opened' ? 'customer.created' : 'account.opened';
+
+    // A primeira transação aplica o efeito e demora a confirmar; a segunda roda nesse intervalo.
+    let applied!: () => void;
+    const firstApplied = new Promise<void>((resolve) => (applied = resolve));
+    const firstTx = a.store.transaction(async (tx) => {
+      await handlers[first as keyof typeof handlers](tx);
+      applied();
+      await new Promise((r) => setTimeout(r, 300));
+    });
+    await firstApplied;
+    await a.store.transaction((tx) => handlers[second as keyof typeof handlers](tx));
+    await firstTx;
+
+    expect(decodeJwt((await login(a, c)).access_token).account_id).toBe(accountId);
+  });
+
+  it('a migração de reparo devolve o account_id a quem caiu na corrida', async () => {
+    const c = await register(a);
+    const customerId = crypto.randomUUID();
+    const accountId = crypto.randomUUID();
+    await a.store.transaction(async (tx) => {
+      await a.accounts.onCustomerCreated(tx, { customerId, userId: c.userId });
+      await tx.linkCustomerAccount(customerId, accountId);
+    });
+    expect(decodeJwt((await login(a, c)).access_token).account_id).toBeUndefined();
+
+    await migrations['0003_repair_user_account']!.up(env.db);
     expect(decodeJwt((await login(a, c)).access_token).account_id).toBe(accountId);
   });
 

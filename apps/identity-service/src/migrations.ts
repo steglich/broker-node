@@ -302,4 +302,17 @@ export const migrations: Record<string, Migration> = {
       }
     },
   },
+  // Quem caiu na corrida entre `customer.created` e `account.opened` ficava sem `account_id` para
+  // sempre: os dois eventos já tinham sido consumidos.
+  '0003_repair_user_account': {
+    async up(db: Kysely<unknown>) {
+      await sql`
+        UPDATE "user" u
+        SET account_id = (
+          SELECT min(ca.account_id::text)::uuid FROM customer_account ca
+          WHERE ca.customer_id = u.customer_id
+        )
+        WHERE u.account_id IS NULL AND u.customer_id IS NOT NULL`.execute(db);
+    },
+  },
 };

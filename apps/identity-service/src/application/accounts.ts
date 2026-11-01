@@ -271,11 +271,16 @@ export class Accounts {
 
   // ---------------------------------------------------------------- usuário → cliente → conta
 
-  /** `customer.created`: o usuário passa a ter cliente (e a conta, se já foi aberta). */
+  /**
+   * `customer.created`: o usuário passa a ter cliente (e a conta, se já foi aberta). Roda em paralelo
+   * com `account.opened`, que tem outra chave de partição. Sem o lock, cada transação pode não ver o
+   * que a outra ainda não confirmou, e o `account_id` nunca seria preenchido.
+   */
   async onCustomerCreated(
     tx: IdentityTx,
     e: { customerId: string; userId: string },
   ): Promise<void> {
+    await tx.lockCustomer(e.customerId);
     const user = await tx.userById(e.userId, { forUpdate: true });
     if (!user) return;
     const [accountId] = await tx.accountsOfCustomer(e.customerId);
@@ -290,6 +295,7 @@ export class Accounts {
     tx: IdentityTx,
     e: { accountId: string; customerId: string },
   ): Promise<void> {
+    await tx.lockCustomer(e.customerId);
     await tx.linkCustomerAccount(e.customerId, e.accountId);
     for (const user of await tx.usersByCustomer(e.customerId)) {
       if (!user.accountId) await tx.updateUser(user.id, { accountId: e.accountId });

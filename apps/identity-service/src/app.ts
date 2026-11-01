@@ -127,7 +127,8 @@ export async function createIdentityService(d: IdentityServiceDeps) {
           superStream: topicName(environment, 'customer'),
           stream: d.stream,
           db: d.db,
-          // Os três handlers comutam: a ordem entre cliente e conta não importa (customer_account).
+          // A ordem entre cliente e conta não importa (customer_account), e o lock por cliente cobre a
+          // execução em paralelo das partições.
           ordered: false,
           newId: d.newId,
           onError: (err) =>

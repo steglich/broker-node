@@ -177,6 +177,8 @@ export interface IdentityTx {
   ): Promise<void>;
   usersByCustomer(customerId: string): Promise<UserRow[]>;
   usersByAccount(accountId: string): Promise<UserRow[]>;
+  /** Até o fim da transação: serializa o que cruza usuário, cliente e conta. */
+  lockCustomer(customerId: string): Promise<void>;
   linkCustomerAccount(customerId: string, accountId: string): Promise<void>;
   accountsOfCustomer(customerId: string): Promise<string[]>;
 

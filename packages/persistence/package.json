@@ -26,6 +26,7 @@
     "pg": "8.23.1"
   },
   "devDependencies": {
+    "@broker/clock": "workspace:*",
     "@broker/testing": "workspace:*",
     "@broker/tsconfig": "workspace:*",
     "@types/node": "^24.19.2",

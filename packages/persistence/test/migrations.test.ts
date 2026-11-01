@@ -52,6 +52,7 @@ describe('migrador (RN-DB-020)', () => {
     expect(first.results?.map((r) => [r.migrationName, r.status])).toEqual([
       ['0000_platform_base', 'Success'],
       ['0000_platform_blocked_key_retry', 'Success'],
+      ['0000_platform_environment_clock', 'Success'],
       ['0001_account_balance', 'Success'],
     ]);
     const second = await migrateToLatest(migrator, migrations);
@@ -62,6 +63,7 @@ describe('migrador (RN-DB-020)', () => {
     expect(applied.rows.map((r) => r.name)).toEqual([
       '0000_platform_base',
       '0000_platform_blocked_key_retry',
+      '0000_platform_environment_clock',
       '0001_account_balance',
     ]);
   });

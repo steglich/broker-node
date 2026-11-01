@@ -9,6 +9,7 @@ export const TEST_SERVICES = [
   'crypto',
   'leader',
   'calendar',
+  'clock',
 ] as const;
 
 export interface PostgresInfo {

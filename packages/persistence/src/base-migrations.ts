@@ -1,5 +1,6 @@
 import { sql, type Kysely } from 'kysely';
 import type { Migration } from 'kysely/migration';
+import { environmentClockMigrations } from './environment-clock.js';
 
 /**
  * Migrações-base reutilizadas por todos os serviços (RN-DB §4, D6, D7). Um serviço monta a lista
@@ -191,4 +192,7 @@ export const baseMigrations: Record<string, Migration> = {
       );
     },
   },
+
+  // Relógio do ambiente restaurado na subida dos serviços com relógio VIRTUAL/ACCELERATED.
+  ...environmentClockMigrations,
 };

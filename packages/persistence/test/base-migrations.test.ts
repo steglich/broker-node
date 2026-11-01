@@ -39,6 +39,7 @@ describe('tabelas técnicas obrigatórias (RN-DB §4)', () => {
         'blocked_key',
         'consumer_offset',
         'dead_letter',
+        'environment_clock',
         'idempotency_record',
         'outbox_event',
         'parked_message',

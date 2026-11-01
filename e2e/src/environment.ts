@@ -12,17 +12,15 @@ export const environmentClock = async (): Promise<ClockView> =>
 
 /**
  * `advance_to(t)` (só em VIRTUAL): o agendador anda até `t` publicando `clock.ticked`, e cada
- * serviço segue o relógio quando consome o tick. Anda sempre ao menos 1 s: o tick novo também
- * acerta um serviço que reiniciou e voltou ao `CLOCK_START` (ele só acompanha o ambiente pelo
- * próximo tick).
+ * serviço segue o relógio quando consome o tick. O relógio não volta: se já passou de `t`, fica.
  */
 export async function advanceClock(to: Date): Promise<ClockView> {
-  const current = Date.parse((await environmentClock()).now);
-  const target = new Date(Math.max(to.getTime(), current + 1000));
+  const current = await environmentClock();
+  if (Date.parse(current.now) >= to.getTime()) return current;
   return expectStatus(
     await http<ClockView>(`${urls.scheduler}/v1/clock/advance`, {
       method: 'POST',
-      body: { to: target.toISOString() },
+      body: { to: to.toISOString() },
     }),
     200,
   ).body;

@@ -13,7 +13,7 @@ import {
   topicName,
   type StreamSettings,
 } from '@broker/messaging';
-import type { DatabaseConfig } from '@broker/persistence';
+import { EnvironmentClockReplica, type DatabaseConfig } from '@broker/persistence';
 import {
   createService,
   type Authenticator,
@@ -63,6 +63,11 @@ export async function createIdentityService(d: IdentityServiceDeps) {
   const auth = new Auth(deps, factors);
   const signature = new TradingSignature(deps);
   const recovery = new Recovery(deps, auth, factors, accounts);
+  // Relógio VIRTUAL/ACCELERATED: retoma o último instante do ambiente antes de qualquer uso; sem
+  // isso, o serviço reiniciado voltaria ao CLOCK_START até o próximo `clock.ticked` (RN-CLK-003).
+  const environmentClock =
+    d.clock instanceof TickedClock ? new EnvironmentClockReplica(d.db, d.clock) : undefined;
+  await environmentClock?.restore();
   await d.signer.ensureKey(d.clock.now());
 
   let relay: OutboxRelay | undefined;
@@ -84,10 +89,9 @@ export async function createIdentityService(d: IdentityServiceDeps) {
       clock: d.clock,
       onError: (err) => d.logger.error({ event: 'outbox.relay_failed', err }, 'falha no relay'),
     });
-    if (d.clock instanceof TickedClock) {
-      // Relógio VIRTUAL/ACCELERATED (RN-CLK-003): emissão, expiração e janelas de sessão e MFA
-      // seguem o relógio do ambiente, que anda pelos `clock.ticked` do agendador.
-      const clock = d.clock;
+    if (environmentClock) {
+      // Emissão, expiração e janelas de sessão e MFA seguem o relógio do ambiente, que anda pelos
+      // `clock.ticked` do agendador.
       const schedulerTopic = topicName(environment, 'scheduler');
       await ensureSuperStream(client, schedulerTopic, { partitions: 1, maxAge: '30D' });
       consumers.push(
@@ -105,8 +109,8 @@ export async function createIdentityService(d: IdentityServiceDeps) {
           handlers: {
             'clock.ticked': {
               definition: ClockTickedV1,
-              handle: async (_trx, e) => {
-                clock.apply(e.payload as { virtualNow: string });
+              handle: async (trx, e) => {
+                await environmentClock.apply(trx, e.payload as { virtualNow: string });
               },
             },
           },

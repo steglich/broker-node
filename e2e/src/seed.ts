@@ -21,8 +21,8 @@ const SCENARIOS: { name: string; digit: KycScenarioDigit; expect: string; balanc
   { name: 'kyc.reprovado', digit: 9, expect: 'REJECTED' },
 ];
 
-// No modo VIRTUAL, o relógio do ambiente anda até o agora (ou um tick adiante): o depósito vence
-// por ele, e o pagamento chega com o horário real do Banco Simulado.
+// No modo VIRTUAL, o relógio do ambiente anda até o agora, se ainda não passou dele: o depósito
+// vence por ele, e o pagamento chega com o horário real do Banco Simulado.
 const clock = await environmentClock();
 if (clock.mode === 'VIRTUAL') await advanceClock(new Date());
 

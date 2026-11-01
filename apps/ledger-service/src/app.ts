@@ -17,7 +17,7 @@ import {
   topicName,
   type StreamSettings,
 } from '@broker/messaging';
-import { CalendarReplica, type DatabaseConfig } from '@broker/persistence';
+import { CalendarReplica, EnvironmentClockReplica, type DatabaseConfig } from '@broker/persistence';
 import {
   createService,
   IdempotencyStore,
@@ -62,6 +62,11 @@ export interface LedgerServiceDeps extends Omit<LedgerDeps, 'store' | 'holds'> {
 /** Monta o ledger-service (catálogo de serviços §3). */
 export async function createLedgerService(d: LedgerServiceDeps) {
   const environment = d.config.ENVIRONMENT;
+  // Relógio VIRTUAL/ACCELERATED: retoma o último instante do ambiente antes de qualquer uso; sem
+  // isso, o serviço reiniciado voltaria ao CLOCK_START até o próximo `clock.ticked` (RN-CLK-003).
+  const environmentClock =
+    d.clock instanceof TickedClock ? new EnvironmentClockReplica(d.db, d.clock) : undefined;
+  await environmentClock?.restore();
   const publisher = new EventPublisher({
     source: d.config.SERVICE_NAME,
     environment,
@@ -219,9 +224,8 @@ export async function createLedgerService(d: LedgerServiceDeps) {
           },
           'clock.ticked': {
             definition: ClockTickedV1,
-            handle: async (_trx, e) => {
-              if (d.clock instanceof TickedClock)
-                d.clock.apply(e.payload as { virtualNow: string });
+            handle: async (trx, e) => {
+              await environmentClock?.apply(trx, e.payload as { virtualNow: string });
             },
           },
         },

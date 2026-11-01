@@ -15,7 +15,7 @@ import {
   topicName,
   type StreamSettings,
 } from '@broker/messaging';
-import type { DatabaseConfig } from '@broker/persistence';
+import { EnvironmentClockReplica, type DatabaseConfig } from '@broker/persistence';
 import {
   createService,
   IdempotencyStore,
@@ -56,6 +56,11 @@ export interface CustomerServiceDeps extends Omit<CustomerDeps, 'store'> {
 /** Monta o customer-service (catálogo de serviços §2). */
 export async function createCustomerService(d: CustomerServiceDeps) {
   const environment = d.config.ENVIRONMENT;
+  // Relógio VIRTUAL/ACCELERATED: retoma o último instante do ambiente antes de qualquer uso; sem
+  // isso, o serviço reiniciado voltaria ao CLOCK_START até o próximo `clock.ticked` (RN-CLK-003).
+  const environmentClock =
+    d.clock instanceof TickedClock ? new EnvironmentClockReplica(d.db, d.clock) : undefined;
+  await environmentClock?.restore();
   const publisher = new EventPublisher({
     source: d.config.SERVICE_NAME,
     environment,
@@ -209,9 +214,8 @@ export async function createCustomerService(d: CustomerServiceDeps) {
           },
           'clock.ticked': {
             definition: ClockTickedV1,
-            handle: async (_trx, e) => {
-              if (d.clock instanceof TickedClock)
-                d.clock.apply(e.payload as { virtualNow: string });
+            handle: async (trx, e) => {
+              await environmentClock?.apply(trx, e.payload as { virtualNow: string });
             },
           },
         },

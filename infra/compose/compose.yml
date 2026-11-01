@@ -160,7 +160,9 @@ services:
     ports: ['${POSTGRES_PORT:-5432}:5432']
     networks: [broker]
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      # Por TCP: no primeiro start, o servidor temporário do init só escuta no socket Unix, e pelo
+      # socket o contêiner ficaria saudável antes de aceitar as conexões dos serviços.
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U postgres -d postgres']
       interval: 5s
       timeout: 3s
       retries: 20

@@ -349,7 +349,9 @@ export class TokenHandler {
     if (!sealed) throw fail();
     try {
       const raw = Buffer.from(sealed, 'base64url');
-      const d = createDecipheriv('aes-256-gcm', this.o.loginKey, raw.subarray(0, 12));
+      const d = createDecipheriv('aes-256-gcm', this.o.loginKey, raw.subarray(0, 12), {
+        authTagLength: 16,
+      });
       d.setAuthTag(raw.subarray(12, 28));
       const json = Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString('utf8');
       return JSON.parse(json) as { verifier: string; mfaToken: string };

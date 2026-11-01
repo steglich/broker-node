@@ -1,5 +1,5 @@
 import { Instant } from '@broker/domain-kernel';
-import { testClock } from '@broker/testing';
+import { eventually, testClock } from '@broker/testing';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { loadFixture } from '../src/adapters/brapi/fixtures.js';
@@ -150,10 +150,14 @@ describe('agendamento adaptativo (RN-BRP-050..053)', () => {
       quoteFixture('PETR4', 38, at('2026-10-27T13:55:00Z')),
     );
     expect(await a.poller.tick()).toBe(2);
-    await new Promise((r) => setTimeout(r, 300));
-    const s = new Map(
-      (await a.store.transaction((tx) => tx.schedules())).map((x) => [x.symbol, x]),
-    );
+    // As duas leituras (PETR4 e Ibovespa) rodam em segundo plano: espera os dois reagendamentos.
+    const s = await eventually(async () => {
+      const m = new Map(
+        (await a.store.transaction((tx) => tx.schedules())).map((x) => [x.symbol, x]),
+      );
+      expect([...m.keys()].sort()).toEqual(['PETR4', '^BVSP'].sort());
+      return m;
+    });
     // Folga fixa do teste: 120 s.
     expect(s.get('PETR4')!.nextReadAt.toString()).toBe('2026-10-27T14:27:00.000Z');
     // Nada vencido: a rodada seguinte não pede nada.
@@ -190,13 +194,15 @@ describe('orçamento e degradação (RN-BRP-030..035)', () => {
   it('RN-BRP-030/032: lê o E9, conta cada envio e recalcula o orçamento', async () => {
     const a = await app(env, { metered: true });
     await a.work();
-    await new Promise((r) => setTimeout(r, 200));
-    const state = await a.http
-      .get('/v1/bo/market-data/provider')
-      .set(bearer(a.tokens.market))
-      .expect(200);
-    expect(state.body.budget).toMatchObject({ level: 'NORMAL', metered: true, planLimit: 15000 });
-    expect(state.body.budget.remaining).toBeLessThanOrEqual(10_800);
+    // A leitura do E9 roda em segundo plano: o orçamento muda quando ela termina.
+    await eventually(async () => {
+      const state = await a.http
+        .get('/v1/bo/market-data/provider')
+        .set(bearer(a.tokens.market))
+        .expect(200);
+      expect(state.body.budget).toMatchObject({ level: 'NORMAL', metered: true, planLimit: 15000 });
+      expect(state.body.budget.remaining).toBeLessThanOrEqual(10_800);
+    });
     await instrument(a, 'PETR4');
     await a.poller.read('PETR4', 1, null);
     expect((await a.store.transaction((tx) => tx.usage())).sentSinceUsage).toBeGreaterThanOrEqual(

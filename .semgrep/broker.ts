@@ -23,3 +23,5 @@ declare const signature: string;
 declare const expected: string;
 // ruleid: webhook-signature-non-constant-compare
 if (signature === expected) console.log(agent, safe);
+// ok: webhook-signature-non-constant-compare
+if (signature.length === 1) console.log(agent, safe);

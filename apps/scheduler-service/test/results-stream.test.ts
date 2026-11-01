@@ -185,10 +185,13 @@ describe('cópia local do calendário (D15)', () => {
       15_000,
       'cópia local',
     );
-    const stored = await sql<{
-      source_event_id: string;
-    }>`SELECT source_event_id FROM calendar_replica`.execute(env.db);
-    expect(stored.rows).toEqual([{ source_event_id: message.eventId }]);
+    // A memória troca dentro da transação do consumidor: a linha aparece no commit, logo depois.
+    const stored = () =>
+      sql<{ source_event_id: string }>`SELECT source_event_id FROM calendar_replica`.execute(
+        env.db,
+      );
+    await waitUntil(async () => (await stored()).rows.length > 0, 15_000, 'cópia gravada');
+    expect((await stored()).rows).toEqual([{ source_event_id: message.eventId }]);
 
     await waitUntil(() => a.isLeader(), 10_000, 'liderança');
     await a.runner.advanceTo(brt('2026-03-06', '09:00'));

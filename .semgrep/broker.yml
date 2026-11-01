@@ -40,3 +40,7 @@ rules:
       - metavariable-regex:
           metavariable: $A
           regex: (?i).*signature.*
+      # Comparar com um número não é comparar assinatura (ex.: `exists(...signature...) === 1`).
+      - metavariable-regex:
+          metavariable: $B
+          regex: ^(?!\d+$).*

@@ -18,7 +18,8 @@ Ledger de partidas dobradas, saldos, depósito e saque por PIX simulado, extrato
   customer-service), o valor bate, a cobrança vale e a conta não está bloqueada. Senão, devolve.
 - **Saque** (`/v1/me/withdrawals`, assinatura `WITHDRAWALS`): hold → (revisão acima de R$ 50 mil
   em `/v1/bo/withdrawals`) → PIX → lançamento. Limite diário e noturno; até 5 tentativas em
-  30 min. Na Fase 1 os holds ficam no próprio ledger (`withdrawal_hold`, `LocalRiskHoldPort`).
+  30 min. Os holds são RPC no risk-service (`RpcRiskHoldPort`), e o sacável desconta a cópia `risk_hold_copy`,
+  alimentada por `risk.hold_*`. Risco parado: `503 RISK_UNAVAILABLE`, e nada vai ao PIX.
 - **Extrato** (`/v1/me/statement`, `/future`): filtros por período, tipo e status, cursor e saldo
   após cada lançamento.
 - **Reconciliação PIX** (rotina `pix_reconciliation`, 23:15): transações do Banco Simulado contra

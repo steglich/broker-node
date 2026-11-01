@@ -2,7 +2,6 @@
 import { Instant } from '@broker/domain-kernel';
 import { uuidv7 } from '@broker/ids';
 import { testClock } from '@broker/testing';
-import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   app,
@@ -73,12 +72,7 @@ const getW = async (x: App, c: Client, id: string) =>
     endToEndId?: string;
   };
 
-const holdOf = async (id: string) =>
-  (
-    await sql<{ status: string }>`SELECT status FROM withdrawal_hold WHERE id = ${id}`.execute(
-      env.db,
-    )
-  ).rows[0]?.status;
+const holdOf = (id: string) => Promise.resolve(a.riskHolds.holds.get(id)?.status);
 
 const eventsOf = async (type: string, withdrawalId: string) =>
   (await outbox(env.db, type)).filter((e) => e.payload['withdrawalId'] === withdrawalId);

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:risk.pretrade_rejected:v1",
+  "title": "risk.pretrade_rejected v1",
+  "description": "Ordem recusada no pré-trade, com o código e os valores usados (RN-PTC-002).",
+  "x-producer": "risk-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "requestId",
+    "accountId",
+    "orderId",
+    "rejectCode"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "classification": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "COVERED_BUY"
+        },
+        {
+          "type": "string",
+          "const": "COVERED_SELL"
+        },
+        {
+          "type": "string",
+          "const": "SHORT_SALE"
+        }
+      ]
+    },
+    "rejectCode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "figures": {
+      "type": "object",
+      "required": [
+        "required",
+        "available"
+      ],
+      "properties": {
+        "required": {
+          "type": "string"
+        },
+        "available": {
+          "type": "string"
+        },
+        "buyingPower": {
+          "type": "string",
+          "pattern": "^-?\\d+\\.\\d{2}$"
+        }
+      }
+    }
+  }
+}

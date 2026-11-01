@@ -23,7 +23,13 @@ describe('cenários de referência (golden master)', () => {
 
   it('carrega os cenários do repositório (e não as fixtures de teste)', () => {
     const ids = scenarios.map((s) => s.id);
-    expect(ids.filter((id) => !id.startsWith('ME-'))).toEqual(['CAL-001', 'FEE-010', 'LED-001']);
+    expect(ids.filter((id) => !id.startsWith('ME-'))).toEqual([
+      'CAL-001',
+      'FEE-010',
+      'LED-001',
+      'RSK-001',
+      'RSK-030',
+    ]);
     // A lista mínima da estratégia de testes §3.1.
     const engine = new Set(ids.filter((id) => id.startsWith('ME-')).map((id) => id.slice(0, 6)));
     for (let n = 1; n <= 14; n++) expect(engine).toContain(`ME-${String(n).padStart(3, '0')}`);

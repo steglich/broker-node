@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:risk.buying_power_changed:v1",
+  "title": "risk.buying_power_changed v1",
+  "description": "Poder de compra mudou, com throttle por conta (Risco §12).",
+  "x-producer": "risk-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "accountId",
+    "cash",
+    "asOf"
+  ],
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "cash": {
+      "type": "string",
+      "pattern": "^-?\\d+\\.\\d{2}$"
+    },
+    "dayTrade": {
+      "type": "string",
+      "pattern": "^-?\\d+\\.\\d{2}$"
+    },
+    "asOf": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

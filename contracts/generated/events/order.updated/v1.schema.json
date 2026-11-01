@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:order.updated:v1",
+  "title": "order.updated v1",
+  "description": "Ordem depois de qualquer mudança: estado, quantidades e versão (Catálogo §6).",
+  "x-producer": "oms-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "orderId",
+    "accountId",
+    "instrumentId",
+    "side",
+    "status",
+    "quantity",
+    "filledQuantity",
+    "remainingQuantity",
+    "canceledQuantity",
+    "version"
+  ],
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "accountId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "side": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BUY"
+        },
+        {
+          "type": "string",
+          "const": "SELL"
+        }
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "RECEIVED"
+        },
+        {
+          "type": "string",
+          "const": "SCHEDULED"
+        },
+        {
+          "type": "string",
+          "const": "PENDING_TRIGGER"
+        },
+        {
+          "type": "string",
+          "const": "PENDING_NEW"
+        },
+        {
+          "type": "string",
+          "const": "NEW"
+        },
+        {
+          "type": "string",
+          "const": "PARTIALLY_FILLED"
+        },
+        {
+          "type": "string",
+          "const": "PENDING_REPLACE"
+        },
+        {
+          "type": "string",
+          "const": "PENDING_CANCEL"
+        },
+        {
+          "type": "string",
+          "const": "FILLED"
+        },
+        {
+          "type": "string",
+          "const": "CANCELED"
+        },
+        {
+          "type": "string",
+          "const": "REJECTED"
+        },
+        {
+          "type": "string",
+          "const": "EXPIRED"
+        }
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "filledQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "remainingQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "canceledQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

@@ -499,33 +499,19 @@ export class PostgresLedgerStore implements LedgerStore {
         ).map(toWithdrawal);
       },
 
-      // ------------------------------------------------------------ holds locais
-      async insertHold(h, at) {
-        return affected(sql`
-          INSERT INTO withdrawal_hold (id, account_id, amount, status, created_at, updated_at)
-          VALUES (${h.id}, ${h.accountId}, ${h.amount.amount}, 'ACTIVE', ${at.toString()}, ${at.toString()})
-          ON CONFLICT (id) DO NOTHING`);
-      },
-      async hold(id) {
-        const r = await one(sql`SELECT * FROM withdrawal_hold WHERE id = ${id}`);
-        return r
-          ? {
-              id: r['id'] as string,
-              accountId: r['account_id'] as string,
-              amount: brl(r['amount']),
-              status: r['status'] as string,
-            }
-          : null;
-      },
-      async settleHold(id, status, at) {
+      // ------------------------------------------------------------ cópia dos holds do Risco
+      async upsertHoldCopy(h) {
         await sql`
-          UPDATE withdrawal_hold SET status = ${status}, updated_at = ${at.toString()}
-          WHERE id = ${id} AND status = 'ACTIVE'`.execute(trx);
+          INSERT INTO risk_hold_copy (hold_id, account_id, amount)
+          VALUES (${h.holdId}, ${h.accountId}, ${h.amount.amount})
+          ON CONFLICT (hold_id) DO UPDATE SET amount = EXCLUDED.amount`.execute(trx);
       },
-      async activeHolds(accountId) {
+      async deleteHoldCopy(holdId) {
+        await sql`DELETE FROM risk_hold_copy WHERE hold_id = ${holdId}`.execute(trx);
+      },
+      async heldAmount(accountId) {
         const r = await one(sql`
-          SELECT coalesce(sum(amount), 0) AS s FROM withdrawal_hold
-          WHERE account_id = ${accountId} AND status = 'ACTIVE'`);
+          SELECT coalesce(sum(amount), 0) AS s FROM risk_hold_copy WHERE account_id = ${accountId}`);
         return brl(r!['s']);
       },
 

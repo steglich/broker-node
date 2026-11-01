@@ -358,6 +358,59 @@
         }
       }
     },
+    "oms": {
+      "address": "{environment}.oms.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "order.canceled.v1": {
+          "$ref": "#/components/messages/order.canceled.v1"
+        },
+        "order.expired.v1": {
+          "$ref": "#/components/messages/order.expired.v1"
+        },
+        "order.rejected.v1": {
+          "$ref": "#/components/messages/order.rejected.v1"
+        },
+        "order.updated.v1": {
+          "$ref": "#/components/messages/order.updated.v1"
+        }
+      }
+    },
+    "risk": {
+      "address": "{environment}.risk.events",
+      "parameters": {
+        "environment": {
+          "description": "Ambiente isolado (RN-PAD-080)."
+        }
+      },
+      "messages": {
+        "risk.buying_power_changed.v1": {
+          "$ref": "#/components/messages/risk.buying_power_changed.v1"
+        },
+        "risk.hold_adjusted.v1": {
+          "$ref": "#/components/messages/risk.hold_adjusted.v1"
+        },
+        "risk.hold_consumed.v1": {
+          "$ref": "#/components/messages/risk.hold_consumed.v1"
+        },
+        "risk.hold_created.v1": {
+          "$ref": "#/components/messages/risk.hold_created.v1"
+        },
+        "risk.hold_released.v1": {
+          "$ref": "#/components/messages/risk.hold_released.v1"
+        },
+        "risk.pretrade_approved.v1": {
+          "$ref": "#/components/messages/risk.pretrade_approved.v1"
+        },
+        "risk.pretrade_rejected.v1": {
+          "$ref": "#/components/messages/risk.pretrade_rejected.v1"
+        }
+      }
+    },
     "session": {
       "address": "{environment}.session.events",
       "parameters": {
@@ -1141,6 +1194,127 @@
       "messages": [
         {
           "$ref": "#/channels/customer/messages/onboarding.submitted.v1"
+        }
+      ]
+    },
+    "oms-service.send.order.canceled.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/oms"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/oms/messages/order.canceled.v1"
+        }
+      ]
+    },
+    "oms-service.send.order.expired.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/oms"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/oms/messages/order.expired.v1"
+        }
+      ]
+    },
+    "oms-service.send.order.rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/oms"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/oms/messages/order.rejected.v1"
+        }
+      ]
+    },
+    "oms-service.send.order.updated.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/oms"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/oms/messages/order.updated.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.buying_power_changed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.buying_power_changed.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.hold_adjusted.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.hold_adjusted.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.hold_consumed.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.hold_consumed.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.hold_created.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.hold_created.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.hold_released.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.hold_released.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.pretrade_approved.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.pretrade_approved.v1"
+        }
+      ]
+    },
+    "risk-service.send.risk.pretrade_rejected.v1": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/risk"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/risk/messages/risk.pretrade_rejected.v1"
         }
       ]
     },
@@ -4990,6 +5164,665 @@
           }
         }
       },
+      "order.canceled.v1": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "accountId",
+          "canceledQuantity",
+          "reason"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "canceledQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "order.expired.v1": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "accountId",
+          "canceledQuantity",
+          "reason"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "canceledQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "order.rejected.v1": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "accountId",
+          "rejectCode"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rejectCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "figures": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {}
+            }
+          }
+        }
+      },
+      "order.updated.v1": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "accountId",
+          "instrumentId",
+          "side",
+          "status",
+          "quantity",
+          "filledQuantity",
+          "remainingQuantity",
+          "canceledQuantity",
+          "version"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instrumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BUY"
+              },
+              {
+                "type": "string",
+                "const": "SELL"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "RECEIVED"
+              },
+              {
+                "type": "string",
+                "const": "SCHEDULED"
+              },
+              {
+                "type": "string",
+                "const": "PENDING_TRIGGER"
+              },
+              {
+                "type": "string",
+                "const": "PENDING_NEW"
+              },
+              {
+                "type": "string",
+                "const": "NEW"
+              },
+              {
+                "type": "string",
+                "const": "PARTIALLY_FILLED"
+              },
+              {
+                "type": "string",
+                "const": "PENDING_REPLACE"
+              },
+              {
+                "type": "string",
+                "const": "PENDING_CANCEL"
+              },
+              {
+                "type": "string",
+                "const": "FILLED"
+              },
+              {
+                "type": "string",
+                "const": "CANCELED"
+              },
+              {
+                "type": "string",
+                "const": "REJECTED"
+              },
+              {
+                "type": "string",
+                "const": "EXPIRED"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "filledQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "remainingQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "canceledQuantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "risk.buying_power_changed.v1": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "cash",
+          "asOf"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cash": {
+            "type": "string",
+            "pattern": "^-?\\d+\\.\\d{2}$"
+          },
+          "dayTrade": {
+            "type": "string",
+            "pattern": "^-?\\d+\\.\\d{2}$"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "risk.hold_adjusted.v1": {
+        "type": "object",
+        "required": [
+          "holdId",
+          "accountId",
+          "type",
+          "resource",
+          "amount",
+          "reference"
+        ],
+        "properties": {
+          "holdId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ORDER_CASH"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_POSITION"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_MARGIN"
+              },
+              {
+                "type": "string",
+                "const": "WITHDRAWAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_COLLATERAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_LENT"
+              }
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "risk.hold_consumed.v1": {
+        "type": "object",
+        "required": [
+          "holdId",
+          "accountId",
+          "type",
+          "resource",
+          "amount",
+          "reference"
+        ],
+        "properties": {
+          "holdId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ORDER_CASH"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_POSITION"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_MARGIN"
+              },
+              {
+                "type": "string",
+                "const": "WITHDRAWAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_COLLATERAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_LENT"
+              }
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "risk.hold_created.v1": {
+        "type": "object",
+        "required": [
+          "holdId",
+          "accountId",
+          "type",
+          "resource",
+          "amount",
+          "reference"
+        ],
+        "properties": {
+          "holdId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ORDER_CASH"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_POSITION"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_MARGIN"
+              },
+              {
+                "type": "string",
+                "const": "WITHDRAWAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_COLLATERAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_LENT"
+              }
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "risk.hold_released.v1": {
+        "type": "object",
+        "required": [
+          "holdId",
+          "accountId",
+          "type",
+          "resource",
+          "amount",
+          "reference"
+        ],
+        "properties": {
+          "holdId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "ORDER_CASH"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_POSITION"
+              },
+              {
+                "type": "string",
+                "const": "ORDER_MARGIN"
+              },
+              {
+                "type": "string",
+                "const": "WITHDRAWAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_COLLATERAL"
+              },
+              {
+                "type": "string",
+                "const": "BTC_LENT"
+              }
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "risk.pretrade_approved.v1": {
+        "type": "object",
+        "required": [
+          "requestId",
+          "accountId",
+          "orderId",
+          "holdId",
+          "classification",
+          "figures"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "holdId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "COVERED_BUY"
+              },
+              {
+                "type": "string",
+                "const": "COVERED_SELL"
+              },
+              {
+                "type": "string",
+                "const": "SHORT_SALE"
+              }
+            ]
+          },
+          "figures": {
+            "type": "object",
+            "required": [
+              "required",
+              "available"
+            ],
+            "properties": {
+              "required": {
+                "type": "string"
+              },
+              "available": {
+                "type": "string"
+              },
+              "buyingPower": {
+                "type": "string",
+                "pattern": "^-?\\d+\\.\\d{2}$"
+              }
+            }
+          }
+        }
+      },
+      "risk.pretrade_rejected.v1": {
+        "type": "object",
+        "required": [
+          "requestId",
+          "accountId",
+          "orderId",
+          "rejectCode"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "COVERED_BUY"
+              },
+              {
+                "type": "string",
+                "const": "COVERED_SELL"
+              },
+              {
+                "type": "string",
+                "const": "SHORT_SALE"
+              }
+            ]
+          },
+          "rejectCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "figures": {
+            "type": "object",
+            "required": [
+              "required",
+              "available"
+            ],
+            "properties": {
+              "required": {
+                "type": "string"
+              },
+              "available": {
+                "type": "string"
+              },
+              "buyingPower": {
+                "type": "string",
+                "pattern": "^-?\\d+\\.\\d{2}$"
+              }
+            }
+          }
+        }
+      },
       "routine.completed.v1": {
         "type": "object",
         "required": [
@@ -8284,6 +9117,395 @@
           "notification-service"
         ]
       },
+      "order.canceled.v1": {
+        "name": "order.canceled",
+        "title": "order.canceled v1",
+        "summary": "Ordem cancelada; o Risco libera a parte cancelada do hold (RN-HLD-004).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "order.canceled"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/order.canceled.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "risk-service",
+          "notification-service"
+        ]
+      },
+      "order.expired.v1": {
+        "name": "order.expired",
+        "title": "order.expired v1",
+        "summary": "Validade da ordem terminou; o Risco libera o que restava do hold (RN-HLD-004).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "order.expired"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/order.expired.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "risk-service",
+          "notification-service"
+        ]
+      },
+      "order.rejected.v1": {
+        "name": "order.rejected",
+        "title": "order.rejected v1",
+        "summary": "Ordem recusada pelo OMS, Risco ou Motor; sem execução, o Risco libera o hold (RN-FLX-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "order.rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/order.rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "risk-service",
+          "notification-service",
+          "realtime-gateway",
+          "audit-service"
+        ]
+      },
+      "order.updated.v1": {
+        "name": "order.updated",
+        "title": "order.updated v1",
+        "summary": "Ordem depois de qualquer mudança: estado, quantidades e versão (Catálogo §6).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "order.updated"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/order.updated.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "oms-service",
+        "x-consumers": [
+          "risk-service",
+          "realtime-gateway",
+          "bff-web",
+          "reporting-service"
+        ]
+      },
+      "risk.buying_power_changed.v1": {
+        "name": "risk.buying_power_changed",
+        "title": "risk.buying_power_changed v1",
+        "summary": "Poder de compra mudou, com throttle por conta (Risco §12).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.buying_power_changed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.buying_power_changed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "realtime-gateway",
+          "bff-web",
+          "bff-mobile",
+          "bff-desktop"
+        ]
+      },
+      "risk.hold_adjusted.v1": {
+        "name": "risk.hold_adjusted",
+        "title": "risk.hold_adjusted v1",
+        "summary": "Reserva reduzida por execução ou cancelamento parcial, ou refeita numa alteração (RN-HLD-004).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.hold_adjusted"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.hold_adjusted.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "ledger-service",
+          "realtime-gateway"
+        ]
+      },
+      "risk.hold_consumed.v1": {
+        "name": "risk.hold_consumed",
+        "title": "risk.hold_consumed v1",
+        "summary": "Reserva consumida: ordem totalmente executada ou saque concluído (RN-HLD-004, RN-LED-032).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.hold_consumed"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.hold_consumed.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "ledger-service",
+          "realtime-gateway"
+        ]
+      },
+      "risk.hold_created.v1": {
+        "name": "risk.hold_created",
+        "title": "risk.hold_created v1",
+        "summary": "Reserva criada sobre saldo ou ativo da conta (RN-HLD-001, RN-RSK-001).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.hold_created"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.hold_created.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "ledger-service",
+          "realtime-gateway"
+        ]
+      },
+      "risk.hold_released.v1": {
+        "name": "risk.hold_released",
+        "title": "risk.hold_released v1",
+        "summary": "Reserva liberada: cancelamento, expiração, saque desfeito ou órfã (RN-HLD-007).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.hold_released"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.hold_released.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "ledger-service",
+          "realtime-gateway"
+        ]
+      },
+      "risk.pretrade_approved.v1": {
+        "name": "risk.pretrade_approved",
+        "title": "risk.pretrade_approved v1",
+        "summary": "Ordem aprovada no pré-trade, com o hold criado (Risco §11).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.pretrade_approved"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.pretrade_approved.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "audit-service"
+        ]
+      },
+      "risk.pretrade_rejected.v1": {
+        "name": "risk.pretrade_rejected",
+        "title": "risk.pretrade_rejected v1",
+        "summary": "Ordem recusada no pré-trade, com o código e os valores usados (RN-PTC-002).",
+        "contentType": "application/json",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Envelope"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "eventType": {
+                  "const": "risk.pretrade_rejected"
+                },
+                "eventVersion": {
+                  "const": 1
+                },
+                "auditable": {
+                  "const": false
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/risk.pretrade_rejected.v1"
+                }
+              }
+            }
+          ]
+        },
+        "x-producer": "risk-service",
+        "x-consumers": [
+          "audit-service"
+        ]
+      },
       "routine.completed.v1": {
         "name": "routine.completed",
         "title": "routine.completed v1",
@@ -8916,6 +10138,7 @@
         },
         "x-producer": "ledger-service",
         "x-consumers": [
+          "risk-service",
           "notification-service",
           "reporting-service"
         ]
@@ -8951,6 +10174,7 @@
         },
         "x-producer": "ledger-service",
         "x-consumers": [
+          "risk-service",
           "notification-service",
           "reporting-service"
         ]
@@ -8986,6 +10210,7 @@
         },
         "x-producer": "ledger-service",
         "x-consumers": [
+          "risk-service",
           "notification-service",
           "reporting-service"
         ]

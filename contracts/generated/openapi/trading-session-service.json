@@ -1,0 +1,2332 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "trading-session-service",
+    "version": "1.0.0",
+    "description": "Gerado de contracts/http (D8). Não edite à mão: rode `pnpm contracts:generate`."
+  },
+  "paths": {
+    "/v1/market/session": {
+      "get": {
+        "operationId": "session",
+        "summary": "Fase do mercado e de cada instrumento e próximos eventos.",
+        "responses": {
+          "200": {
+            "description": "Estado da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "businessDate",
+                    "tradingDayStatus",
+                    "market",
+                    "instruments",
+                    "nextEvents"
+                  ],
+                  "properties": {
+                    "businessDate": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tradingDayStatus": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "market": {
+                      "type": "object",
+                      "required": [
+                        "phase",
+                        "scheduledPhase",
+                        "since",
+                        "expectedEndAt",
+                        "reason"
+                      ],
+                      "properties": {
+                        "phase": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "CLOSED"
+                            },
+                            {
+                              "type": "string",
+                              "const": "PRE_TRADING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "PRE_OPENING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CONTINUOUS"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CLOSING_CALL"
+                            },
+                            {
+                              "type": "string",
+                              "const": "POST_CLOSE"
+                            },
+                            {
+                              "type": "string",
+                              "const": "AFTER_MARKET"
+                            },
+                            {
+                              "type": "string",
+                              "const": "VOLATILITY_AUCTION"
+                            },
+                            {
+                              "type": "string",
+                              "const": "HALTED"
+                            }
+                          ]
+                        },
+                        "scheduledPhase": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "CLOSED"
+                            },
+                            {
+                              "type": "string",
+                              "const": "PRE_TRADING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "PRE_OPENING"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CONTINUOUS"
+                            },
+                            {
+                              "type": "string",
+                              "const": "CLOSING_CALL"
+                            },
+                            {
+                              "type": "string",
+                              "const": "POST_CLOSE"
+                            },
+                            {
+                              "type": "string",
+                              "const": "AFTER_MARKET"
+                            },
+                            {
+                              "type": "string",
+                              "const": "VOLATILITY_AUCTION"
+                            },
+                            {
+                              "type": "string",
+                              "const": "HALTED"
+                            }
+                          ]
+                        },
+                        "since": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "expectedEndAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "instruments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrumentId",
+                          "symbol",
+                          "phase",
+                          "reason",
+                          "since",
+                          "expectedEndAt",
+                          "auction",
+                          "previousClose",
+                          "bandReferencePrice"
+                        ],
+                        "properties": {
+                          "instrumentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "symbol": {
+                            "type": "string"
+                          },
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CLOSED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_OPENING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CONTINUOUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSING_CALL"
+                              },
+                              {
+                                "type": "string",
+                                "const": "POST_CLOSE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "AFTER_MARKET"
+                              },
+                              {
+                                "type": "string",
+                                "const": "VOLATILITY_AUCTION"
+                              },
+                              {
+                                "type": "string",
+                                "const": "HALTED"
+                              }
+                            ]
+                          },
+                          "reason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "since": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "expectedEndAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "auction": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "auctionId",
+                                  "type",
+                                  "status",
+                                  "startedAt",
+                                  "expectedEndAt",
+                                  "effectiveEndAt",
+                                  "extensions",
+                                  "theoreticalPrice"
+                                ],
+                                "properties": {
+                                  "auctionId": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "type": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "const": "OPENING"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "const": "CLOSING"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "const": "VOLATILITY"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "const": "REOPENING"
+                                      }
+                                    ]
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "startedAt": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "expectedEndAt": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "effectiveEndAt": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "date-time"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "extensions": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "theoreticalPrice": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "previousClose": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "bandReferencePrice": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "nextEvents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "phase",
+                          "at"
+                        ],
+                        "properties": {
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CLOSED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_OPENING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CONTINUOUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSING_CALL"
+                              },
+                              {
+                                "type": "string",
+                                "const": "POST_CLOSE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "AFTER_MARKET"
+                              },
+                              {
+                                "type": "string",
+                                "const": "VOLATILITY_AUCTION"
+                              },
+                              {
+                                "type": "string",
+                                "const": "HALTED"
+                              }
+                            ]
+                          },
+                          "at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/session/{symbol}": {
+      "get": {
+        "operationId": "instrumentSession",
+        "summary": "Fase efetiva de um instrumento, leilão em curso e próximos eventos.",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z0-9]{4,8}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado do instrumento.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "instrumentId",
+                    "symbol",
+                    "phase",
+                    "reason",
+                    "since",
+                    "expectedEndAt",
+                    "auction",
+                    "previousClose",
+                    "bandReferencePrice",
+                    "nextEvents"
+                  ],
+                  "properties": {
+                    "instrumentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "symbol": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "CLOSED"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PRE_TRADING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "PRE_OPENING"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CONTINUOUS"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CLOSING_CALL"
+                        },
+                        {
+                          "type": "string",
+                          "const": "POST_CLOSE"
+                        },
+                        {
+                          "type": "string",
+                          "const": "AFTER_MARKET"
+                        },
+                        {
+                          "type": "string",
+                          "const": "VOLATILITY_AUCTION"
+                        },
+                        {
+                          "type": "string",
+                          "const": "HALTED"
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "since": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "expectedEndAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "auction": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "auctionId",
+                            "type",
+                            "status",
+                            "startedAt",
+                            "expectedEndAt",
+                            "effectiveEndAt",
+                            "extensions",
+                            "theoreticalPrice"
+                          ],
+                          "properties": {
+                            "auctionId": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "type": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "const": "OPENING"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "CLOSING"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "VOLATILITY"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "REOPENING"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string"
+                            },
+                            "startedAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "expectedEndAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "effectiveEndAt": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "extensions": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "theoreticalPrice": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "previousClose": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "bandReferencePrice": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "nextEvents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "phase",
+                          "at"
+                        ],
+                        "properties": {
+                          "phase": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "CLOSED"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_TRADING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "PRE_OPENING"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CONTINUOUS"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CLOSING_CALL"
+                              },
+                              {
+                                "type": "string",
+                                "const": "POST_CLOSE"
+                              },
+                              {
+                                "type": "string",
+                                "const": "AFTER_MARKET"
+                              },
+                              {
+                                "type": "string",
+                                "const": "VOLATILITY_AUCTION"
+                              },
+                              {
+                                "type": "string",
+                                "const": "HALTED"
+                              }
+                            ]
+                          },
+                          "at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instrumento inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/halt": {
+      "post": {
+        "operationId": "halt",
+        "summary": "Suspende um instrumento (imediato) ou propõe suspender o mercado (aprovação).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "instrumentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "cancelAllOnHalt": {
+                    "type": "boolean"
+                  },
+                  "resumeAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instrumento suspenso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "haltId",
+                    "scope",
+                    "reasonCode",
+                    "description",
+                    "startedAt",
+                    "endedAt",
+                    "resumeAt",
+                    "cancelAllOnHalt",
+                    "actorId",
+                    "approvalRequestId"
+                  ],
+                  "properties": {
+                    "haltId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "reasonCode": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "startedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "endedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "resumeAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cancelAllOnHalt": {
+                      "type": "boolean"
+                    },
+                    "actorId": {
+                      "type": "string"
+                    },
+                    "approvalRequestId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Solicitação criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/resume": {
+      "post": {
+        "operationId": "resume",
+        "summary": "Retoma um instrumento (imediato) ou propõe retomar o mercado; a volta é por leilão.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "haltId"
+                ],
+                "properties": {
+                  "haltId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instrumento em retomada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "haltId",
+                    "scope",
+                    "reasonCode",
+                    "description",
+                    "startedAt",
+                    "endedAt",
+                    "resumeAt",
+                    "cancelAllOnHalt",
+                    "actorId",
+                    "approvalRequestId"
+                  ],
+                  "properties": {
+                    "haltId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "reasonCode": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "startedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "endedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "resumeAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cancelAllOnHalt": {
+                      "type": "boolean"
+                    },
+                    "actorId": {
+                      "type": "string"
+                    },
+                    "approvalRequestId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Solicitação criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/circuit-breaker": {
+      "post": {
+        "operationId": "circuitBreaker",
+        "summary": "Propõe o disparo manual do próximo nível (RN-CB-003).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "justification"
+                ],
+                "properties": {
+                  "justification": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Solicitação criada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/sandbox/session/circuit-breaker": {
+      "post": {
+        "operationId": "sandboxCircuitBreaker",
+        "summary": "Dispara o próximo nível sem aprovação; só com os comandos de sandbox (RN-SBX-005).",
+        "responses": {
+          "200": {
+            "description": "Disparado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "level"
+                  ],
+                  "properties": {
+                    "level": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 3
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/auctions/{id}/conclude": {
+      "post": {
+        "operationId": "concludeAuction",
+        "summary": "Conclui um leilão mantido, limitado ao túnel (RN-AUC-003).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Encerramento enviado ao Motor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "auctionId",
+                    "status"
+                  ],
+                  "properties": {
+                    "auctionId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/halts": {
+      "get": {
+        "operationId": "halts",
+        "summary": "Suspensões, da mais recente.",
+        "parameters": [
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "true"
+                },
+                {
+                  "type": "string",
+                  "const": "false"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "haltId",
+                          "scope",
+                          "reasonCode",
+                          "description",
+                          "startedAt",
+                          "endedAt",
+                          "resumeAt",
+                          "cancelAllOnHalt",
+                          "actorId",
+                          "approvalRequestId"
+                        ],
+                        "properties": {
+                          "haltId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "scope": {
+                            "type": "string"
+                          },
+                          "reasonCode": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "startedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "endedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "resumeAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "cancelAllOnHalt": {
+                            "type": "boolean"
+                          },
+                          "actorId": {
+                            "type": "string"
+                          },
+                          "approvalRequestId": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/alerts": {
+      "get": {
+        "operationId": "alerts",
+        "summary": "Alertas ao backoffice: prorrogações esgotadas e divergência de fechamento.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "kind",
+                          "message",
+                          "data",
+                          "createdAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "kind": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/closing-prices": {
+      "get": {
+        "operationId": "closingPrices",
+        "summary": "Fechamentos do dia com a origem e o externo (RN-FCH-001/003).",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "instrumentId",
+                          "businessDate",
+                          "price",
+                          "source",
+                          "externalClose",
+                          "divergenceAlert"
+                        ],
+                        "properties": {
+                          "instrumentId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "businessDate": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "price": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "externalClose": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "divergenceAlert": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/change-requests": {
+      "get": {
+        "operationId": "changeRequests",
+        "summary": "Solicitações de dupla aprovação.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "payload",
+                          "currentState",
+                          "justification",
+                          "makerId",
+                          "status",
+                          "createdAt",
+                          "expiresAt",
+                          "decidedBy",
+                          "decidedAt",
+                          "decisionReason"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "MARKET_HALT"
+                              },
+                              {
+                                "type": "string",
+                                "const": "MARKET_RESUME"
+                              },
+                              {
+                                "type": "string",
+                                "const": "CIRCUIT_BREAKER"
+                              }
+                            ]
+                          },
+                          "payload": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "currentState": {
+                            "type": "object",
+                            "patternProperties": {
+                              "^.*$": {}
+                            }
+                          },
+                          "justification": {
+                            "type": "string"
+                          },
+                          "makerId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "decidedBy": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decidedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "decisionReason": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/change-requests/{id}/approve": {
+      "post": {
+        "operationId": "approveRequest",
+        "summary": "Aprova e executa (RN-MC-BO-002..004).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Decidida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/change-requests/{id}/reject": {
+      "post": {
+        "operationId": "rejectRequest",
+        "summary": "Reprova.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decidida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/bo/session/change-requests/{id}/cancel": {
+      "post": {
+        "operationId": "cancelRequest",
+        "summary": "Cancela (pelo maker).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "type",
+                    "payload",
+                    "currentState",
+                    "justification",
+                    "makerId",
+                    "status",
+                    "createdAt",
+                    "expiresAt",
+                    "decidedBy",
+                    "decidedAt",
+                    "decisionReason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "type": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "MARKET_HALT"
+                        },
+                        {
+                          "type": "string",
+                          "const": "MARKET_RESUME"
+                        },
+                        {
+                          "type": "string",
+                          "const": "CIRCUIT_BREAKER"
+                        }
+                      ]
+                    },
+                    "payload": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "currentState": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^.*$": {}
+                      }
+                    },
+                    "justification": {
+                      "type": "string"
+                    },
+                    "makerId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decidedBy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decidedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "decisionReason": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "Problem Details (RFC 9457, RN-BE-030).",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "service": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

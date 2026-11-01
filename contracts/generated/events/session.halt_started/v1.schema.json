@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:session.halt_started:v1",
+  "title": "session.halt_started v1",
+  "description": "Suspensão de um instrumento ou do mercado (Pregão §5).",
+  "x-producer": "trading-session-service",
+  "x-auditable": true,
+  "type": "object",
+  "required": [
+    "haltId",
+    "scope",
+    "reasonCode",
+    "cancelAllOnHalt",
+    "resumesAt"
+  ],
+  "properties": {
+    "haltId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MARKET"
+        },
+        {
+          "type": "string",
+          "format": "uuid"
+        }
+      ]
+    },
+    "reasonCode": {
+      "type": "string"
+    },
+    "cancelAllOnHalt": {
+      "type": "boolean"
+    },
+    "resumesAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

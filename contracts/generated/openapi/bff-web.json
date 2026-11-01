@@ -1478,6 +1478,38 @@
         ]
       }
     },
+    "/v1/market/session": {
+      "get": {
+        "operationId": "marketSession",
+        "summary": "Repassada ao trading-session-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
+    "/v1/market/session/{symbol}": {
+      "get": {
+        "operationId": "instrumentSession",
+        "summary": "Repassada ao trading-session-service (contrato do dono).",
+        "responses": {
+          "200": {
+            "description": "Resposta do serviço dono, como veio."
+          }
+        },
+        "security": [
+          {
+            "user": []
+          }
+        ]
+      }
+    },
     "/v1/me/notifications": {
       "get": {
         "operationId": "notifications",

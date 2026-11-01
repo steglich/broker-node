@@ -257,6 +257,8 @@ export const bffWebHttp = defineHttpContract({
     indexes: forwarded('get', '/v1/market/indexes', 'market-data-service'),
     history: forwarded('get', '/v1/market/history/:symbol', 'market-data-service'),
     calendar: forwarded('get', '/v1/market/calendar', 'reference-data-service'),
+    marketSession: forwarded('get', '/v1/market/session', 'trading-session-service'),
+    instrumentSession: forwarded('get', '/v1/market/session/:symbol', 'trading-session-service'),
     notifications: forwarded('get', '/v1/me/notifications', 'notification-service'),
     notificationsRead: forwarded('post', '/v1/me/notifications/read', 'notification-service'),
     preferences: forwarded('get', '/v1/me/notification-preferences', 'notification-service'),

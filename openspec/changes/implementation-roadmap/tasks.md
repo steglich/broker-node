@@ -158,9 +158,9 @@
 
 ## 21. Fase 2 — trading-session-service
 
-- [ ] 21.1 Implementar `trading_day`, `market_phase_state` e `instrument_phase_state` com a fase efetiva mais restritiva, a grade por `session_schedule` acionada por rotinas, `session.phase_changed` e o comando `PhaseChange` ao Motor; verificar um dia completo com o relógio virtual (RN-SES-001/002)
-- [ ] 21.2 Implementar os leilões programados com prorrogação e política, as suspensões (manual, defasagem, evento corporativo, falha técnica, `ENGINE_RECOVERY`) com retomada por leilão e `cancel_all_on_halt`; verificar a prorrogação por túnel estático (RN-AUC-001..003, RN-HLT-*)
-- [ ] 21.3 Implementar o circuit breaker (níveis, uma vez por pregão, última meia hora, manual e sandbox) e o preço de fechamento por precedência com alerta de divergência; verificar o nível 1 e a ausência de disparo às 16:40 (RN-CB-*, RN-FCH-*)
+- [x] 21.1 Implementar `trading_day`, `market_phase_state` e `instrument_phase_state` com a fase efetiva mais restritiva, a grade por `session_schedule` acionada por rotinas, `session.phase_changed` e o comando `PhaseChange` ao Motor; verificar um dia completo com o relógio virtual (RN-SES-001/002)
+- [x] 21.2 Implementar os leilões programados com prorrogação e política, as suspensões (manual, defasagem, evento corporativo, falha técnica, `ENGINE_RECOVERY`) com retomada por leilão e `cancel_all_on_halt`; verificar a prorrogação por túnel estático (RN-AUC-001..003, RN-HLT-*)
+- [x] 21.3 Implementar o circuit breaker (níveis, uma vez por pregão, última meia hora, manual e sandbox) e o preço de fechamento por precedência com alerta de divergência; verificar o nível 1 e a ausência de disparo às 16:40 (RN-CB-*, RN-FCH-*)
 
 ## 22. Fase 2 — matching-engine
 

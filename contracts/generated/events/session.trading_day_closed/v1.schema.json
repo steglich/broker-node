@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:session.trading_day_closed:v1",
+  "title": "session.trading_day_closed v1",
+  "description": "Fim do dia de negociação, depois do pós-fechamento (Pregão §8).",
+  "x-producer": "trading-session-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "businessDate"
+  ],
+  "properties": {
+    "businessDate": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

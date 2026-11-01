@@ -300,6 +300,7 @@ export async function app(env: Env) {
       ledger: upstream.url,
       referenceData: upstream.url,
       marketData: upstream.url,
+      tradingSession: upstream.url,
       notification: upstream.url,
     },
     clientId: 'bff-web',

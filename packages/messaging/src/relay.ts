@@ -30,6 +30,11 @@ export interface OutboxRelayOptions {
   /** Mesma credencial, para a conexão dedicada do LISTEN. */
   listenConfig: DatabaseConfig;
   producer: PartitionedProducer;
+  /**
+   * Tópico próprio por `eventType`, para quem publica em mais de um (ex.: a sessão manda comandos a
+   * `engine.commands`). Os demais tipos vão para `producer`.
+   */
+  routes?: Readonly<Record<string, PartitionedProducer>>;
   clock: Clock;
   batchSize?: number;
   /** Polling de segurança, caso um NOTIFY se perca (padrão 1 s). */
@@ -151,15 +156,22 @@ export class OutboxRelay {
       if (rows.length === 0) return 0;
 
       const publishedAt = this.options.clock.now().toString();
-      await this.options.producer.sendAll(
-        rows.map((row) => ({
-          partitionKey: row.partition_key,
-          publishingId: row.seq,
-          messageId: row.id,
-          body: Buffer.from(JSON.stringify(toEnvelope(row, publishedAt))),
-          applicationProperties: { eventType: row.event_type, eventVersion: row.event_version },
-        })),
-      );
+      const batches = new Map<PartitionedProducer, OutboxRow[]>();
+      for (const row of rows) {
+        const producer = this.options.routes?.[row.event_type] ?? this.options.producer;
+        batches.set(producer, [...(batches.get(producer) ?? []), row]);
+      }
+      for (const [producer, batch] of batches) {
+        await producer.sendAll(
+          batch.map((row) => ({
+            partitionKey: row.partition_key,
+            publishingId: row.seq,
+            messageId: row.id,
+            body: Buffer.from(JSON.stringify(toEnvelope(row, publishedAt))),
+            applicationProperties: { eventType: row.event_type, eventVersion: row.event_version },
+          })),
+        );
+      }
       const ids = rows.map((r) => r.id);
       await this.options.afterPublish?.(ids);
       await sql`UPDATE outbox_event SET published_at = now() WHERE id = ANY(${ids}::uuid[])`.execute(

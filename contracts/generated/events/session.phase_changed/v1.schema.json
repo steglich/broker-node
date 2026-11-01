@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:session.phase_changed:v1",
+  "title": "session.phase_changed v1",
+  "description": "Fase do mercado (`MARKET`) ou fase efetiva do instrumento que tem estado próprio mudou (RN-SES-002).",
+  "x-producer": "trading-session-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "scope",
+    "from",
+    "to",
+    "reason",
+    "effectiveAt",
+    "expectedEndAt"
+  ],
+  "properties": {
+    "scope": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MARKET"
+        },
+        {
+          "type": "string",
+          "format": "uuid"
+        }
+      ]
+    },
+    "from": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CLOSED"
+        },
+        {
+          "type": "string",
+          "const": "PRE_TRADING"
+        },
+        {
+          "type": "string",
+          "const": "PRE_OPENING"
+        },
+        {
+          "type": "string",
+          "const": "CONTINUOUS"
+        },
+        {
+          "type": "string",
+          "const": "CLOSING_CALL"
+        },
+        {
+          "type": "string",
+          "const": "POST_CLOSE"
+        },
+        {
+          "type": "string",
+          "const": "AFTER_MARKET"
+        },
+        {
+          "type": "string",
+          "const": "VOLATILITY_AUCTION"
+        },
+        {
+          "type": "string",
+          "const": "HALTED"
+        }
+      ]
+    },
+    "to": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CLOSED"
+        },
+        {
+          "type": "string",
+          "const": "PRE_TRADING"
+        },
+        {
+          "type": "string",
+          "const": "PRE_OPENING"
+        },
+        {
+          "type": "string",
+          "const": "CONTINUOUS"
+        },
+        {
+          "type": "string",
+          "const": "CLOSING_CALL"
+        },
+        {
+          "type": "string",
+          "const": "POST_CLOSE"
+        },
+        {
+          "type": "string",
+          "const": "AFTER_MARKET"
+        },
+        {
+          "type": "string",
+          "const": "VOLATILITY_AUCTION"
+        },
+        {
+          "type": "string",
+          "const": "HALTED"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "effectiveAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expectedEndAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "auctionId": {
+      "type": "string",
+      "format": "uuid"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.phase_change:v1",
+  "title": "engine.phase_change v1",
+  "description": "Comando `PhaseChange`: fase efetiva de um instrumento no Motor (RN-SES-002, Catálogo §6).",
+  "x-producer": "trading-session-service",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "scope",
+    "phase"
+  ],
+  "properties": {
+    "scope": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "phase": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "CLOSED"
+        },
+        {
+          "type": "string",
+          "const": "PRE_TRADING"
+        },
+        {
+          "type": "string",
+          "const": "PRE_OPENING"
+        },
+        {
+          "type": "string",
+          "const": "CONTINUOUS"
+        },
+        {
+          "type": "string",
+          "const": "CLOSING_CALL"
+        },
+        {
+          "type": "string",
+          "const": "POST_CLOSE"
+        },
+        {
+          "type": "string",
+          "const": "AFTER_MARKET"
+        },
+        {
+          "type": "string",
+          "const": "VOLATILITY_AUCTION"
+        },
+        {
+          "type": "string",
+          "const": "HALTED"
+        }
+      ]
+    },
+    "auctionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "auctionType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "OPENING"
+        },
+        {
+          "type": "string",
+          "const": "CLOSING"
+        },
+        {
+          "type": "string",
+          "const": "VOLATILITY"
+        },
+        {
+          "type": "string",
+          "const": "REOPENING"
+        }
+      ]
+    },
+    "auctionEndAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "randomSeed": {
+      "type": "string"
+    },
+    "concludesAuctionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "priceLimit": {
+      "type": "object",
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        "max": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

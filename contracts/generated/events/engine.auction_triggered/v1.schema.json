@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.auction_triggered:v1",
+  "title": "engine.auction_triggered v1",
+  "description": "O Motor abriu um leilão por volatilidade (RN-AUC-030..032).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "auctionId",
+    "type",
+    "reason",
+    "expectedEndAt"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "auctionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "OPENING"
+        },
+        {
+          "type": "string",
+          "const": "CLOSING"
+        },
+        {
+          "type": "string",
+          "const": "VOLATILITY"
+        },
+        {
+          "type": "string",
+          "const": "REOPENING"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "expectedEndAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

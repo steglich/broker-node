@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:broker:event:engine.auction_indicative:v1",
+  "title": "engine.auction_indicative v1",
+  "description": "Preço teórico do leilão a cada mudança no livro (RN-AUC-002/023); a sessão o compara ao túnel estático no fim previsto (RN-AUC-003).",
+  "x-producer": "matching-engine",
+  "x-auditable": false,
+  "type": "object",
+  "required": [
+    "instrumentId",
+    "board",
+    "engineSeq",
+    "inputSeq",
+    "auctionId",
+    "theoreticalPrice",
+    "theoreticalQuantity",
+    "imbalanceSide",
+    "imbalanceQuantity"
+  ],
+  "properties": {
+    "instrumentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "board": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "MAIN"
+        },
+        {
+          "type": "string",
+          "const": "ODD_LOT"
+        }
+      ]
+    },
+    "engineSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "inputSeq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "auctionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "theoreticalPrice": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,8})?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "theoreticalQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "imbalanceSide": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "BUY"
+        },
+        {
+          "type": "string",
+          "const": "SELL"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "imbalanceQuantity": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

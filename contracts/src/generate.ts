@@ -49,7 +49,9 @@ export function asyncApiDocument(events: readonly EventContract[]): JsonSchema {
     const { eventType, eventVersion, auditable } = contract.definition;
     const key = eventKey(contract);
     const context = contract.context ?? contextOf(eventType);
-    const channelId = context === '*' ? 'owner-topics' : context;
+    const kind = contract.kind ?? 'events';
+    const channelId =
+      context === '*' ? 'owner-topics' : kind === 'events' ? context : `${context}-${kind}`;
     schemas[key] = toJsonSchema(contract.definition.payload);
     messages[key] = {
       name: eventType,
@@ -85,7 +87,7 @@ export function asyncApiDocument(events: readonly EventContract[]): JsonSchema {
             messages: {},
           }
         : {
-            address: `{environment}.${context}.events`,
+            address: `{environment}.${context}.${kind}`,
             parameters: { environment: { description: 'Ambiente isolado (RN-PAD-080).' } },
             messages: {},
           });

@@ -287,6 +287,8 @@ describe('19.3 rotas da Fase 1 e auditoria', () => {
     expect(a.upstream.seen).toHaveLength(1);
     expect((await get('/v1/market/indexes')).query).toEqual({ symbols: '^BVSP' });
     expect((await get('/v1/market/calendar')).path).toBe('/v1/calendar');
+    expect((await get('/v1/market/session')).path).toBe('/v1/market/session');
+    expect((await get('/v1/market/session/PETR4')).path).toBe('/v1/market/session/PETR4');
   });
 
   it('cadastro e recuperação são públicos e vão ao identity', async () => {

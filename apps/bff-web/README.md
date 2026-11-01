@@ -34,8 +34,7 @@ calendário e notificações. Os caminhos públicos seguem o documento de contra
 `/v1/auth/password-reset`, `/v1/instruments/{symbol}`, `/v1/market/...`) e o BFF traduz para os do dono.
 
 Diferenças do documento de contratos: `/v1/me/password` não existe (a troca de senha é pela
-recuperação de acesso); `/v1/market/session`, book, negócios e candles internos chegam com o
-trading-session e o Motor (Fase 2); `/v1/market/quotes` só tem a cotação externa por enquanto. O BFF
+recuperação de acesso); book, negócios e candles internos chegam com o Motor (Fase 2); `/v1/market/quotes` só tem a cotação externa por enquanto. O BFF
 repassa o token do usuário; o token de serviço adicional (RN-API-050) fica para quando os serviços o
 exigirem.
 

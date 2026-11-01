@@ -1116,6 +1116,40 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  e2e:
+    dependencies:
+      '@broker/calendar':
+        specifier: workspace:*
+        version: link:../packages/calendar
+      '@broker/domain-kernel':
+        specifier: workspace:*
+        version: link:../packages/domain-kernel
+      '@broker/testing':
+        specifier: workspace:*
+        version: link:../packages/testing
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+    devDependencies:
+      '@broker/tsconfig':
+        specifier: workspace:*
+        version: link:../packages/tsconfig
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+
   infra:
     devDependencies:
       '@aws-sdk/client-s3':

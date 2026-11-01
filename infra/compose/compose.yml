@@ -138,6 +138,11 @@ secrets:
     file: ../secrets/webhook/pix_simulator
   webhook_kyc_simulator:
     file: ../secrets/webhook/kyc_simulator
+  # Segredos dos clientes de serviço do identity (client credentials), provisionados pelo `env:up`.
+  service_client_ledger:
+    file: ../secrets/service-clients/ledger-service
+  service_client_notification:
+    file: ../secrets/service-clients/notification-service
 
 services:
   # ---------------------------------------------------------------- infraestrutura
@@ -602,6 +607,10 @@ services:
       - valkey_password
       - identity_field_master_key
       - identity_blind_index_key
+    volumes:
+      # Provisionamento local dos clientes de serviço (dist/provision-clients.js, chamado pelo env:up).
+      - ../identity/service-clients.json:/etc/broker/service-clients.json:ro
+      - ../secrets/service-clients:/run/secrets/service-clients:ro
     networks: [broker]
     depends_on:
       identity-migrate:
@@ -752,11 +761,13 @@ services:
       PIX_URL: http://pix-simulator:8080
       PIX_WEBHOOK_SECRET_FILE: /run/secrets/webhook_pix_simulator
       CUSTOMER_URL: http://customer-service:8080
-      # Cliente OAuth `ledger-service` (client credentials) cadastrado no identity pelo backoffice.
-      SERVICE_CLIENT_SECRET: ${LEDGER_SERVICE_CLIENT_SECRET:-}
+      # Cliente OAuth `ledger-service` (client credentials): no local, o `env:up` o cadastra no
+      # identity com este segredo (infra/identity/service-clients.json).
+      SERVICE_CLIENT_SECRET_FILE: /run/secrets/service_client_ledger
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets:
       - db_ledger_app
+      - service_client_ledger
       - rabbitmq_password
       - valkey_password
       - webhook_pix_simulator
@@ -972,15 +983,16 @@ services:
       AUTH_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
       AUTH_ISSUER: https://auth.broker.localhost
       CUSTOMER_URL: http://customer-service:8080
-      # Cliente OAuth `notification-service` (client credentials, customer:notification-recipients)
-      # cadastrado no identity pelo backoffice.
-      SERVICE_CLIENT_SECRET: ${NOTIFICATION_SERVICE_CLIENT_SECRET:-}
+      # Cliente OAuth `notification-service` (client credentials, customer:notification-recipients):
+      # no local, o `env:up` o cadastra no identity com este segredo.
+      SERVICE_CLIENT_SECRET_FILE: /run/secrets/service_client_notification
       SMTP_HOST: mailpit
       MESSAGE_SINK_URL: http://message-sink:8080
       APP_URL: https://app.broker.localhost
       OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     secrets:
       - db_notification_app
+      - service_client_notification
       - rabbitmq_password
       - valkey_password
       - notification_field_master_key

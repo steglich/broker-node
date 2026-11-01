@@ -1,0 +1,4 @@
+{
+  "ledger-service": ["customer:eligibility", "customer:holder", "customer:withdrawal-accounts"],
+  "notification-service": ["customer:notification-recipients"]
+}

@@ -1,4 +1,4 @@
-import type { Clock } from '@broker/clock';
+import { RealClock, type Clock } from '@broker/clock';
 import { ledgerServiceHttp } from '@broker/contracts/http/ledger-service';
 import { BusinessDate, Instant, Money } from '@broker/domain-kernel';
 import {
@@ -31,6 +31,13 @@ import {
 } from '../application/statement.js';
 import type { Withdrawals } from '../application/withdrawals.js';
 import { LedgerRuleError } from '../domain/journal.js';
+
+/**
+ * O carimbo do webhook é do relógio de parede de quem envia (simuladores e provedores externos), e a
+ * defasagem é proteção de transporte (RN-SIM-003): confere com o relógio real, não com o do
+ * ambiente, que no modo VIRTUAL/ACCELERATED anda separado.
+ */
+const WEBHOOK_CLOCK = new RealClock();
 
 const r = ledgerServiceHttp.routes;
 
@@ -202,7 +209,7 @@ export function registerHttp(service: Service, d: HttpDeps): void {
     auth: 'public',
     handler: (q) =>
       run(async () => {
-        assertWebhookSignature(q, { secret: d.pixWebhookSecret, clock: d.clock });
+        assertWebhookSignature(q, { secret: d.pixWebhookSecret, clock: WEBHOOK_CLOCK });
         if (q.headers['x-webhook-event'] !== 'pix.recebido') return { status: 204 };
         const body = q.body as {
           pix?: {

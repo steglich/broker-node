@@ -412,6 +412,11 @@ export class PostgresIdentityStore implements IdentityStore {
           trx,
         );
       },
+      async updateClientCredentials(clientId, secretHash, allowedScopes) {
+        await sql`
+          UPDATE oauth_client SET secret_hash = ${secretHash}, allowed_scopes = ${allowedScopes}
+          WHERE client_id = ${clientId}`.execute(trx);
+      },
       async insertLoginTransaction(t: LoginTransactionRow) {
         await sql`
           INSERT INTO login_transaction (id_hash, user_id, client_id, redirect_uri, code_challenge, scope, client_device,

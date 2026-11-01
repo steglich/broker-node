@@ -25,6 +25,12 @@ export function serviceCatalog() {
     .filter((l) => l && !l.startsWith('#'));
 }
 
+export function serviceClients() {
+  return Object.keys(
+    JSON.parse(readFileSync(join(infra, 'identity', 'service-clients.json'), 'utf8')),
+  );
+}
+
 export function generateSecrets() {
   const created = [];
   const add = (path, value) => ensure(path, value) && created.push(path);
@@ -53,6 +59,9 @@ export function generateSecrets() {
   // brapi real, escreva o token em brapi/token (e o próximo, na rotação, em brapi/token_next).
   add('brapi/token', '');
   add('brapi/token_next', '');
+  // Clientes de serviço (client credentials) do identity: o segredo vai para o serviço e para o
+  // provisionamento do identity (infra/identity/service-clients.json).
+  for (const client of serviceClients()) add(`service-clients/${client}`);
   for (const svc of serviceCatalog()) {
     add(`db/${svc}_app`);
     add(`db/${svc}_migrator`);

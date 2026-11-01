@@ -21,6 +21,8 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 RUN pnpm turbo run build --filter="${SERVICE}..."
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm deploy --filter="${SERVICE}" --prod /out
+# Dados lidos em tempo de execução fora do dist (ex.: as fixtures da brapi do market-data).
+RUN mkdir -p /out/fixtures
 
 FROM ${NODE_IMAGE} AS runtime
 # Versão e commit do artefato (RN-CICD-020): o commit vai para o /info (GIT_COMMIT); a versão vem
@@ -38,6 +40,7 @@ WORKDIR /app
 COPY --from=build --chown=node:node /out/package.json ./package.json
 COPY --from=build --chown=node:node /out/node_modules ./node_modules
 COPY --from=build --chown=node:node /out/dist ./dist
+COPY --from=build --chown=node:node /out/fixtures ./fixtures
 # Usuário sem privilégios (já existe na imagem oficial do Node).
 USER node
 CMD ["node", "dist/main.js"]

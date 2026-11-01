@@ -277,6 +277,31 @@ describe('13.2 Authorization Code + PKCE, access token e refresh (Autenticação
     );
   });
 
+  it('provisionamento local: cria, mantém e alinha segredo e escopos do cliente de serviço', async () => {
+    const token = (secret: string, scope: string) =>
+      a.http
+        .post('/v1/oauth/token')
+        .auth('ledger-local', secret)
+        .type('form')
+        .send({ grant_type: 'client_credentials', scope });
+    const input = { clientId: 'ledger-local', scopes: ['customer:holder'], secret: 's3gredo-1' };
+
+    expect(await a.accounts.ensureServiceClient(input)).toBe('CREATED');
+    expect(await a.accounts.ensureServiceClient(input)).toBe('UNCHANGED');
+    expect((await token('s3gredo-1', 'customer:holder')).status).toBe(200);
+
+    // Segredo e escopos novos (cofre rotacionado, manifesto mudou): o antigo para de valer.
+    expect(
+      await a.accounts.ensureServiceClient({
+        ...input,
+        secret: 's3gredo-2',
+        scopes: ['customer:holder', 'customer:eligibility'],
+      }),
+    ).toBe('UPDATED');
+    expect((await token('s3gredo-1', 'customer:holder')).body.error).toBe('invalid_client');
+    expect((await token('s3gredo-2', 'customer:eligibility')).status).toBe(200);
+  });
+
   it('o token de assinatura não serve como access token', async () => {
     const c = await register(a);
     const tokens = await login(a, c);

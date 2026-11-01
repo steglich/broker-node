@@ -4,6 +4,7 @@ packages:
   - 'contracts'
   - 'scenarios'
   - 'infra'
+  - 'e2e'
 
 # Scripts de instalação bloqueados: todos opcionais (binários pré-compilados ou aceleração nativa).
 allowBuilds:

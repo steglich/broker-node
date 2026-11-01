@@ -1,0 +1,25 @@
+{
+  "name": "@broker/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Jornadas de ponta a ponta pela borda (Traefik → api-gateway → BFF), como o app faria: o E2E de cada fase contra o compose e as sementes de clientes do ambiente local (RN-ENV-031).",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "seed": "tsx --conditions=source src/seed.ts"
+  },
+  "dependencies": {
+    "@broker/calendar": "workspace:*",
+    "@broker/domain-kernel": "workspace:*",
+    "@broker/testing": "workspace:*",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@broker/tsconfig": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.12"
+  }
+}

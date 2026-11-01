@@ -372,7 +372,8 @@ export function webhook(a: App, item: ReturnType<FakePix['pay']>, secret = WEBHO
       'content-type': 'application/json',
       'X-Webhook-Event': 'pix.recebido',
       'X-Webhook-Id': item.endToEndId,
-      ...signedHeaders(secret, a.clock.now().epochMillis, raw),
+      // O simulador assina com o relógio real; o receptor confere a defasagem com ele também.
+      ...signedHeaders(secret, Date.now(), raw),
     })
     .send(raw);
 }

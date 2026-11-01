@@ -82,6 +82,27 @@ jobs:
         env:
           SECRETS_BASE: ${{ github.event_name == 'workflow_dispatch' && '' || env.TURBO_SCM_BASE }}
 
+  e2e:
+    name: E2E da fase pela borda (compose core)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # Critério de pronto da fase (RN-QA-010): o compose `core` com o relógio VIRTUAL, as sementes
+      # rodadas duas vezes (idempotência, RN-ENV-031) e as jornadas E2E terminando em INV-01.
+      - run: pnpm env:up core
+        env:
+          CLOCK_MODE: VIRTUAL
+      - run: pnpm env:seed
+      - run: pnpm env:seed
+      - run: pnpm test:e2e
+      - name: Estado e logs do ambiente
+        if: failure()
+        run: |
+          pnpm env:ps
+          docker compose -f infra/compose/compose.yml --profile core logs --no-color --tail 300
+
   affected-apps:
     name: Serviços afetados
     runs-on: ubuntu-24.04

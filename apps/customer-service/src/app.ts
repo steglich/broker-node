@@ -131,12 +131,14 @@ export async function createCustomerService(d: CustomerServiceDeps) {
     const superStream = topicName(environment, 'customer');
     await ensureSuperStream(client, superStream, { maxAge: '30D' });
     // Tópicos consumidos cujos donos podem subir depois, com os parâmetros dos donos: o agendador
-    // (1 partição) e o identity, que por sua vez consome o nosso.
+    // (1 partição), o identity e o ledger, que por sua vez consomem o nosso.
     await ensureSuperStream(client, topicName(environment, 'scheduler'), {
       partitions: 1,
       maxAge: '30D',
     });
     await ensureSuperStream(client, topicName(environment, 'identity'), { maxAge: '30D' });
+    if (d.consumeLedgerEvents)
+      await ensureSuperStream(client, topicName(environment, 'ledger'), { maxAge: '90D' });
     relay = new OutboxRelay({
       db: d.db,
       listenConfig: d.database,

@@ -1,4 +1,4 @@
-import type { Clock } from '@broker/clock';
+import { RealClock, type Clock } from '@broker/clock';
 import { customerServiceHttp } from '@broker/contracts/http/customer-service';
 import {
   HttpError,
@@ -20,6 +20,13 @@ import type {
 import type { SuitabilityAndTerms } from '../application/suitability-terms.js';
 import type { Operation } from '../domain/account.js';
 import type { DocumentType } from '../domain/documents.js';
+
+/**
+ * O carimbo do webhook é do relógio de parede de quem envia (simuladores e provedores externos), e a
+ * defasagem é proteção de transporte (RN-SIM-003): confere com o relógio real, não com o do
+ * ambiente, que no modo VIRTUAL/ACCELERATED anda separado.
+ */
+const WEBHOOK_CLOCK = new RealClock();
 
 const r = customerServiceHttp.routes;
 
@@ -174,7 +181,7 @@ export function registerHttp(service: Service, d: HttpDeps): void {
     path: '/webhooks/kyc-simulator',
     auth: 'public',
     handler: async (q) => {
-      assertWebhookSignature(q, { secret: d.kycWebhookSecret, clock: d.clock });
+      assertWebhookSignature(q, { secret: d.kycWebhookSecret, clock: WEBHOOK_CLOCK });
       const event = q.headers['x-webhook-event'];
       const body = q.body as {
         check_id: string;

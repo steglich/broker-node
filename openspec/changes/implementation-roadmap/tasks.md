@@ -153,8 +153,8 @@
 
 ## 20. Fase 1 — Critério de pronto
 
-- [ ] 20.1 Teste E2E: cadastro → KYC aprovado → conta ativa → depósito PIX → cotação externa com defasagem sinalizada → saque, terminando com INV-01 verificado; verificar no CI com o compose `core`
-- [ ] 20.2 Atualizar as sementes (`pnpm env:seed`) com usuários por cenário de KYC, universo inicial e histórico por replay; verificar a idempotência rodando duas vezes (RN-ENV-031)
+- [x] 20.1 Teste E2E: cadastro → KYC aprovado → conta ativa → depósito PIX → cotação externa com defasagem sinalizada → saque, terminando com INV-01 verificado; verificar no CI com o compose `core`
+- [x] 20.2 Atualizar as sementes (`pnpm env:seed`) com usuários por cenário de KYC, universo inicial e histórico por replay; verificar a idempotência rodando duas vezes (RN-ENV-031)
 
 ## 21. Fase 2 — trading-session-service
 

@@ -1,6 +1,7 @@
-import type { Clock } from '@broker/clock';
+import { TickedClock, type Clock } from '@broker/clock';
 import { AccountOpenedV1 } from '@broker/contracts/events/account.opened/v1';
 import { AccountStatusChangedV1 } from '@broker/contracts/events/account.status_changed/v1';
+import { ClockTickedV1 } from '@broker/contracts/events/clock.ticked/v1';
 import { CustomerCreatedV1 } from '@broker/contracts/events/customer.created/v1';
 import {
   connectStream,
@@ -83,6 +84,35 @@ export async function createIdentityService(d: IdentityServiceDeps) {
       clock: d.clock,
       onError: (err) => d.logger.error({ event: 'outbox.relay_failed', err }, 'falha no relay'),
     });
+    if (d.clock instanceof TickedClock) {
+      // Relógio VIRTUAL/ACCELERATED (RN-CLK-003): emissão, expiração e janelas de sessão e MFA
+      // seguem o relógio do ambiente, que anda pelos `clock.ticked` do agendador.
+      const clock = d.clock;
+      const schedulerTopic = topicName(environment, 'scheduler');
+      await ensureSuperStream(client, schedulerTopic, { partitions: 1, maxAge: '30D' });
+      consumers.push(
+        new EventConsumer({
+          name: 'identity.scheduler',
+          environment,
+          superStream: schedulerTopic,
+          stream: d.stream,
+          db: d.db,
+          // `apply` ignora tick antigo: a ordem não importa.
+          ordered: false,
+          newId: d.newId,
+          onError: (err) =>
+            d.logger.error({ event: 'consumer.failed', err }, 'falha no consumidor'),
+          handlers: {
+            'clock.ticked': {
+              definition: ClockTickedV1,
+              handle: async (_trx, e) => {
+                clock.apply(e.payload as { virtualNow: string });
+              },
+            },
+          },
+        }),
+      );
+    }
     if (d.consumeCustomerEvents) {
       // O customer-service pode subir depois (e ele consome o nosso tópico): garante o dele.
       await ensureSuperStream(client, topicName(environment, 'customer'), { maxAge: '30D' });

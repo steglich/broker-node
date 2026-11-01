@@ -512,7 +512,8 @@ export function kycWebhook(a: App, event: string, body: object, secret = WEBHOOK
     .set({
       'content-type': 'application/json',
       'x-webhook-event': event,
-      ...signedHeaders(secret, a.clock.now().epochMillis, raw),
+      // O simulador assina com o relógio real; o receptor confere a defasagem com ele também.
+      ...signedHeaders(secret, Date.now(), raw),
     })
     .send(raw);
 }

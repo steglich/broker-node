@@ -239,6 +239,11 @@ export interface IdentityTx {
 
   client(clientId: string): Promise<ClientRow | null>;
   insertClient(c: ClientRow): Promise<void>;
+  updateClientCredentials(
+    clientId: string,
+    secretHash: string,
+    allowedScopes: string[],
+  ): Promise<void>;
 
   insertLoginTransaction(t: LoginTransactionRow): Promise<void>;
   loginTransaction(

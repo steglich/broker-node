@@ -224,10 +224,11 @@ export class PostgresMarketDataStore implements MarketDataStore, ReplaySource {
                   ${h.quoteTime.toString()}, ${quoteJson(h.quote)}, ${h.rawSha256}, ${h.disposition},
                   ${JSON.stringify(h.warnings)})`.execute(trx);
       },
+      // Leituras reais da brapi e, no ambiente local, as das fixtures (inclusive as da semente).
       replayReading: (symbol, at) =>
         one(
           sql<Row>`SELECT * FROM external_quote_history
-                   WHERE symbol = ${symbol} AND provider = 'brapi' AND disposition = 'ACCEPTED'
+                   WHERE symbol = ${symbol} AND provider IN ('brapi', 'fixture') AND disposition = 'ACCEPTED'
                      AND quote_time <= ${at.toString()}
                    ORDER BY quote_time DESC LIMIT 1`,
           (r): HistoryRow => ({

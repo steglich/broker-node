@@ -104,6 +104,29 @@ pnpm test:infra   # verificações contra o ambiente rodando: isolamento do Post
 pnpm ci:local     # o mesmo pipeline do CI, na sua máquina
 ```
 
+### Sementes e E2E da fase
+
+`pnpm env:seed` (com o perfil `core` no ar) cria, de forma idempotente: o universo negociável inicial
+(PETR4, VALE3 e ITUB4, os tickers com cotação completa nas fixtures), o histórico de preços desses
+tickers (candles diários e as leituras que o provedor `replay` reproduz) e um cliente por cenário de
+KYC, todos com a senha `Broker#Local2026`:
+
+| E-mail                               | Penúltimo dígito do CPF | Resultado                            |
+| ------------------------------------ | ----------------------- | ------------------------------------ |
+| `kyc.aprovado@exemplo.com`           | 3                       | aprovado, conta ativa e R$ 10.000,00 |
+| `kyc.revisao-face-match@exemplo.com` | 7                       | revisão manual (FACE_MATCH)          |
+| `kyc.revisao-watchlist@exemplo.com`  | 8                       | revisão manual (WATCHLIST)           |
+| `kyc.reprovado@exemplo.com`          | 9                       | reprovado                            |
+
+O E2E da fase atravessa a borda como o app web (cadastro → KYC → conta → depósito PIX → cotação
+→ saque, terminando com a reconciliação INV-01). Ele avança o relógio do ambiente (carência de 24 h
+da conta de saque, pregão), então precisa do modo `VIRTUAL`:
+
+```bash
+CLOCK_MODE=VIRTUAL pnpm env:up core
+pnpm test:e2e
+```
+
 ## 7. Dia a dia
 
 | Comando                   | O quê                                                  |

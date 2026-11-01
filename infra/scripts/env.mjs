@@ -34,6 +34,10 @@ function gitCommit() {
   }
 }
 process.env.GIT_COMMIT ??= gitCommit();
+// O relógio VIRTUAL/ACCELERATED precisa de um início (RN-CLK-002): sem CLOCK_START, o começo do dia
+// (UTC), estável entre subidas no mesmo dia para não recriar os contêineres à toa.
+if (['VIRTUAL', 'ACCELERATED'].includes(process.env.CLOCK_MODE ?? ''))
+  process.env.CLOCK_START ||= `${new Date().toISOString().slice(0, 10)}T00:00:00Z`;
 
 const compose = (args, profile = 'full') =>
   run('docker', ['compose', '-f', composeFile, ...profileArgs(profile), ...args]);
@@ -113,6 +117,9 @@ switch (command) {
       ['exec', '-T', 'postgres', 'bash', '/docker-entrypoint-initdb.d/01-services.sh'],
       profile,
     );
+    // Clientes de serviço do identity com os segredos locais (client credentials entre serviços).
+    if (profile !== 'infra')
+      compose(['exec', '-T', 'identity-service', 'node', 'dist/provision-clients.js'], profile);
     console.log(`\nambiente '${profile}' pronto.`);
     break;
   }
@@ -127,8 +134,13 @@ switch (command) {
     compose(['ps', '-a', ...rest]);
     break;
   case 'seed':
-    // Cada serviço publica sua semente idempotente num script `seed` (RN-ENV-031).
-    run('pnpm', ['-r', '--if-present', 'run', 'seed']);
+    // Sementes idempotentes (RN-ENV-031), em ordem: o universo inicial (reference-data), o histórico
+    // de preços para o replay (market-data, que conhece o universo pelo evento) e os clientes por
+    // cenário de KYC com saldo (pela borda, como o app). As dos serviços rodam no contêiner deles,
+    // com a configuração e os segredos do próprio serviço.
+    for (const service of ['reference-data-service', 'market-data-service'])
+      compose(['exec', '-T', '-e', 'LOG_LEVEL=warn', service, 'node', 'dist/seed.js'], 'core');
+    run('pnpm', ['--filter', '@broker/e2e', 'run', 'seed']);
     break;
   default:
     console.log(

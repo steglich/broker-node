@@ -221,6 +221,44 @@ export class Accounts {
     return { clientId: input.clientId, clientSecret: secret };
   }
 
+  /**
+   * Cliente de serviço com segredo conhecido (CLI de provisionamento do ambiente local, onde o
+   * segredo vem do cofre simulado): cria ou alinha segredo e escopos. Em staging/prod o cadastro é
+   * pelo backoffice (`registerServiceClient`), e o segredo nunca sai do identity.
+   */
+  async ensureServiceClient(input: {
+    clientId: string;
+    scopes: string[];
+    secret: string;
+  }): Promise<'CREATED' | 'UPDATED' | 'UNCHANGED'> {
+    const scopes = [...new Set(input.scopes)].sort();
+    const current = await this.d.store.transaction((tx) => tx.client(input.clientId));
+    if (current && current.realm !== 'services')
+      throw new IdentityError(409, 'CLIENT_EXISTS', 'O id é de um cliente que não é de serviço.');
+    if (
+      current?.secretHash &&
+      current.allowedScopes.join(' ') === scopes.join(' ') &&
+      (await this.d.hasher.verify(current.secretHash, input.secret))
+    )
+      return 'UNCHANGED';
+    const secretHash = await this.d.hasher.hash(input.secret);
+    await this.d.store.transaction(async (tx) => {
+      if (await tx.client(input.clientId))
+        await tx.updateClientCredentials(input.clientId, secretHash, scopes);
+      else
+        await tx.insertClient({
+          clientId: input.clientId,
+          realm: 'services',
+          type: 'CONFIDENTIAL',
+          channel: null,
+          secretHash,
+          redirectUris: [],
+          allowedScopes: scopes,
+        });
+    });
+    return current ? 'UPDATED' : 'CREATED';
+  }
+
   /** Primeiro administrador do backoffice (CLI de bootstrap); não faz nada se já existir um. */
   async bootstrapAdmin(email: string, fullName: string): Promise<{ link: string } | null> {
     const exists = await this.d.store.transaction(async (tx) =>

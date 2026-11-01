@@ -338,12 +338,14 @@ describe('matching-engine', () => {
     );
     // A recuperação pôs o livro ao vivo em HALTED, no journal, e avisou a sessão (RN-REC-003).
     await waitUntil(async () => (await journalCount(id)) === 4);
-    const { rows } = await sql<{ event_type: string }>`
-      SELECT event_type FROM outbox_event WHERE partition_key = ${id} ORDER BY seq`.execute(db);
-    expect(rows.map((r) => r.event_type)).toEqual([
-      'engine.book_recovering',
-      'engine.book_recovered',
-    ]);
+    // O aviso é gravado em outra transação, logo depois do journal.
+    const notices = async () => {
+      const { rows } = await sql<{ event_type: string }>`
+        SELECT event_type FROM outbox_event WHERE partition_key = ${id} ORDER BY seq`.execute(db);
+      return rows.map((r) => r.event_type);
+    };
+    await waitUntil(async () => (await notices()).length >= 2);
+    expect(await notices()).toEqual(['engine.book_recovering', 'engine.book_recovered']);
     await waitUntil(() => app.partitions().some((p) => p.engine(id)?.phase === 'HALTED'));
   });
 
